@@ -92,6 +92,7 @@ backend/
 | `AGENTS.md` | AI가 일할 때 지킬 규칙 |
 | `CLAUDE.md` | `AGENTS.md`를 불러오는 한 줄 파일 |
 | `docs/DECISIONS.md` | 팀이 확정한 결정과 그 이유 |
+| `docs/PLAN.md` | 할 일, 상태, 확인 결과, 다음 행동 |
 
 기획서와 디자인 가이드 같은 다른 문서는 `docs/` 폴더에 둡니다.
 
