@@ -13,7 +13,7 @@
   | `AGENTS.md` | 있음 |
   | `docs/DECISIONS.md` | 있음 |
   | `docs/PRD.md` | 있음 |
-  | `docs/ARCHITECTURE.md` | 없음 |
+  | `docs/ARCHITECTURE.md` | 있음 |
   | `docs/SCREEN-SPEC.md` | 없음 |
   | `docs/DATA-MODEL.md` | 없음 |
   | `docs/API-SPEC.md` | 없음 |

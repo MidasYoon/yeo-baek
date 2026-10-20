@@ -96,6 +96,7 @@ backend/
 | `docs/DECISIONS.md` | 팀이 확정한 결정과 그 이유 |
 | `docs/PLAN.md` | 할 일, 상태, 확인 결과, 다음 행동 |
 | `docs/PRD.md` | 무엇을 만들지 (기능별 요구사항) |
+| `docs/ARCHITECTURE.md` | 어떤 구조로 만들지 (부품과 책임) |
 
 기획서와 디자인 가이드 같은 다른 문서는 `docs/` 폴더에 둡니다.
 
