@@ -14,7 +14,7 @@
   | `docs/DECISIONS.md` | 있음 |
   | `docs/PRD.md` | 있음 |
   | `docs/ARCHITECTURE.md` | 있음 |
-  | `docs/SCREEN-SPEC.md` | 없음 |
+  | `docs/SCREEN-SPEC.md` | 있음 |
   | `docs/DATA-MODEL.md` | 없음 |
   | `docs/API-SPEC.md` | 없음 |
   | `docs/TEST-PLAN.md` | 없음 |
@@ -30,7 +30,7 @@
 | P-03 | DECISIONS D-001~D-007 기록 | `docs/DECISIONS.md`를 열면 D-001~D-007의 결정, 상태, 날짜가 보인다 | 완료 |
 | P-04 | PRD 작성 | `docs/PRD.md`를 열면 여행기록, 여행지 정보, 여행 다이어리, Home 절이 있다. "만들지 않는 것" 목록이 README와 같다 | 완료 |
 | P-05 | ARCHITECTURE 작성 | `docs/ARCHITECTURE.md`를 열면 폴더 구조, 공통 파일과 담당자, 화면과 서버의 연결 방식이 보인다. 정하지 않은 항목은 "미정"으로 표시돼 있다 | 완료 |
-| P-06 | SCREEN-SPEC 작성 | `docs/SCREEN-SPEC.md`를 열면 담당자별 절(여행기록, 여행지 정보, 다이어리, Home, 공통 레이아웃)마다 보이는 것, 할 수 있는 행동, 빈 상태·로딩·오류 표시가 있다 | 예정 |
+| P-06 | SCREEN-SPEC 작성 | `docs/SCREEN-SPEC.md`를 열면 담당자별 절(여행기록, 여행지 정보, 다이어리, Home, 공통 레이아웃)마다 보이는 것, 할 수 있는 행동, 빈 상태·로딩·오류 표시가 있다 | 진행 중 |
 | P-07 | DATA-MODEL 작성 | `docs/DATA-MODEL.md`를 열면 `trips`, `places`, `diaries`의 필드 이름과 뜻이 보인다. `places`와 `diaries`에 `trip_id`가 있다 | 예정 |
 | P-08 | API-SPEC 작성 | `docs/API-SPEC.md`를 열면 기능별 주소, 메서드, 요청·응답 모양이 보인다. Home이 쓰는 API가 표시돼 있다 | 예정 |
 | P-09 | TEST-PLAN 작성 | `docs/TEST-PLAN.md`를 열면 기능별 검사 항목과 기대 결과가 있다. 기능 사이 연결·회귀 검사를 다루는 공통 절이 있다 | 예정 |
@@ -56,7 +56,6 @@
 - 버전, 설치·실행 명령
 - 지도 화면 방식과 핀 위치 저장 방법 — 보류 중
 - 반응형 구조 — `docs/SCREEN-SPEC.md`가 생기면 그쪽 열린 질문으로 옮긴다 (D-012)
-- "새 여행 만들기" 버튼이 갈 여행 추가 화면의 주소 — `docs/SCREEN-SPEC.md`가 생기면 그쪽에서 정한다, 서준 (PRD H-04)
 - `trips` 테이블 구조와 `/api/trips` 응답 모양 — P-07, P-08 단계에서 결정
 - 여행을 지울 때 연결된 장소·일기도 함께 지울지 — 방향은 "막기"로 맞춤 (PRD 공통 #1). P-07에서 확정
 - 입력 검증 규칙 (빈 값 허용 여부, 종료일이 시작일보다 빠를 때) — PRD에 초안 있음, 팀 확인 후 DECISIONS에 기록
@@ -74,4 +73,4 @@
 
 **다음 행동**
 
-- P-06: `docs/SCREEN-SPEC.md`를 담당자별 절로 쓴다 (D-007). ARCHITECTURE에서 넘긴 "새 여행 만들기" 버튼 주소(서준)와 반응형 구조(건용)를 정한다.
+- P-06: `docs/SCREEN-SPEC.md`를 담당자별 절로 쓴다 (D-007). ARCHITECTURE에서 넘긴 반응형 구조(건용)를 정한다. "새 여행 만들기" 버튼 주소는 `/trip/new`로 정했다 (SCREEN-SPEC 3절).
