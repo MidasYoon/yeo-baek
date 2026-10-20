@@ -74,4 +74,4 @@
 
 **다음 행동**
 
-- P-05: `docs/ARCHITECTURE.md` 초안을 쓴다 (D-007)
+- P-06: `docs/SCREEN-SPEC.md`를 담당자별 절로 쓴다 (D-007). ARCHITECTURE에서 넘긴 "새 여행 만들기" 버튼 주소(서준)와 반응형 구조(건용)를 정한다.
