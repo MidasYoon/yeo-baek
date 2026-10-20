@@ -28,7 +28,7 @@
 | P-01 | README 작성 | `README.md`를 열면 프로젝트 소개, 현재 상태, 주요 기능, 만들지 않는 것, 팀, 실행 방법(제안)이 보인다 | 완료 |
 | P-02 | AGENTS 작성 | 새 대화에서 AI가 `AGENTS.md` 규칙을 설명하고, 없는 파일은 없다고 말한다 | 완료 |
 | P-03 | DECISIONS D-001 기록 | `docs/DECISIONS.md`를 열면 D-001의 결정, 상태, 날짜가 보인다 | 완료 |
-| P-04 | PRD 작성 | `docs/PRD.md`를 열면 여행기록, 여행지 정보, 여행 다이어리, Home 절이 있다. "만들지 않는 것" 목록이 README와 같다 | 예정 |
+| P-04 | PRD 작성 | `docs/PRD.md`를 열면 여행기록, 여행지 정보, 여행 다이어리, Home 절이 있다. "만들지 않는 것" 목록이 README와 같다 | 진행 중 |
 | P-05 | ARCHITECTURE 작성 | `docs/ARCHITECTURE.md`를 열면 폴더 구조, 공통 파일과 담당자, 화면과 서버의 연결 방식이 보인다. 정하지 않은 항목은 "미정"으로 표시돼 있다 | 예정 |
 | P-06 | SCREEN-SPEC 작성 | `docs/SCREEN-SPEC.md`를 열면 담당자별 절(여행기록, 여행지 정보, 다이어리, Home, 공통 레이아웃)마다 보이는 것, 할 수 있는 행동, 빈 상태·로딩·오류 표시가 있다 | 예정 |
 | P-07 | DATA-MODEL 작성 | `docs/DATA-MODEL.md`를 열면 `trips`, `places`, `diaries`의 필드 이름과 뜻이 보인다. `places`와 `diaries`에 `trip_id`가 있다 | 예정 |
