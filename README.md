@@ -34,6 +34,7 @@
 | 건용 | 여행 다이어리 |
 
 - 공통 파일(라우터 등록, 화면 레이아웃, DB 설정) 관리자: 건용
+- 공통 스타일 파일(`tokens.css`, `global.css`)과 `vite.config.js`: 팀 공동 관리, 합의 후 수정 (D-010)
 - 첫 화면(Home) 담당: 은희
 
 ## 기술 스택
@@ -41,11 +42,12 @@
 | 영역 | 사용 | 상태 |
 | --- | --- | --- |
 | 프론트엔드 | React | 확정 |
-| 빌드 도구 | Vite | 제안 (미정) |
-| 스타일 | CSS Module + 공통 토큰 파일 | 제안 (미정) |
+| 빌드 도구 | Vite | 확정 (D-008) |
+| 스타일 | CSS Module + 공통 토큰 파일 | 확정 (D-008) |
+| 화면 주소 | React Router | 확정 (D-012) |
 | 백엔드 | FastAPI (Python 3.10+) | 확정 |
 | DB | SQLite | 확정 |
-| DB 접근 방식 | `sqlite3` 또는 SQLAlchemy | 미정 |
+| DB 접근 방식 | `sqlite3` | 확정 (D-009) |
 
 React · FastAPI · SQLite 외의 프레임워크·DB는 쓰지 않습니다.
 
@@ -61,10 +63,11 @@ yeo-back/
 └── CLAUDE.md   # Claude Code가 AGENTS.md를 자동으로 읽게 하는 파일
 ```
 
-`frontend/`, `backend/` 안쪽 구조는 아래와 같이 **제안**합니다. 뼈대를 만든 뒤 실제 구조로 고쳐 주세요.
+`frontend/`, `backend/` 안쪽 구조는 아래와 같습니다 (D-010).
 
 ```text
 frontend/
+├─ vite.config.js     프록시 설정 (팀 공동)
 └─ src/
    ├─ api/            trips.js · places.js · diaries.js   ← 서버 호출은 여기서만
    ├─ pages/
@@ -73,7 +76,8 @@ frontend/
    │  ├─ Places/      은희
    │  └─ Diary/       건용
    ├─ components/     공통 컴포넌트
-   └─ styles/         tokens.css · global.css (공통 파일)
+   │  └─ Layout/      공통 레이아웃, 네비 포함 (공통 파일)
+   └─ styles/         tokens.css · global.css (팀 공동)
 backend/
 ├─ main.py            앱 생성, 라우터 등록 (공통 파일)
 ├─ database.py        SQLite 연결 (공통 파일)
@@ -143,7 +147,7 @@ npm install
 | `backend/` (venv 켠 상태) | `uvicorn main:app --reload --port 8000` | http://localhost:8000/docs |
 | `frontend/` | `npm run dev` | http://localhost:5173 |
 
-- 포트는 백엔드 8000(FastAPI 기본값), 프론트엔드 5173(Vite 기본값)으로 확정했습니다. 빌드 도구는 아직 미정입니다.
+- 포트는 백엔드 8000(FastAPI 기본값), 프론트엔드 5173(Vite 기본값)으로 확정했습니다.
 - DB 파일(`*.db`)은 Git에 올리지 않습니다. 데이터를 초기화하려면 서버를 끄고 지운 뒤 다시 켜면 됩니다.
 
 ## 확인과 기록
