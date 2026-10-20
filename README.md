@@ -34,7 +34,7 @@
 | 건용 | 여행 다이어리 |
 
 - 공통 파일(라우터 등록, 화면 레이아웃, DB 설정) 관리자: 건용
-- 공통 스타일 파일(`tokens.css`, `global.css`)과 `vite.config.js`: 팀 공동 관리, 합의 후 수정 (D-010)
+- 공통 스타일 파일(`tokens.css`, `global.css`), `vite.config.js`, `App.jsx`: 팀 공동 관리, 합의 후 수정 (D-010, D-013)
 - 첫 화면(Home) 담당: 은희
 
 ## 기술 스택
@@ -63,12 +63,13 @@ yeo-back/
 └── CLAUDE.md   # Claude Code가 AGENTS.md를 자동으로 읽게 하는 파일
 ```
 
-`frontend/`, `backend/` 안쪽 구조는 아래와 같습니다 (D-010).
+`frontend/`, `backend/` 안쪽 구조는 아래와 같습니다 (D-010, D-013).
 
 ```text
 frontend/
 ├─ vite.config.js     프록시 설정 (팀 공동)
 └─ src/
+   ├─ App.jsx         화면 주소 등록 (팀 공동)
    ├─ api/            trips.js · places.js · diaries.js   ← 서버 호출은 여기서만
    ├─ pages/
    │  ├─ Home/        은희

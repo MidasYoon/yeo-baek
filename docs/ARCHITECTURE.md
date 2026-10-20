@@ -53,12 +53,13 @@ yeo-back/
 └── docs/       # 프로젝트 문서
 ```
 
-`frontend/`, `backend/` 안쪽 구조는 아래와 같다 (D-010).
+`frontend/`, `backend/` 안쪽 구조는 아래와 같다 (D-010, D-013).
 
 ```text
 frontend/
 ├─ vite.config.js     프록시 설정 (팀 공동)
 └─ src/
+   ├─ App.jsx         화면 주소 등록 (팀 공동)
    ├─ api/            trips.js · places.js · diaries.js   ← 서버 호출은 여기서만
    ├─ pages/
    │  ├─ Home/        은희
@@ -78,7 +79,6 @@ backend/
 └─ requirements.txt
 ```
 
-- 위에 없는 파일(예: 화면 주소를 등록하는 파일)의 위치는 미정이다. 7절 참고.
 - 변수·함수 이름 같은 일반 이름 규칙은 미정이다 (AGENTS).
 
 ## 4. 공통 파일과 담당자
@@ -90,6 +90,7 @@ backend/
 | 화면 레이아웃 (네비 포함) | `frontend/src/components/Layout/` | 건용 | D-004, D-010 |
 | 공통 스타일 | `frontend/src/styles/tokens.css`, `global.css` | 팀 공동 (합의 후 수정) | D-010 |
 | 프록시 설정 | `frontend/vite.config.js` | 팀 공동 (합의 후 수정) | D-010, D-011 |
+| 화면 주소 등록 | `frontend/src/App.jsx` | 팀 공동 (합의 후 수정) | D-013 |
 | 첫 화면 Home (`/`) | `frontend/src/pages/Home/` | 은희 | D-004 |
 | 여행기록 화면·API 호출·라우터 | `pages/Trips/`, `api/trips.js`, `routers/trips.py` | 서준 | AGENTS 역할 분담 |
 | 여행지 정보 화면·API 호출·라우터 | `pages/Places/`, `api/places.js`, `routers/places.py` | 은희 | AGENTS 역할 분담 |
@@ -118,19 +119,16 @@ Home은 세 기능의 API를 가져다 쓰기만 한다 (PRD 5절 Home "5. 다�
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
 | 화면 주소를 나누는 방법 | React Router | 확정 (D-012). 새 라이브러리라 설치 전에 승인 필요 |
+| 화면 주소를 등록하는 파일 | `frontend/src/App.jsx` (팀 공동) | 확정 (D-013) |
 | Home | `/` | 확정 (README, PRD, D-012) |
 | 여행기록 | `/trip` | 확정 (D-012) |
 | 여행지 정보 | `/place` | 확정 (D-012) |
 | 여행 다이어리 | `/diary` | 확정 (D-012) |
 | 각 화면 안쪽 주소 (여행 상세·추가 등) | 그 기능의 담당자가 정한다 | 미정 (D-012) |
 | 네비 메뉴 | trip · place · diary 3개 (PRD L-07) | 확정 (D-012) |
-| 반응형 구조 | 화면 폭에 따라 어떻게 보이는지는 `docs/SCREEN-SPEC.md`에서 정한다 | 미정 |
-| "새 여행 만들기" 버튼이 가는 곳 | 여행 추가 화면. 저장은 그 화면에서 서버를 부른다. 화면 주소가 정해지기 전에는 trip 메뉴(`/trip`)로 보낸다 (PRD H-04) | 미정 (서준) |
+| 반응형 구조 | 화면 폭에 따라 어떻게 보이는지 | 미정 (`docs/SCREEN-SPEC.md`에서 정함) |
+| "새 여행 만들기" 버튼이 가는 곳 | 여행 추가 화면. 저장은 그 화면에서 서버를 부른다. 화면 주소가 정해지기 전에는 trip 메뉴(`/trip`)로 보낸다 (PRD H-04) | 미정 (`docs/SCREEN-SPEC.md`에서 정함, 서준) |
 
 ## 7. 열린 질문
 
-| 질문 | 관련 | 함께 볼 사람 |
-| --- | --- | --- |
-| "새 여행 만들기" 버튼이 갈 여행 추가 화면의 주소 | 6절, PRD H-04 | 서준 |
-| 반응형 구조 (`docs/SCREEN-SPEC.md`로 넘김) | 6절, PRD L-07 | 건용 |
-| 화면 주소를 등록하는 파일의 위치와 담당 (AGENTS의 "라우터 등록"이 프론트엔드도 가리키는지) | 3절, 4절 | 건용·전원 |
+지금은 없다. "새 여행 만들기" 버튼이 갈 화면 주소와 반응형 구조는 `docs/SCREEN-SPEC.md`에서 정한다 (6절).
