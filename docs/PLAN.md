@@ -3,8 +3,9 @@
 ## 이번 목표와 범위
 
 - **목표:** 무엇을, 어떻게 만들지 문서로 정한다.
-- **범위 안:** 설계 문서 작성 (PRD, ARCHITECTURE, SCREEN-SPEC, DATA-MODEL, API-SPEC, TEST-PLAN)
-- **범위 밖:** 코드 작성, 패키지·도구 설치, `docs/DESIGN.md` (이번 MVP에서 만들지 않음)
+- **범위 안:** 설계 문서 작성 (PRD, ARCHITECTURE, SCREEN-SPEC, DATA-MODEL, API-SPEC, TEST-PLAN, DESIGN)
+- **범위 밖:** 코드 작성, 패키지·도구 설치
+- `docs/DESIGN.md`는 처음에 범위 밖이었으나 D-023으로 범위 안에 넣었다.
 - **참고 문서**
 
   | 문서 | 상태 |
@@ -18,6 +19,7 @@
   | `docs/DATA-MODEL.md` | 있음 |
   | `docs/API-SPEC.md` | 있음 |
   | `docs/TEST-PLAN.md` | 있음 |
+  | `docs/DESIGN.md` | 있음 |
 
 - 문서를 누가 어떻게 나눠 쓰는지는 `docs/DECISIONS.md`의 D-007을 따른다.
 
@@ -34,6 +36,7 @@
 | P-07 | DATA-MODEL 작성 | `docs/DATA-MODEL.md`를 열면 `trips`, `places`, `diaries`의 필드 이름과 뜻이 보인다. `places`와 `diaries`에 `trip_id`가 있다 | 완료 |
 | P-08 | API-SPEC 작성 | `docs/API-SPEC.md`를 열면 기능별 주소, 메서드, 요청·응답 모양이 보인다. Home이 쓰는 API가 표시돼 있다 | 완료 |
 | P-09 | TEST-PLAN 작성 | `docs/TEST-PLAN.md`를 열면 기능별 검사 항목과 기대 결과가 있다. 기능 사이 연결·회귀 검사를 다루는 공통 절이 있다 | 완료 |
+| P-10 | DESIGN 작성 | `docs/DESIGN.md`를 열면 색, 글자, 여백·모양, 반응형, 공통 부품 모양, 한국풍 장식 규칙, 접근성이 보인다. 색 값이 "한지 노을" 시안과 같다. 시안에 없는 내용은 "제안"으로 표시돼 있다 | 확인 대기 |
 
 ## 실제 검증 결과
 
@@ -79,3 +82,5 @@
 **다음 행동**
 
 - 설계 문서 작성(P-01~P-09)을 마쳤다. 다음 목표와 범위(예: 코드 뼈대 만들기)는 팀이 정해 이 PLAN을 고친다.
+- P-10: 사람이 `docs/DESIGN.md`를 열어 확인하고 "실제 검증 결과"에 적는다. DESIGN.md 11절 열린 질문(Home 문구·그림, 여행지 정보 2단 배치)은 은희가 SCREEN-SPEC에서 정한다.
+- 시안 캔버스 링크는 비공개다. 팀원이 보려면 만든 사람이 공유해야 한다.
