@@ -15,7 +15,7 @@
   | `docs/PRD.md` | 있음 |
   | `docs/ARCHITECTURE.md` | 있음 |
   | `docs/SCREEN-SPEC.md` | 있음 |
-  | `docs/DATA-MODEL.md` | 없음 |
+  | `docs/DATA-MODEL.md` | 있음 |
   | `docs/API-SPEC.md` | 없음 |
   | `docs/TEST-PLAN.md` | 없음 |
 
@@ -31,7 +31,7 @@
 | P-04 | PRD 작성 | `docs/PRD.md`를 열면 여행기록, 여행지 정보, 여행 다이어리, Home 절이 있다. "만들지 않는 것" 목록이 README와 같다 | 완료 |
 | P-05 | ARCHITECTURE 작성 | `docs/ARCHITECTURE.md`를 열면 폴더 구조, 공통 파일과 담당자, 화면과 서버의 연결 방식이 보인다. 정하지 않은 항목은 "미정"으로 표시돼 있다 | 완료 |
 | P-06 | SCREEN-SPEC 작성 | `docs/SCREEN-SPEC.md`를 열면 담당자별 절(여행기록, 여행지 정보, 다이어리, Home, 공통 레이아웃)마다 보이는 것, 할 수 있는 행동, 빈 상태·로딩·오류 표시가 있다 | 완료 |
-| P-07 | DATA-MODEL 작성 | `docs/DATA-MODEL.md`를 열면 `trips`, `places`, `diaries`의 필드 이름과 뜻이 보인다. `places`와 `diaries`에 `trip_id`가 있다 | 예정 |
+| P-07 | DATA-MODEL 작성 | `docs/DATA-MODEL.md`를 열면 `trips`, `places`, `diaries`의 필드 이름과 뜻이 보인다. `places`와 `diaries`에 `trip_id`가 있다 | 완료 |
 | P-08 | API-SPEC 작성 | `docs/API-SPEC.md`를 열면 기능별 주소, 메서드, 요청·응답 모양이 보인다. Home이 쓰는 API가 표시돼 있다 | 예정 |
 | P-09 | TEST-PLAN 작성 | `docs/TEST-PLAN.md`를 열면 기능별 검사 항목과 기대 결과가 있다. 기능 사이 연결·회귀 검사를 다루는 공통 절이 있다 | 예정 |
 
@@ -47,17 +47,17 @@
 | P-04 | `docs/PRD.md` 파일을 열어 절과 "만들지 않는 것" 목록을 확인함 | 확인함 |
 | P-05 | `docs/ARCHITECTURE.md`와 함께 고친 `docs/DECISIONS.md`·`AGENTS.md`·`README.md`·`docs/PLAN.md`를 열어 확인함 | 확인함 |
 | P-06 | `docs/SCREEN-SPEC.md`와 함께 고친 `docs/PRD.md`·`docs/ARCHITECTURE.md`·`docs/DECISIONS.md`를 열어 담당자별 절과 빈 상태·로딩·오류 표시를 확인함 | 확인함 |
+| P-07 | `docs/DATA-MODEL.md`와 함께 고친 `docs/DECISIONS.md`(D-015~D-017)·`docs/PRD.md`·`docs/PLAN.md`·`README.md`·`docs/ARCHITECTURE.md`를 열어 확인함 | 확인함 |
 
 ## 남은 문제와 다음 행동
 
 **아직 정하지 않은 것** (정하면 `docs/DECISIONS.md`에 기록)
 
-- 이름 규칙
+- 이름 규칙 (DB 필드는 snake_case로 정함, D-016. 코드 이름 규칙은 미정)
 - 브랜치 이름 규칙
 - 버전, 설치·실행 명령
 - 지도 화면 방식과 핀 위치 저장 방법 — 보류 중
-- `trips` 테이블 구조와 `/api/trips` 응답 모양 — P-07, P-08 단계에서 결정
-- 여행을 지울 때 연결된 장소·일기도 함께 지울지 — 방향은 "막기"로 맞춤 (PRD 공통 #1). P-07에서 확정
+- `/api/trips` 응답 모양 — P-08에서 결정
 - 입력 검증 규칙 (빈 값 허용 여부, 종료일이 시작일보다 빠를 때) — PRD에 초안 있음, 팀 확인 후 DECISIONS에 기록
 - 다이어리 기분 목록 — PRD에 초안 있음, 팀 확인 후 DECISIONS에 기록
 - 여행기록의 "여행 정보"에 무엇을 적을지 — PRD에 초안 있음, 팀 확인 후 DECISIONS에 기록
@@ -69,8 +69,10 @@
 - `docs/PRD.md` "절 사이 맞춤" 10가지를 담당자가 확인한 뒤 `docs/DECISIONS.md`에 기록한다.
 - ARCHITECTURE를 "다 같이 쓴다"는 것이 D-007의 "`ARCHITECTURE` 초안은 건용이 쓴다"와 다르다. 팀이 정하면 DECISIONS에 새 번호로 기록한다.
 - `README.md` 폴더 구조 아래의 "공통 파일을 고칠 때는 팀에 먼저 알립니다"가 팀 공동 파일의 "합의 후 수정"(D-010)과 다르다.
+- `docs/TEST-PLAN.md`(P-09)에 "고친 뒤 `updated_at`이 바뀌는지" 검사를 넣는다 (D-017).
+- `docs/SCREEN-SPEC.md` 5절 6번의 시각 저장 형식 줄에 남은 "(AI 제안)" 표시를 정리한다 (D-016으로 확정).
 - 원본 PRD 파일(`PRD_1.md`, `PRD_3.md`, `check.md`, `prd2_1.md`, `prd2_2.md`)을 정리할지 정한다.
 
 **다음 행동**
 
-- P-07: `docs/DATA-MODEL.md`를 쓴다. `docs/SCREEN-SPEC.md` 각 절 "6. 다른 문서로 넘길 것"의 `DATA-MODEL` 항목을 반영한다.
+- P-08: `docs/API-SPEC.md`를 쓴다. `docs/PRD.md`·`docs/SCREEN-SPEC.md`·`docs/DATA-MODEL.md` 각 절 "다른 문서로 넘길 것"의 `API-SPEC` 항목을 반영한다.

@@ -9,6 +9,7 @@
 - 제품 요구 문서(`docs/PRD.md`)를 작성했습니다.
 - 구조 문서(`docs/ARCHITECTURE.md`)를 작성했습니다.
 - 화면 명세(`docs/SCREEN-SPEC.md`)를 작성했습니다.
+- 데이터 모델(`docs/DATA-MODEL.md`)을 작성했습니다.
 - 앱 안에는 AI 기능을 넣지 않습니다.
 
 ## 주요 기능
@@ -104,6 +105,7 @@ backend/
 | `docs/PRD.md` | 무엇을 만들지 (기능별 요구사항) |
 | `docs/ARCHITECTURE.md` | 어떤 구조로 만들지 (부품과 책임) |
 | `docs/SCREEN-SPEC.md` | 화면에서 보이는 것과 할 수 있는 행동 (담당자별 절) |
+| `docs/DATA-MODEL.md` | 저장할 정보의 이름과 뜻 (테이블별 절) |
 
 기획서와 디자인 가이드 같은 다른 문서는 `docs/` 폴더에 둡니다.
 
