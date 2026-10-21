@@ -109,10 +109,10 @@ backend/
 | 백엔드 라우터 | `trips` / `places` / `diaries` 기능별 파일 | 확정 (AGENTS) |
 | 데이터 연결 | `places`와 `diaries`는 `trip_id`로 `trips`에 연결 | 확정 (AGENTS) |
 | 날짜 형식 | `YYYY-MM-DD` | 확정 (AGENTS) |
-| API 주소, 메서드, 요청·응답 모양 | `docs/API-SPEC.md`에서 정한다 | 미정 |
+| API 주소, 메서드, 요청·응답 모양 | `docs/API-SPEC.md`에 정함 | 정함 (D-018~D-020) |
 | 테이블 구조 | `docs/DATA-MODEL.md`에 정함 | 확정 (D-015~D-017) |
 
-Home은 세 기능의 API를 가져다 쓰기만 한다 (PRD 5절 Home "5. 다른 기능과의 연결"). 어떤 API를 쓰는지는 `docs/API-SPEC.md`에 적는다.
+Home은 세 기능의 API를 가져다 쓰기만 한다 (PRD 5절 Home "5. 다른 기능과의 연결"). 어떤 API를 쓰는지는 `docs/API-SPEC.md` 5절에 적었다.
 
 ## 6. 화면 주소와 공통 레이아웃
 
