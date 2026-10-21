@@ -11,6 +11,7 @@
 - 화면 명세(`docs/SCREEN-SPEC.md`)를 작성했습니다.
 - 데이터 모델(`docs/DATA-MODEL.md`)을 작성했습니다.
 - API 명세(`docs/API-SPEC.md`)를 작성했습니다.
+- 시험 계획(`docs/TEST-PLAN.md`)을 작성했습니다.
 - 앱 안에는 AI 기능을 넣지 않습니다.
 
 ## 주요 기능
@@ -108,6 +109,7 @@ backend/
 | `docs/SCREEN-SPEC.md` | 화면에서 보이는 것과 할 수 있는 행동 (담당자별 절) |
 | `docs/DATA-MODEL.md` | 저장할 정보의 이름과 뜻 (테이블별 절) |
 | `docs/API-SPEC.md` | 화면과 서버가 주고받는 약속 (기능별 절) |
+| `docs/TEST-PLAN.md` | 무엇을 보면 통과인지 (검사 항목과 기대 결과, 기능별 절) |
 
 기획서와 디자인 가이드 같은 다른 문서는 `docs/` 폴더에 둡니다.
 
