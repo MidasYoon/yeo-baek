@@ -30,7 +30,7 @@
 | P-03 | DECISIONS D-001~D-007 기록 | `docs/DECISIONS.md`를 열면 D-001~D-007의 결정, 상태, 날짜가 보인다 | 완료 |
 | P-04 | PRD 작성 | `docs/PRD.md`를 열면 여행기록, 여행지 정보, 여행 다이어리, Home 절이 있다. "만들지 않는 것" 목록이 README와 같다 | 완료 |
 | P-05 | ARCHITECTURE 작성 | `docs/ARCHITECTURE.md`를 열면 폴더 구조, 공통 파일과 담당자, 화면과 서버의 연결 방식이 보인다. 정하지 않은 항목은 "미정"으로 표시돼 있다 | 완료 |
-| P-06 | SCREEN-SPEC 작성 | `docs/SCREEN-SPEC.md`를 열면 담당자별 절(여행기록, 여행지 정보, 다이어리, Home, 공통 레이아웃)마다 보이는 것, 할 수 있는 행동, 빈 상태·로딩·오류 표시가 있다 | 진행 중 |
+| P-06 | SCREEN-SPEC 작성 | `docs/SCREEN-SPEC.md`를 열면 담당자별 절(여행기록, 여행지 정보, 다이어리, Home, 공통 레이아웃)마다 보이는 것, 할 수 있는 행동, 빈 상태·로딩·오류 표시가 있다 | 완료 |
 | P-07 | DATA-MODEL 작성 | `docs/DATA-MODEL.md`를 열면 `trips`, `places`, `diaries`의 필드 이름과 뜻이 보인다. `places`와 `diaries`에 `trip_id`가 있다 | 예정 |
 | P-08 | API-SPEC 작성 | `docs/API-SPEC.md`를 열면 기능별 주소, 메서드, 요청·응답 모양이 보인다. Home이 쓰는 API가 표시돼 있다 | 예정 |
 | P-09 | TEST-PLAN 작성 | `docs/TEST-PLAN.md`를 열면 기능별 검사 항목과 기대 결과가 있다. 기능 사이 연결·회귀 검사를 다루는 공통 절이 있다 | 예정 |
@@ -46,6 +46,7 @@
 | P-03 | `docs/DECISIONS.md` 파일을 열어 D-001~D-007 내용을 확인함 | 확인함 (D-006의 은희 확인은 미확인) |
 | P-04 | `docs/PRD.md` 파일을 열어 절과 "만들지 않는 것" 목록을 확인함 | 확인함 |
 | P-05 | `docs/ARCHITECTURE.md`와 함께 고친 `docs/DECISIONS.md`·`AGENTS.md`·`README.md`·`docs/PLAN.md`를 열어 확인함 | 확인함 |
+| P-06 | `docs/SCREEN-SPEC.md`와 함께 고친 `docs/PRD.md`·`docs/ARCHITECTURE.md`·`docs/DECISIONS.md`를 열어 담당자별 절과 빈 상태·로딩·오류 표시를 확인함 | 확인함 |
 
 ## 남은 문제와 다음 행동
 
@@ -72,4 +73,4 @@
 
 **다음 행동**
 
-- P-06: `docs/SCREEN-SPEC.md`를 담당자별 절로 쓴다 (D-007). ARCHITECTURE에서 넘긴 "새 여행 만들기" 버튼 주소는 `/trip/new`(SCREEN-SPEC 3절), 반응형 구조는 768px 하나(SCREEN-SPEC 2절)로 정했다.
+- P-07: `docs/DATA-MODEL.md`를 쓴다. `docs/SCREEN-SPEC.md` 각 절 "6. 다른 문서로 넘길 것"의 `DATA-MODEL` 항목을 반영한다.
