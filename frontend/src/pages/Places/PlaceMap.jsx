@@ -2,7 +2,9 @@ import mapSvg from '../../assets/Map_of_South_Korea-blank.svg?raw'
 import { MAP_VIEW_BOX, PIN_POSITIONS, REGIONS } from './regions.js'
 import styles from './PlaceMap.module.css'
 
-// 지도와 핀 (담당: 은희). SCREEN-SPEC 4절 2·3번, DESIGN 6절 "지도", 7절 "마름모".
+// 지도와 깃발 핀 (담당: 은희). SCREEN-SPEC 4절 2·3번, DESIGN 6절 "지도".
+// 시·도 색은 그림 안의 id(seoul, gangwon …)로 CSS에서 칠한다. 그림 파일은 고치지 않는다 (D-030).
+// 깃대 아래 끝(그림 좌표 8, 46)이 그 시·도의 핀 위치를 가리킨다.
 // 지도 API를 쓰지 않고 그림 한 장 위에 핀을 올린다 (README "만들지 않는 것", D-028).
 // places: 고른 여행의 장소 목록. selectedRegion: 눌린 핀의 시·도 (없으면 null).
 // onSelect(region): 핀을 누르면 그 시·도를 넘긴다.
@@ -41,10 +43,14 @@ export default function PlaceMap({ places, selectedRegion, onSelect }) {
             aria-pressed={selected}
             onClick={() => onSelect(region)}
           >
-            <span className={styles.diamond} aria-hidden="true" />
-            <span className={styles.count} aria-hidden="true">
-              {counts[region]}
-            </span>
+            <svg className={styles.flag} viewBox="0 0 40 48" aria-hidden="true">
+              <ellipse className={styles.flagShadow} cx="8" cy="46" rx="5" ry="1.6" />
+              <path className={styles.flagPole} d="M8 46V3" />
+              <path className={styles.flagBanner} d="M8 4H36L30.5 13L36 22H8Z" />
+              <text className={styles.flagCount} x="19.5" y="18.5" textAnchor="middle">
+                {counts[region]}
+              </text>
+            </svg>
           </button>
         )
       })}

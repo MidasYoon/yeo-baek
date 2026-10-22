@@ -10,7 +10,7 @@
 /* PC(768px 이상): 왼쪽 지도, 오른쪽 장소 목록. 지도는 목록을 내려도 화면에 붙어 있다. */
 .layout {
   display: grid;
-  grid-template-columns: minmax(280px, 400px) 1fr;
+  grid-template-columns: minmax(187px, 267px) 1fr; /* 지도 폭 2/3 (2026-10-22) */
   align-items: start;
   gap: var(--space-32);
 }
@@ -53,5 +53,11 @@
 
   .mapColumn {
     position: static;
+  }
+
+  /* 모바일에서도 화면 폭의 2/3, 가운데 */
+  .mapColumn > * {
+    width: 66.667%;
+    margin: 0 auto;
   }
 }

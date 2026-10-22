@@ -1,15 +1,11 @@
-/* 지도: DESIGN 6절 "지도" (쪽빛 바탕, 문살 격자, 짙은 한지 땅, 경계 #C9B79E), 7절, 8절 */
+/* 지도: DESIGN 6절 "지도" — 옛 지도 풍. 테두리 없이 바다는 화면 바탕과 같은 색,
+   시·도마다 다른 담채 색, 가는 먹 경계와 해안선. 사람이 준 참고 그림(2026-10-22)을 따른다. 8절 */
 .map {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 267px; /* 2026-10-22 400px의 2/3로 줄임 */
   overflow: hidden;
-  border-radius: var(--radius);
-  background-color: var(--color-indigo);
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-  background-size: 36px 36px;
+  background: var(--color-bg); /* 바다 = 화면 바탕 (2026-10-22 사람이 정함) */
 }
 
 .land,
@@ -19,60 +15,132 @@
   height: 100%;
 }
 
-/* 그림 안의 회색 채움·흰 경계를 DESIGN 색으로 덮는다 (원본 파일은 그대로 둔다). */
-.land :global(svg) :global(polyline),
-.land :global(svg) :global(path) {
-  fill: var(--color-surface-sunken) !important;
-  stroke: #c9b79e !important; /* DESIGN 6절 지도 경계 색 (토큰 없음) */
-  stroke-width: 1.5px !important;
+/* 땅 바깥으로만 1px 그림자를 네 방향에 겹쳐 먹 해안선을 그린다 (안쪽 경계는 땅이 덮는다). */
+.land :global(svg) {
+  filter:
+    drop-shadow(1px 0 0 #3a2e24)
+    drop-shadow(-1px 0 0 #3a2e24)
+    drop-shadow(0 1px 0 #3a2e24)
+    drop-shadow(0 -1px 0 #3a2e24);
 }
 
-/* 누르는 곳은 44px (DESIGN 8절). 마름모는 그 안에 그린다. */
+/* 그림 안의 회색 채움·흰 경계를 덮는다 (원본 파일은 그대로 둔다). 시·도 색은 아래 표 */
+.land :global(svg) :global(polyline),
+.land :global(svg) :global(path) {
+  fill: #e8dcb8 !important;
+  stroke: #3a2e24 !important;
+  stroke-opacity: 0.75;
+  stroke-width: 1.5px !important;
+  stroke-linejoin: round;
+}
+
+/* 시·도마다 다른 담채 색 (참고 그림을 따름. 토큰 없음). 서울·인천은 경기, 대전은 충남과 같은 색 */
+.land :global(#gyeonggi),
+.land :global(#seoul),
+.land :global(#incheon) {
+  fill: #ecd36f !important;
+}
+.land :global(#gangwon) {
+  fill: #dca85e !important;
+}
+.land :global(#chungbuk) {
+  fill: #86b672 !important;
+}
+.land :global(#chungnam),
+.land :global(#daejeon) {
+  fill: #e3a3a0 !important;
+}
+.land :global(#sejong),
+.land :global(#jeonbuk) {
+  fill: #aecb84 !important;
+}
+.land :global(#gyeongbuk) {
+  fill: #a9cbbf !important;
+}
+.land :global(#daegu),
+.land :global(#ulsan),
+.land :global(#busan) {
+  fill: #d8ad62 !important;
+}
+.land :global(#jeonnam) {
+  fill: #c89d55 !important;
+}
+.land :global(#gwangju) {
+  fill: #ead284 !important;
+}
+.land :global(#gyeongnam) {
+  fill: #4f8a83 !important;
+}
+.land :global(#jeju) {
+  fill: #5b9c95 !important;
+}
+
+/* 깃발 핀. 누르는 곳은 44×48px (DESIGN 8절)이고, 깃대 아래 끝이 핀 위치에 오게 옮긴다.
+   지도를 2/3로 줄이며 깃발 그림은 3/4(30×36px)로 줄였다. 깃대 끝은 그림 좌표 (8, 46) → (6, 34.5)px. */
 .pin {
   position: absolute;
-  display: grid;
-  place-items: center;
   width: 44px;
-  height: 44px;
+  height: 48px;
   margin: 0;
   padding: 0;
   border: none;
   background: none;
-  transform: translate(-50%, -50%);
+  transform: translate(-6px, -34.5px);
   cursor: pointer;
 }
 
-.diamond {
-  grid-area: 1 / 1;
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--color-indigo);
-  border-radius: 2px;
-  background: var(--color-surface);
-  transform: rotate(45deg);
+.flag {
+  display: block;
+  width: 30px;
+  height: 36px;
+  overflow: visible;
+  transform-origin: 6px 34.5px;
+  transition: transform 0.15s;
 }
 
-.count {
-  grid-area: 1 / 1;
-  position: relative;
-  color: var(--color-indigo);
-  font-size: 13px;
+.pin:hover .flag {
+  transform: scale(1.1);
+}
+
+.flagShadow {
+  fill: rgba(43, 33, 27, 0.25);
+}
+
+.flagPole {
+  stroke: var(--color-text);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.flagBanner {
+  fill: var(--color-surface);
+  stroke: var(--color-indigo);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.flagCount {
+  fill: var(--color-indigo);
+  font-family: var(--font-body);
+  font-size: 15px; /* 그림 좌표 단위. 3/4로 줄어 화면에서는 약 11px */
   font-weight: 700;
 }
 
-/* 고른 핀: 더 크게, 주홍 바탕 + 먹 테두리 + 흰 숫자. 색만으로 구분하지 않는다. */
+/* 고른 깃발: 더 크게, 주홍 깃발 + 먹 테두리 + 흰 숫자. 색만으로 구분하지 않는다. */
 .selected {
   z-index: 1;
 }
 
-.selected .diamond {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--color-text);
-  background: var(--color-accent);
+.selected .flag,
+.selected:hover .flag {
+  transform: scale(1.3);
 }
 
-.selected .count {
-  color: #fff;
-  font-size: 15px;
+.selected .flagBanner {
+  fill: var(--color-accent);
+  stroke: var(--color-text);
+}
+
+.selected .flagCount {
+  fill: #fff;
 }
