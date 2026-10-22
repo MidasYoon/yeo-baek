@@ -105,14 +105,17 @@ export default function Places() {
         onRetry={() => loadPlaces(selectedId)}
       />
     )
+  } else if (status === 'done' && places.length === 0) {
+    // 장소가 없으면 지도도 보이지 않는다 (2026-10-22 사람이 정함).
+    content = <StatusMessage kind="empty" message="아직 넣은 장소가 없어요." />
   } else if (status === 'done') {
+    // PC(768px 이상)는 왼쪽 지도·오른쪽 카드 2단, 모바일은 지도 → 카드로 쌓는다.
     content = (
-      <>
-        <PlaceMap places={places} selectedRegion={selectedRegion} onSelect={handlePinSelect} />
-        {places.length === 0 ? (
-          <StatusMessage kind="empty" message="아직 넣은 장소가 없어요." />
-        ) : (
-          <ul className={styles.list} ref={listRef}>
+      <div className={styles.layout}>
+        <div className={styles.mapColumn}>
+          <PlaceMap places={places} selectedRegion={selectedRegion} onSelect={handlePinSelect} />
+        </div>
+        <ul className={styles.list} ref={listRef}>
             {places.map((place) => {
               const highlighted = place.region === selectedRegion
               return (
@@ -134,9 +137,16 @@ export default function Places() {
                 </li>
               )
             })}
-          </ul>
-        )}
-      </>
+        </ul>
+      </div>
+    )
+  } else if (trips?.length > 0 && selectedId === null) {
+    // 여행을 고르기 전 안내 (2026-10-22 사람이 요청, AI 제안 문구)
+    content = (
+      <StatusMessage
+        kind="empty"
+        message="여행을 고르면 그 여행에서 다녀온 곳을 지도와 카드로 볼 수 있어요."
+      />
     )
   }
 

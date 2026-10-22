@@ -109,6 +109,11 @@ export default function Diary() {
   } else if (status === 'done') {
     // 여행을 바꾸면 펼친 줄이 모두 접히도록 여행마다 새로 그린다.
     content = <DiaryList key={selectedId} diaries={diaries} renderActions={renderActions} />
+  } else if (trips?.length > 0 && selectedId === null) {
+    // 여행을 고르기 전 안내 (2026-10-22 사람이 요청, AI 제안 문구)
+    content = (
+      <StatusMessage kind="empty" message="여행을 고르면 그 여행에서 쓴 일기를 날짜별로 볼 수 있어요." />
+    )
   }
 
   // "새 일기 쓰기"는 한 곳에만 둔다: 일기가 있으면 오른쪽 위, 없으면 빈 상태 문구 아래.

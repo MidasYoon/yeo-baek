@@ -1,4 +1,4 @@
-/* 여행지 정보 화면 배치: DESIGN 4절(최대 폭 1200px), SCREEN-SPEC 4절(위에서 아래로 쌓기) */
+/* 여행지 정보 화면 배치: DESIGN 4절(최대 폭 1200px), 5절(반응형) */
 .page {
   display: flex;
   flex-direction: column;
@@ -7,9 +7,22 @@
   margin: 0 auto;
 }
 
+/* PC(768px 이상): 왼쪽 지도, 오른쪽 카드 2단. 지도는 카드를 내려도 화면에 붙어 있다. */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 400px) 1fr;
+  align-items: start;
+  gap: var(--space-32);
+}
+
+.mapColumn {
+  position: sticky;
+  top: var(--space-24);
+}
+
 .list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--space-16);
   margin: 0;
   padding: 0;
@@ -25,7 +38,16 @@
   justify-content: center;
 }
 
+/* 모바일(768px 미만): 지도 → 카드 순서로 쌓고, 카드는 한 줄에 하나 */
 @media (max-width: 767px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mapColumn {
+    position: static;
+  }
+
   .list {
     grid-template-columns: 1fr;
   }
