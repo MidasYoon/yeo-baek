@@ -16,3 +16,27 @@ async function request(url, options) {
 export function getDiaries(tripId) {
   return request(`/api/diaries?trip_id=${encodeURIComponent(tripId)}`)
 }
+
+export function getDiary(id) {
+  return request(`/api/diaries/${encodeURIComponent(id)}`)
+}
+
+export function createDiary(data) {
+  return request('/api/diaries', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+}
+
+export function updateDiary(id, data) {
+  return request(`/api/diaries/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+}
+
+export function deleteDiary(id) {
+  return request(`/api/diaries/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}

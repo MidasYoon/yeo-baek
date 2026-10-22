@@ -1,0 +1,22 @@
+/* 여행 다이어리 화면 배치: DESIGN 4절(최대 폭 880px), SCREEN-SPEC 5절(위에서 아래로 쌓기) */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: var(--content-width-diary);
+  margin: 0 auto;
+}
+
+/* 제목 왼쪽, "새 일기 쓰기" 오른쪽 위 (여행기록 목록과 같은 모양) */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}

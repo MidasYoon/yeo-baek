@@ -1,0 +1,105 @@
+/* 입력 칸·상태 표시: DESIGN 6절 "입력 칸", "상태 표시" */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.trip {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.field,
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.label {
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.input {
+  height: 48px;
+  padding: 0 var(--space-12);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.textarea {
+  min-height: 160px;
+  padding: var(--space-12);
+  resize: vertical;
+}
+
+.invalid {
+  border-color: var(--color-accent);
+}
+
+.timeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.timeRow .input {
+  min-width: 96px;
+}
+
+/* 기분 이모지 버튼 5개: 48px 정사각형, 고른 것은 옅은 주홍 바탕 + 주홍 2px 테두리 */
+.moods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.mood {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.moodSelected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.error {
+  color: var(--color-accent-deep);
+  font-size: 13px;
+}
+
+.saveError {
+  margin: 0;
+  color: var(--color-accent-deep);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}

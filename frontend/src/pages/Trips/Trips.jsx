@@ -51,11 +51,14 @@ export default function Trips() {
     )
   }
 
+  // "새 여행 만들기"는 한 곳에만 둔다: 목록이 있으면 오른쪽 위, 없으면 빈 상태 문구 아래.
+  const hasList = status === 'done' && trips.length > 0
+
   return (
     <section className={styles.page}>
       <div className={styles.header}>
         <h1>여행기록</h1>
-        <Button to="/trip/new">새 여행 만들기</Button>
+        {hasList && <Button to="/trip/new">새 여행 만들기</Button>}
       </div>
       {content}
     </section>
