@@ -116,6 +116,7 @@ export default function PlaceForm({ title, trip, initialValues = EMPTY, onSubmit
         </label>
         <PhotoInput
           label="사진"
+          help="사진은 4장까지 넣을 수 있어요"
           alt="장소 사진"
           photos={values.photos}
           max={4}

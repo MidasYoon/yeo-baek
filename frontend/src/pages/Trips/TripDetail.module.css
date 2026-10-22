@@ -9,14 +9,16 @@
   overflow-wrap: anywhere;
 }
 
-/* 대표사진: 여행명 위, 폭 가득, 16:9 (DESIGN 6절 "사진") */
+/* 대표사진: 여행명 위, 자르지 않고 원래 비율. 높이 최대 480px, 폭은 콘텐츠 폭까지 (DESIGN 6절 "사진") */
 .photo {
   display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
+  align-self: flex-start; /* 머리 칸(flex)이 폭을 늘려 사진이 찌그러지지 않게 한다 */
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 480px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
-  object-fit: cover;
 }
 
 .meta {

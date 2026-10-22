@@ -6,6 +6,7 @@ import styles from './PhotoInput.module.css'
 // photos: 지금 사진 파일 이름 목록. max: 최대 장수(여행·일기 1, 장소 4).
 // upload(file): 그 기능의 api 파일의 올리기 함수 ({ filename }을 돌려준다). 서버 호출은 api/ 안에만 둔다.
 // photoUrl(filename): 보기 주소. onChange(photos): 바뀐 목록. onBusyChange(bool): 올리는 중인지.
+// help: (선택) 칸 이름 아래에 늘 보이는 도움말. 있으면 다 찼을 때 따로 안내하지 않고 버튼만 숨긴다.
 const MAX_BYTES = 5 * 1024 * 1024
 
 // 확장자마다 받는 형식. 서버(backend/routers/uploads.py)와 같다.
@@ -25,6 +26,7 @@ function checkFile(file) {
 
 export default function PhotoInput({
   label,
+  help,
   alt,
   photos,
   max,
@@ -74,6 +76,7 @@ export default function PhotoInput({
   return (
     <div className={styles.field}>
       <span className={styles.label}>{label}</span>
+      {help && <span className={styles.help}>{help}</span>}
       {photos.length > 0 && (
         <ul className={styles.list}>
           {photos.map((filename) => (
@@ -100,7 +103,7 @@ export default function PhotoInput({
           사진 올리는 중…
         </p>
       ) : !single && full ? (
-        <p className={styles.note}>사진은 {max}장까지 넣을 수 있어요</p>
+        !help && <p className={styles.note}>사진은 {max}장까지 넣을 수 있어요</p>
       ) : (
         <div>
           <Button

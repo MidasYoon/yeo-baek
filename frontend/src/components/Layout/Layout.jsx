@@ -31,6 +31,7 @@ export default function Layout() {
                   className={({ isActive }) =>
                     isActive ? `${styles.link} ${styles.active}` : styles.link
                   }
+                  data-label={menu.label}
                 >
                   {menu.label}
                 </NavLink>
