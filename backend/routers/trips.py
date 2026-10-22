@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, field_validator, model_validator
 
 from database import get_connection
+from routers.uploads import check_photo_name, delete_photo
 
 router = APIRouter(prefix="/api/trips", tags=["trips"])
 
@@ -20,6 +21,7 @@ class TripIn(BaseModel):
     start_date: str
     end_date: str
     info: str | None = None
+    photo: str | None = None  # 대표사진 파일 이름 (D-033)
 
     @field_validator("name", "destination")
     @classmethod
@@ -52,6 +54,14 @@ class TripIn(BaseModel):
             return None
         value = value.strip()
         return value or None
+
+    @field_validator("photo")
+    @classmethod
+    def check_photo(cls, value: str | None) -> str | None:
+        # POST /api/uploads가 돌려준 이름이어야 한다 (API-SPEC 1절).
+        if value is None:
+            return None
+        return check_photo_name(value)
 
     @model_validator(mode="after")
     def check_period(self):
@@ -95,9 +105,9 @@ def create_trip(trip: TripIn):
     conn = get_connection()
     try:
         cursor = conn.execute(
-            "INSERT INTO trips (name, destination, start_date, end_date, info)"
-            " VALUES (?, ?, ?, ?, ?)",
-            (trip.name, trip.destination, trip.start_date, trip.end_date, trip.info),
+            "INSERT INTO trips (name, destination, start_date, end_date, info, photo)"
+            " VALUES (?, ?, ?, ?, ?, ?)",
+            (trip.name, trip.destination, trip.start_date, trip.end_date, trip.info, trip.photo),
         )
         conn.commit()
         row = find_trip(conn, cursor.lastrowid)
@@ -111,7 +121,7 @@ def update_trip(trip_id: int, trip: TripIn):
     """검사 순서: 본문 422 → 없는 id 404 → 기간 밖 장소·일기 409."""
     conn = get_connection()
     try:
-        find_trip(conn, trip_id)
+        old_photo = find_trip(conn, trip_id)["photo"]
         # 새 기간 밖에 있는 장소·일기를 센다 (R-T-017).
         place_count = conn.execute(
             "SELECT COUNT(*) FROM places"
@@ -130,13 +140,19 @@ def update_trip(trip_id: int, trip: TripIn):
             )
         conn.execute(
             "UPDATE trips SET name = ?, destination = ?, start_date = ?, end_date = ?,"
-            " info = ?, updated_at = datetime('now', 'localtime') WHERE id = ?",
-            (trip.name, trip.destination, trip.start_date, trip.end_date, trip.info, trip_id),
+            " info = ?, photo = ?, updated_at = datetime('now', 'localtime') WHERE id = ?",
+            (
+                trip.name, trip.destination, trip.start_date, trip.end_date,
+                trip.info, trip.photo, trip_id,
+            ),
         )
         conn.commit()
         row = find_trip(conn, trip_id)
     finally:
         conn.close()
+    # 바꾸거나 뺀 전 사진 파일을 지운다 (D-033).
+    if old_photo != trip.photo:
+        delete_photo(old_photo)
     return dict(row)
 
 
@@ -145,7 +161,7 @@ def delete_trip(trip_id: int):
     """검사 순서: 없는 id 404 → 붙은 장소·일기 409 (D-015)."""
     conn = get_connection()
     try:
-        find_trip(conn, trip_id)
+        photo = find_trip(conn, trip_id)["photo"]
         place_count = conn.execute(
             "SELECT COUNT(*) FROM places WHERE trip_id = ?", (trip_id,)
         ).fetchone()[0]
@@ -161,4 +177,5 @@ def delete_trip(trip_id: int):
         conn.commit()
     finally:
         conn.close()
+    delete_photo(photo)  # 409면 여기까지 오지 않아 사진도 남는다 (D-033).
     return Response(status_code=204)

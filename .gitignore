@@ -5,3 +5,4 @@ venv
 .env
 dist
 __pycache__
+backend/uploads/

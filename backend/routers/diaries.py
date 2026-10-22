@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, field_validator
 
 from database import get_connection
+from routers.uploads import check_photo_name, delete_photo
 
 router = APIRouter(prefix="/api/diaries", tags=["diaries"])
 
@@ -38,6 +39,7 @@ class DiaryUpdate(BaseModel):
     title: str
     body: str | None = None
     mood: str
+    photo: str | None = None  # 사진 파일 이름 (D-033)
 
     @field_validator("date")
     @classmethod
@@ -76,6 +78,14 @@ class DiaryUpdate(BaseModel):
         if value not in MOODS:
             raise ValueError("기분 이름 5개 중 하나여야 해요")
         return value
+
+    @field_validator("photo")
+    @classmethod
+    def check_photo(cls, value: str | None) -> str | None:
+        # POST /api/uploads가 돌려준 이름이어야 한다 (API-SPEC 1절).
+        if value is None:
+            return None
+        return check_photo_name(value)
 
 
 class DiaryIn(DiaryUpdate):
@@ -151,9 +161,12 @@ def create_diary(diary: DiaryIn):
     try:
         check_in_period(conn, diary.trip_id, diary.date)
         cursor = conn.execute(
-            "INSERT INTO diaries (trip_id, date, time, title, body, mood)"
-            " VALUES (?, ?, ?, ?, ?, ?)",
-            (diary.trip_id, diary.date, diary.time, diary.title, diary.body, diary.mood),
+            "INSERT INTO diaries (trip_id, date, time, title, body, mood, photo)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                diary.trip_id, diary.date, diary.time, diary.title,
+                diary.body, diary.mood, diary.photo,
+            ),
         )
         conn.commit()
         row = find_diary(conn, cursor.lastrowid)
@@ -171,14 +184,20 @@ def update_diary(diary_id: int, diary: DiaryUpdate):
         saved = find_diary(conn, diary_id)
         check_in_period(conn, saved["trip_id"], diary.date)
         conn.execute(
-            "UPDATE diaries SET date = ?, time = ?, title = ?, body = ?, mood = ?,"
+            "UPDATE diaries SET date = ?, time = ?, title = ?, body = ?, mood = ?, photo = ?,"
             " updated_at = datetime('now', 'localtime') WHERE id = ?",
-            (diary.date, diary.time, diary.title, diary.body, diary.mood, diary_id),
+            (
+                diary.date, diary.time, diary.title, diary.body,
+                diary.mood, diary.photo, diary_id,
+            ),
         )
         conn.commit()
         row = find_diary(conn, diary_id)
     finally:
         conn.close()
+    # 바꾸거나 뺀 전 사진 파일을 지운다 (D-033).
+    if saved["photo"] != diary.photo:
+        delete_photo(saved["photo"])
     return dict(row)
 
 
@@ -186,9 +205,10 @@ def update_diary(diary_id: int, diary: DiaryUpdate):
 def delete_diary(diary_id: int):
     conn = get_connection()
     try:
-        find_diary(conn, diary_id)
+        photo = find_diary(conn, diary_id)["photo"]
         conn.execute("DELETE FROM diaries WHERE id = ?", (diary_id,))
         conn.commit()
     finally:
         conn.close()
+    delete_photo(photo)  # 사진 파일도 지운다 (D-033).
     return Response(status_code=204)

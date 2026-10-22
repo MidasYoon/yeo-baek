@@ -40,3 +40,16 @@ export function updateTrip(id, data) {
 export function deleteTrip(id) {
   return request(`/api/trips/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
+
+// 대표사진 올리기 (D-033, API-SPEC 1절). 성공하면 { filename }을 돌려준다.
+// Content-Type은 브라우저가 multipart 경계와 함께 넣으므로 적지 않는다.
+export function uploadTripPhoto(file) {
+  const body = new FormData()
+  body.append('file', file)
+  return request('/api/uploads', { method: 'POST', body })
+}
+
+// 저장된 사진 이름으로 보기 주소를 만든다.
+export function photoUrl(filename) {
+  return `/api/uploads/${encodeURIComponent(filename)}`
+}

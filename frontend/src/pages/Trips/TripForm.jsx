@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { photoUrl, uploadTripPhoto } from '../../api/trips.js'
 import Button from '../../components/Button/Button.jsx'
+import PhotoInput from '../../components/PhotoInput/PhotoInput.jsx'
 import { countText } from './countMessage.js'
 import styles from './TripForm.module.css'
 
 // 여행 추가·수정 폼 (담당: 서준). SCREEN-SPEC 3절 2·4·5번.
 // initialValues: 수정할 때 지금 값. onSubmit(values): 저장 요청 (실패하면 던진다).
-const EMPTY = { name: '', destination: '', start_date: '', end_date: '', info: '' }
+const EMPTY = { name: '', destination: '', start_date: '', end_date: '', info: '', photo: null }
 
 // 비운 칸의 안내 문구 (SCREEN-SPEC 3절 4번, "여행명을 적어 주세요"와 같은 꼴)
 const REQUIRED_MESSAGES = {
@@ -40,6 +42,8 @@ export default function TripForm({ initialValues = EMPTY, onSubmit, onCancel }) 
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
+  // 사진을 올리는 동안은 저장할 수 없다 (SCREEN-SPEC 1절 "사진 칸 (폼)").
+  const [photoBusy, setPhotoBusy] = useState(false)
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -110,12 +114,22 @@ export default function TripForm({ initialValues = EMPTY, onSubmit, onCancel }) 
           onChange={handleChange}
         />
       </label>
+      <PhotoInput
+        label="대표사진"
+        alt="여행 대표사진"
+        photos={values.photo ? [values.photo] : []}
+        max={1}
+        upload={uploadTripPhoto}
+        photoUrl={photoUrl}
+        onChange={(photos) => setValues((prev) => ({ ...prev, photo: photos[0] ?? null }))}
+        onBusyChange={setPhotoBusy}
+      />
       {saveFailed && <p className={styles.saveError}>저장하지 못했어요. 다시 시도해 주세요.</p>}
       <div className={styles.actions}>
         <Button variant="secondary" onClick={onCancel}>
           취소
         </Button>
-        <Button type="submit" disabled={saving}>
+        <Button type="submit" disabled={saving || photoBusy}>
           저장
         </Button>
       </div>

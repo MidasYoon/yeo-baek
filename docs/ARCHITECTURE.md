@@ -13,10 +13,11 @@
 [Vite 개발 서버 프록시]  /api 로 시작하는 요청만 백엔드로 넘김
    ▼
 [서버] FastAPI (8000)
-   │  라우터를 기능별 파일로 나눔: trips / places / diaries
+   │  라우터를 기능별 파일로 나눔: trips / places / diaries (+ 공통 사진 올리기 uploads)
    ▼
-[DB] SQLite (sqlite3로 접근)
-      places, diaries는 trip_id로 trips에 연결
+[DB] SQLite (sqlite3로 접근)          [사진 파일] backend/uploads/
+      places, diaries는 trip_id로 trips에 연결    DB에는 파일 이름만 (D-033)
+      place_photos는 place_id로 places에 연결
 ```
 
 | 부품 | 책임 | 근거 |
@@ -25,7 +26,9 @@
 | `frontend/src/api/` | 서버 호출. 이 폴더 밖에서는 서버를 부르지 않는다 | AGENTS 코드 규칙 |
 | Vite 프록시 | `/api`로 시작하는 요청을 백엔드(8000)로 넘김 | D-011 |
 | FastAPI 라우터 | 기능별 요청 처리 (`trips` / `places` / `diaries`) | AGENTS 코드 규칙 |
-| SQLite | 여행·장소·일기 저장 | AGENTS 환경, D-009 |
+| SQLite | 여행·장소·일기와 사진 파일 이름 저장 | AGENTS 환경, D-009, D-033 |
+| `uploads` 라우터 | 사진 한 장을 받아 검사(형식·용량)하고 `backend/uploads/`에 새 이름으로 저장한다. 기능별 라우터가 아닌 세 기능 공통 | D-033 |
+| `backend/uploads/` | 사진 파일 보관. `main.py`가 `/api/uploads`로 보여 준다. Git에 올리지 않는다 | D-033 |
 
 ## 2. 기술 스택
 
@@ -38,6 +41,7 @@
 | 백엔드 | FastAPI | 확정 |
 | DB | SQLite | 확정 |
 | DB 접근 방식 | `sqlite3` | 확정 (D-009) |
+| 사진 받기 (multipart) | `python-multipart` (FastAPI가 파일을 받을 때 필요한 패키지). 버전은 설치할 때 `requirements.txt`에 고정한다 (D-026) | 확정 (D-033) |
 | 버전, 설치·실행 명령 | Python 3.10+, Node.js 20+. 명령은 `README.md` "실행 방법" | 확정 (D-024) |
 
 React · FastAPI · SQLite 외의 프레임워크·DB는 쓰지 않는다.
@@ -66,7 +70,7 @@ frontend/
    │  ├─ Trips/       서준
    │  ├─ Places/      은희
    │  └─ Diary/       건용
-   ├─ components/     공통 컴포넌트 (팀 공동, D-028)
+   ├─ components/     공통 컴포넌트 (팀 공동, D-028). 사진 칸 부품 `PhotoInput/`도 여기에 둔다 (D-033, P-37)
    ├─ assets/         지도 그림 등 (팀 공동, D-030)
    │  └─ Layout/      공통 레이아웃, 네비 포함 (건용). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)
@@ -76,7 +80,9 @@ backend/
 ├─ routers/
 │  ├─ trips.py        서준
 │  ├─ places.py       은희
-│  └─ diaries.py      건용
+│  ├─ diaries.py      건용
+│  └─ uploads.py      사진 올리기 (건용, D-033)
+├─ uploads/           사진 파일 (Git에 올리지 않음, D-033)
 └─ requirements.txt
 ```
 
@@ -88,6 +94,7 @@ backend/
 | --- | --- | --- | --- |
 | 라우터 등록 | `backend/main.py` | 건용 | D-004 |
 | DB 설정 | `backend/database.py` | 건용 | D-004 |
+| 사진 올리기 라우터 | `backend/routers/uploads.py` | 건용 | D-033 |
 | 화면 레이아웃 (네비 포함) | `frontend/src/components/Layout/` | 건용 | D-004, D-010 |
 | 공통 스타일 | `frontend/src/styles/tokens.css`, `global.css` | 팀 공동 (합의 후 수정) | D-010 |
 | 프록시 설정 | `frontend/vite.config.js` | 팀 공동 (합의 후 수정) | D-010, D-011 |
@@ -109,8 +116,9 @@ backend/
 | 서버 호출 위치 | `frontend/src/api/` 안의 기능별 파일에서만 | 확정 (AGENTS) |
 | 백엔드를 부르는 방식 | Vite 개발 서버 프록시. `api/` 파일은 `/api/...` 상대 주소만 쓰고 서버 포트를 적지 않는다 | 확정 (D-011) |
 | API 주소 규칙 | `/api`로 시작한다. 화면 주소(`/trip` 등)와 겹치지 않게 하기 위해서다 | 확정 (D-011) |
-| 백엔드 라우터 | `trips` / `places` / `diaries` 기능별 파일 | 확정 (AGENTS) |
-| 데이터 연결 | `places`와 `diaries`는 `trip_id`로 `trips`에 연결 | 확정 (AGENTS) |
+| 백엔드 라우터 | `trips` / `places` / `diaries` 기능별 파일. 사진 올리기만 공통 `uploads` | 확정 (AGENTS, D-033) |
+| 데이터 연결 | `places`와 `diaries`는 `trip_id`로 `trips`에 연결. `place_photos`는 `place_id`로 `places`에 연결 | 확정 (AGENTS, D-033) |
+| 사진 | `POST /api/uploads`로 먼저 올려 파일 이름을 받고, 저장할 때 JSON에 그 이름을 넣는다. 보기는 `/api/uploads/{filename}`이라 Vite 프록시 설정을 바꾸지 않는다 | 확정 (D-033) |
 | 날짜 형식 | `YYYY-MM-DD` | 확정 (AGENTS) |
 | API 주소, 메서드, 요청·응답 모양 | `docs/API-SPEC.md`에 정함 | 정함 (D-018~D-020) |
 | 테이블 구조 | `docs/DATA-MODEL.md`에 정함 | 확정 (D-015~D-017) |

@@ -1,0 +1,51 @@
+/* 사진 칸: DESIGN 6절 "사진", "입력 칸", "상태 표시" */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.preview {
+  display: block;
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.hidden {
+  display: none;
+}
+
+.status,
+.note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.error {
+  color: var(--color-accent-deep);
+  font-size: 13px;
+}

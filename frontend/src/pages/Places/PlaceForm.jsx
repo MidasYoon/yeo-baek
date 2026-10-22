@@ -1,12 +1,14 @@
 import { useState } from 'react'
+import { photoUrl, uploadPlacePhoto } from '../../api/places.js'
 import Button from '../../components/Button/Button.jsx'
+import PhotoInput from '../../components/PhotoInput/PhotoInput.jsx'
 import { REGIONS } from './regions.js'
 import styles from './PlaceForm.module.css'
 
 // 장소 추가·수정 폼 (담당: 은희). SCREEN-SPEC 4절 2·4·5번.
 // trip: 고른 여행 (이름·기간을 보이고 방문 날짜를 검사한다).
 // initialValues: 수정할 때 지금 값. onSubmit(values): 저장 요청 (실패하면 던진다).
-const EMPTY = { region: '', name: '', visit_date: '', memo: '' }
+const EMPTY = { region: '', name: '', visit_date: '', memo: '', photos: [] }
 
 function validate(values, trip) {
   const errors = {}
@@ -29,6 +31,8 @@ export default function PlaceForm({ title, trip, initialValues = EMPTY, onSubmit
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
+  // 사진을 올리는 동안은 저장할 수 없다 (SCREEN-SPEC 1절 "사진 칸 (폼)").
+  const [photoBusy, setPhotoBusy] = useState(false)
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -110,12 +114,22 @@ export default function PlaceForm({ title, trip, initialValues = EMPTY, onSubmit
           <input type="text" {...inputProps('memo')} />
           {errorLine('memo')}
         </label>
+        <PhotoInput
+          label="사진"
+          alt="장소 사진"
+          photos={values.photos}
+          max={4}
+          upload={uploadPlacePhoto}
+          photoUrl={photoUrl}
+          onChange={(photos) => setValues((prev) => ({ ...prev, photos }))}
+          onBusyChange={setPhotoBusy}
+        />
         {saveFailed && <p className={styles.saveError}>저장하지 못했어요. 다시 시도해 주세요.</p>}
         <div className={styles.actions}>
           <Button variant="secondary" onClick={onCancel}>
             취소
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button type="submit" disabled={saving || photoBusy}>
             저장
           </Button>
         </div>

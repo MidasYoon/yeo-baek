@@ -1,6 +1,6 @@
 """SQLite 연결과 테이블 만들기 (공통 파일, 담당: 건용).
 
-테이블 구조는 docs/DATA-MODEL.md 2~4절을 따른다. 바꿀 때는 팀이 합의한다.
+테이블 구조는 docs/DATA-MODEL.md 2~5절을 따른다. 바꿀 때는 팀이 합의한다.
 """
 
 import sqlite3
@@ -8,7 +8,7 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parent / "yeoback.db"
 
-# trips를 먼저 만든다. places·diaries가 trips(id)를 가리키기 때문이다.
+# trips를 먼저 만든다. places·diaries가 trips(id)를, place_photos가 places(id)를 가리키기 때문이다.
 SCHEMA = [
     # trips (담당: 서준) — DATA-MODEL 2절
     """
@@ -19,6 +19,7 @@ SCHEMA = [
         start_date TEXT NOT NULL,
         end_date TEXT NOT NULL,
         info TEXT,
+        photo TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
     )
@@ -46,6 +47,17 @@ SCHEMA = [
         title TEXT NOT NULL,
         body TEXT,
         mood TEXT NOT NULL,
+        photo TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+    )
+    """,
+    # place_photos (담당: 은희) — DATA-MODEL 5절, D-033
+    """
+    CREATE TABLE IF NOT EXISTS place_photos (
+        id INTEGER PRIMARY KEY,
+        place_id INTEGER NOT NULL REFERENCES places(id) ON DELETE CASCADE,
+        filename TEXT NOT NULL,
         created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
     )

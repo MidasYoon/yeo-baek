@@ -9,6 +9,16 @@
   overflow-wrap: anywhere;
 }
 
+/* 대표사진: 여행명 위, 폭 가득, 16:9 (DESIGN 6절 "사진") */
+.photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
 .meta {
   margin: 0;
   color: var(--color-text-muted);

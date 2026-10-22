@@ -50,6 +50,25 @@
   overflow-wrap: anywhere;
 }
 
+/* 사진 줄: 64px 정사각형 최대 4장, 사이 8px (DESIGN 6절 "사진") */
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photo {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
 .actions {
   display: flex;
   gap: var(--space-4);

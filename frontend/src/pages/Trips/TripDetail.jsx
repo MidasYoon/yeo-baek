@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getDiaries } from '../../api/diaries.js'
 import { getPlaces } from '../../api/places.js'
-import { deleteTrip, getTrip } from '../../api/trips.js'
+import { deleteTrip, getTrip, photoUrl } from '../../api/trips.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
@@ -28,6 +28,8 @@ export default function TripDetail() {
   const [deleting, setDeleting] = useState(false)
   const [deleteFailed, setDeleteFailed] = useState(false)
   const [blocked, setBlocked] = useState(null)
+  // 불러오지 못한 사진 이름. 그 사진은 없는 것처럼 숨긴다 (SCREEN-SPEC 1절 "사진 표시").
+  const [brokenPhoto, setBrokenPhoto] = useState(null)
 
   const loadTrip = useCallback(async () => {
     setStatus('loading')
@@ -142,6 +144,14 @@ export default function TripDetail() {
   return (
     <section className={pageStyles.page}>
       <div className={styles.head}>
+        {trip.photo && trip.photo !== brokenPhoto && (
+          <img
+            className={styles.photo}
+            src={photoUrl(trip.photo)}
+            alt="여행 대표사진"
+            onError={() => setBrokenPhoto(trip.photo)}
+          />
+        )}
         <h1 className={styles.title}>{trip.name}</h1>
         <p className={styles.meta}>
           {trip.destination} · {trip.start_date} ~ {trip.end_date}

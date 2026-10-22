@@ -6,9 +6,10 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from database import init_db
-from routers import diaries, places, trips
+from routers import diaries, places, trips, uploads
 
 
 @asynccontextmanager
@@ -23,3 +24,7 @@ app = FastAPI(title="여백", lifespan=lifespan)
 app.include_router(trips.router)
 app.include_router(places.router)
 app.include_router(diaries.router)
+app.include_router(uploads.router)
+
+# 사진 보기: GET /api/uploads/{filename} (D-033). 올리기 라우터보다 뒤에 둔다.
+app.mount("/api/uploads", StaticFiles(directory=uploads.UPLOAD_DIR), name="uploads")

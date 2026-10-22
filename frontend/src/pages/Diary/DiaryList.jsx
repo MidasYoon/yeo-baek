@@ -1,10 +1,27 @@
 import { useState } from 'react'
+import { photoUrl } from '../../api/diaries.js'
 import { MOOD_EMOJI, formatTime } from './diaryFormat.js'
 import styles from './DiaryList.module.css'
 
 // 일기 목록 (담당: 건용). SCREEN-SPEC 5절 2·3번, DESIGN 6절 "일기 목록".
 // diaries: API 순서(날짜 → 시각 → id) 그대로 받은 일기들.
 // renderActions(diary): (선택) 펼친 줄 아래에 둘 버튼. 여행 상세 안 목록(P-34)에서는 넘기지 않는다.
+// 사진이 있으면 펼친 줄의 본문 위에 보인다. 접힌 줄에는 보이지 않는다 (D-033).
+
+// 일기 사진. 불러오지 못하면 숨긴다 (SCREEN-SPEC 1절 "사진 표시").
+function DiaryPhoto({ filename }) {
+  const [broken, setBroken] = useState(false)
+  if (broken) return null
+  return (
+    <img
+      className={styles.photo}
+      src={photoUrl(filename)}
+      alt="일기 사진"
+      onError={() => setBroken(true)}
+    />
+  )
+}
+
 export default function DiaryList({ diaries, renderActions }) {
   // 줄마다 따로 펼치고 접는다. 여러 줄을 함께 펼칠 수 있다.
   const [openIds, setOpenIds] = useState(() => new Set())
@@ -58,6 +75,7 @@ export default function DiaryList({ diaries, renderActions }) {
                   </button>
                   {open && (
                     <div id={panelId} className={styles.detail}>
+                      {diary.photo && <DiaryPhoto key={diary.photo} filename={diary.photo} />}
                       {/* 본문이 없으면 본문 자리를 비워 둔다 (TEST-PLAN T-D-05) */}
                       <p className={styles.body}>{diary.body ?? ''}</p>
                       {renderActions && <div className={styles.actions}>{renderActions(diary)}</div>}

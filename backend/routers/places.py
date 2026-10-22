@@ -6,10 +6,13 @@ from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, field_validator
 
 from database import get_connection
+from routers.uploads import check_photo_name, delete_photo
 
 router = APIRouter(prefix="/api/places", tags=["places"])
 
 NOT_FOUND = "장소를 찾을 수 없어요"
+
+MAX_PHOTOS = 4  # 장소 사진은 0~4장 (D-033)
 
 # 지역에 저장하는 시·도 17개 이름 (D-016)
 REGIONS = (
@@ -36,6 +39,7 @@ class PlaceUpdate(BaseModel):
     name: str
     visit_date: str
     memo: str | None = None
+    photos: list[str] = []  # 사진 파일 이름 목록 (D-033)
 
     @field_validator("region")
     @classmethod
@@ -71,6 +75,16 @@ class PlaceUpdate(BaseModel):
             raise ValueError("20자까지 쓸 수 있어요")
         return value or None
 
+    @field_validator("photos")
+    @classmethod
+    def check_photos(cls, value: list[str]) -> list[str]:
+        # 0~4장, 같은 이름은 한 번만, 모두 POST /api/uploads가 돌려준 이름이어야 한다 (API-SPEC 3절).
+        if len(value) > MAX_PHOTOS:
+            raise ValueError(f"사진은 {MAX_PHOTOS}장까지 넣을 수 있어요")
+        if len(set(value)) != len(value):
+            raise ValueError("같은 사진이 두 번 있어요")
+        return [check_photo_name(name) for name in value]
+
 
 class PlaceIn(PlaceUpdate):
     """POST 본문. 규칙은 API-SPEC 3절 3번."""
@@ -83,6 +97,21 @@ def find_place(conn, place_id: int):
     if row is None:
         raise HTTPException(status_code=404, detail=NOT_FOUND)
     return row
+
+
+def photo_names(conn, place_id: int) -> list[str]:
+    """한 장소의 사진 파일 이름. 먼저 붙인 것(id가 작은 것)이 앞."""
+    rows = conn.execute(
+        "SELECT filename FROM place_photos WHERE place_id = ? ORDER BY id", (place_id,)
+    ).fetchall()
+    return [row["filename"] for row in rows]
+
+
+def with_photos(conn, row) -> dict:
+    """장소 줄에 photos 목록을 붙여 응답 모양으로 만든다 (API-SPEC 3절 2번)."""
+    place = dict(row)
+    place["photos"] = photo_names(conn, place["id"])
+    return place
 
 
 def check_in_period(conn, trip_id: int, visit_date: str):
@@ -108,9 +137,10 @@ def list_places(trip_id: int):
             "SELECT * FROM places WHERE trip_id = ? ORDER BY visit_date ASC, id ASC",
             (trip_id,),
         ).fetchall()
+        places = [with_photos(conn, row) for row in rows]
     finally:
         conn.close()
-    return [dict(row) for row in rows]
+    return places
 
 
 # /recent는 /{place_id}보다 먼저 등록해야 recent가 id로 읽히지 않는다 (API-SPEC 1절).
@@ -122,19 +152,20 @@ def get_recent_place():
         row = conn.execute(
             "SELECT * FROM places ORDER BY visit_date DESC, id DESC LIMIT 1"
         ).fetchone()
+        place = with_photos(conn, row) if row else None
     finally:
         conn.close()
-    return dict(row) if row else None
+    return place
 
 
 @router.get("/{place_id}")
 def get_place(place_id: int):
     conn = get_connection()
     try:
-        row = find_place(conn, place_id)
+        place = with_photos(conn, find_place(conn, place_id))
     finally:
         conn.close()
-    return dict(row)
+    return place
 
 
 @router.post("", status_code=201)
@@ -148,11 +179,15 @@ def create_place(place: PlaceIn):
             " VALUES (?, ?, ?, ?, ?)",
             (place.trip_id, place.region, place.name, place.visit_date, place.memo),
         )
+        conn.executemany(
+            "INSERT INTO place_photos (place_id, filename) VALUES (?, ?)",
+            [(cursor.lastrowid, name) for name in place.photos],
+        )
         conn.commit()
-        row = find_place(conn, cursor.lastrowid)
+        created = with_photos(conn, find_place(conn, cursor.lastrowid))
     finally:
         conn.close()
-    return dict(row)
+    return created
 
 
 @router.put("/{place_id}")
@@ -168,11 +203,24 @@ def update_place(place_id: int, place: PlaceUpdate):
             " updated_at = datetime('now', 'localtime') WHERE id = ?",
             (place.region, place.name, place.visit_date, place.memo, place_id),
         )
+        # 사진은 본문 목록으로 통째로 바꾼다. 남는 사진은 순서 그대로, 새 사진은 뒤에 붙는다 (API-SPEC 3절 4번).
+        old_photos = photo_names(conn, place_id)
+        removed = [name for name in old_photos if name not in place.photos]
+        conn.executemany(
+            "DELETE FROM place_photos WHERE place_id = ? AND filename = ?",
+            [(place_id, name) for name in removed],
+        )
+        conn.executemany(
+            "INSERT INTO place_photos (place_id, filename) VALUES (?, ?)",
+            [(place_id, name) for name in place.photos if name not in old_photos],
+        )
         conn.commit()
-        row = find_place(conn, place_id)
+        updated = with_photos(conn, find_place(conn, place_id))
     finally:
         conn.close()
-    return dict(row)
+    for name in removed:
+        delete_photo(name)
+    return updated
 
 
 @router.delete("/{place_id}", status_code=204)
@@ -180,8 +228,12 @@ def delete_place(place_id: int):
     conn = get_connection()
     try:
         find_place(conn, place_id)
+        photos = photo_names(conn, place_id)
+        # 사진 줄은 DB가 ON DELETE CASCADE로 함께 지운다 (DATA-MODEL 5절, DM-01).
         conn.execute("DELETE FROM places WHERE id = ?", (place_id,))
         conn.commit()
     finally:
         conn.close()
+    for name in photos:
+        delete_photo(name)
     return Response(status_code=204)

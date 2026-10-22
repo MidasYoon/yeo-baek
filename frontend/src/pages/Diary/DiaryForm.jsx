@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { photoUrl, uploadDiaryPhoto } from '../../api/diaries.js'
 import Button from '../../components/Button/Button.jsx'
+import PhotoInput from '../../components/PhotoInput/PhotoInput.jsx'
 import { MOOD_EMOJI, joinTime, splitTime } from './diaryFormat.js'
 import styles from './DiaryForm.module.css'
 
@@ -29,7 +31,9 @@ function validate(values, trip) {
 
 function toFormValues(trip, diary) {
   if (!diary) {
-    return { date: trip.start_date, period: '', hour: '', minute: '', title: '', body: '', mood: '' }
+    return {
+      date: trip.start_date, period: '', hour: '', minute: '', title: '', body: '', mood: '', photo: null,
+    }
   }
   return {
     date: diary.date,
@@ -37,6 +41,7 @@ function toFormValues(trip, diary) {
     title: diary.title,
     body: diary.body ?? '',
     mood: diary.mood,
+    photo: diary.photo ?? null,
   }
 }
 
@@ -45,6 +50,8 @@ export default function DiaryForm({ title, trip, initialValues, onSubmit, onCanc
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
   const [saveFailed, setSaveFailed] = useState(false)
+  // 사진을 올리는 동안은 저장할 수 없다 (SCREEN-SPEC 1절 "사진 칸 (폼)").
+  const [photoBusy, setPhotoBusy] = useState(false)
 
   function setField(name, value) {
     setValues((prev) => ({ ...prev, [name]: value }))
@@ -69,6 +76,7 @@ export default function DiaryForm({ title, trip, initialValues, onSubmit, onCanc
         title: values.title,
         body: values.body === '' ? null : values.body,
         mood: values.mood,
+        photo: values.photo,
       })
     } catch {
       // 422를 받아도 공통 저장 실패 문구를 보인다 (D-021). 입력한 값은 그대로 둔다.
@@ -210,12 +218,23 @@ export default function DiaryForm({ title, trip, initialValues, onSubmit, onCanc
           {errorLine('mood')}
         </fieldset>
 
+        <PhotoInput
+          label="사진"
+          alt="일기 사진"
+          photos={values.photo ? [values.photo] : []}
+          max={1}
+          upload={uploadDiaryPhoto}
+          photoUrl={photoUrl}
+          onChange={(photos) => setField('photo', photos[0] ?? null)}
+          onBusyChange={setPhotoBusy}
+        />
+
         {saveFailed && <p className={styles.saveError}>저장하지 못했어요. 다시 시도해 주세요.</p>}
         <div className={styles.actions}>
           <Button variant="secondary" onClick={onCancel}>
             취소
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button type="submit" disabled={saving || photoBusy}>
             저장
           </Button>
         </div>
