@@ -1,20 +1,29 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { getDiaries } from '../../api/diaries.js'
+import { getPlaces } from '../../api/places.js'
 import { deleteTrip, getTrip } from '../../api/trips.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
+import DiaryList from '../Diary/DiaryList.jsx'
+import PlaceCard from '../Places/PlaceCard.jsx'
 import { countText } from './countMessage.js'
 import styles from './TripDetail.module.css'
 import pageStyles from './Trips.module.css'
 
 // 여행 상세 (담당: 서준). SCREEN-SPEC 3절. 주소: /trip/:id
-// 상세 안의 장소·일기 목록(R-T-009)은 P-34에서 붙인다.
+// 아래에 그 여행의 장소·일기 목록을 보인다 (R-T-009). 장소 화면·다이어리 화면과 같은 모양·순서이고,
+// 수정·삭제 버튼은 넘기지 않는다. 두 목록은 따로 불러와 하나가 실패해도 여행 내용은 그대로 보인다.
 export default function TripDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [trip, setTrip] = useState(null)
   const [status, setStatus] = useState('loading')
+  const [places, setPlaces] = useState([])
+  const [placesStatus, setPlacesStatus] = useState('loading')
+  const [diaries, setDiaries] = useState([])
+  const [diariesStatus, setDiariesStatus] = useState('loading')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteFailed, setDeleteFailed] = useState(false)
@@ -30,13 +39,56 @@ export default function TripDetail() {
     }
   }, [id])
 
+  const loadPlaces = useCallback(async (isCurrent = () => true) => {
+    setPlacesStatus('loading')
+    try {
+      const loaded = await getPlaces(id)
+      if (!isCurrent()) return
+      setPlaces(loaded)
+      setPlacesStatus('done')
+    } catch {
+      if (isCurrent()) setPlacesStatus('error')
+    }
+  }, [id])
+
+  const loadDiaries = useCallback(async (isCurrent = () => true) => {
+    setDiariesStatus('loading')
+    try {
+      const loaded = await getDiaries(id)
+      if (!isCurrent()) return
+      setDiaries(loaded)
+      setDiariesStatus('done')
+    } catch {
+      if (isCurrent()) setDiariesStatus('error')
+    }
+  }, [id])
+
   useEffect(() => {
     loadTrip()
   }, [loadTrip])
 
+  useEffect(() => {
+    // 다른 여행으로 옮겨 간 뒤 앞서 부른 응답이 늦게 와도 덮어쓰지 않게 한다.
+    let current = true
+    loadPlaces(() => current)
+    loadDiaries(() => current)
+    return () => {
+      current = false
+    }
+  }, [loadPlaces, loadDiaries])
+
   function openDialog() {
     setBlocked(null)
     setDeleteFailed(false)
+    // 두 목록을 모두 불러왔으면 그 개수로 확인 창 대신 안내를 먼저 보인다 (SCREEN-SPEC 3절 4번, D-019).
+    // 하나라도 불러오지 못했으면 확인 창을 띄우고 서버의 409로 안내한다.
+    if (placesStatus === 'done' && diariesStatus === 'done') {
+      const counts = { place_count: places.length, diary_count: diaries.length }
+      if (counts.place_count > 0 || counts.diary_count > 0) {
+        setBlocked(counts)
+        return
+      }
+    }
     setDialogOpen(true)
   }
 
@@ -114,6 +166,48 @@ export default function TripDetail() {
           삭제
         </Button>
       </div>
+
+      <section className={styles.part}>
+        <h2 className={styles.partTitle}>장소</h2>
+        {placesStatus === 'loading' && <StatusMessage kind="loading" />}
+        {placesStatus === 'error' && (
+          <StatusMessage
+            kind="error"
+            message="장소를 불러오지 못했어요."
+            onRetry={() => loadPlaces()}
+          />
+        )}
+        {placesStatus === 'done' && places.length === 0 && (
+          <StatusMessage kind="empty" message="아직 넣은 장소가 없어요." />
+        )}
+        {placesStatus === 'done' && places.length > 0 && (
+          <ul className={styles.placeList}>
+            {places.map((place) => (
+              <li key={place.id}>
+                <PlaceCard place={place} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className={styles.part}>
+        <h2 className={styles.partTitle}>일기</h2>
+        {diariesStatus === 'loading' && <StatusMessage kind="loading" />}
+        {diariesStatus === 'error' && (
+          <StatusMessage
+            kind="error"
+            message="일기를 불러오지 못했어요."
+            onRetry={() => loadDiaries()}
+          />
+        )}
+        {diariesStatus === 'done' && diaries.length === 0 && (
+          <StatusMessage kind="empty" message="아직 쓴 일기가 없어요." />
+        )}
+        {diariesStatus === 'done' && diaries.length > 0 && (
+          <DiaryList key={id} diaries={diaries} />
+        )}
+      </section>
 
       <ConfirmDialog
         open={dialogOpen}

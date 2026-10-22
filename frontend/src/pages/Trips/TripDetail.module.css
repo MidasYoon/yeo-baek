@@ -34,6 +34,33 @@
   gap: var(--space-8);
 }
 
+/* 상세 안의 장소·일기 목록 (R-T-009) */
+.part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.partTitle {
+  margin: 0;
+}
+
+/* 장소 목록 판: 장소 화면(Places.module.css .list)과 같은 모양을 옮겨 둔다. 바꿀 때 두 곳을 함께 고친다. */
+.placeList {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-row);
+  list-style: none;
+}
+
+.placeList > li + li {
+  border-top: 1px solid var(--color-line);
+}
+
 .center {
   display: flex;
   justify-content: center;
