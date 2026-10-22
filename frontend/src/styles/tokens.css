@@ -1,0 +1,55 @@
+/* 공통 토큰 (팀 공동, D-010). 값은 DESIGN.md 2~4절을 따른다. */
+:root {
+  /* 색 (DESIGN 2절) */
+  --color-bg: #faf5ec;
+  --color-surface: #fffdf8;
+  --color-surface-sunken: #f3eadb;
+  --color-line: #e8dccb;
+  --color-line-strong: #dccbb5;
+  --color-text: #2b211b;
+  --color-text-muted: #6e5d50;
+  --color-accent: #b23a2b;
+  --color-accent-deep: #862c20;
+  --color-accent-soft: #f6e7e6;
+  --color-indigo: #2c4a6b;
+  --color-gold: #c99a2e;
+  --color-green: #3e7a6a;
+
+  /* 글꼴 (DESIGN 3절) */
+  --font-heading: 'Hahmlet', serif;
+  --font-body: 'IBM Plex Sans KR', sans-serif;
+
+  /* 간격 (DESIGN 4절) */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-28: 28px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-80: 80px;
+  --space-96: 96px;
+
+  /* 폭과 높이 (DESIGN 4절) */
+  --content-width-wide: 1200px; /* Home, 여행지 정보 */
+  --content-width-trip: 960px; /* 여행기록 */
+  --content-width-diary: 880px; /* 여행 다이어리 */
+  --page-gutter: 24px;
+  --header-height: 76px;
+
+  /* 모양 (DESIGN 4절) */
+  --radius: 4px;
+  --shadow-card: 0 12px 32px rgba(60, 40, 20, 0.06);
+  --shadow-row: 0 8px 24px rgba(60, 40, 20, 0.05);
+  --shadow-hover: 0 12px 32px rgba(60, 40, 20, 0.1);
+}
+
+/* 모바일 (768px 미만, DESIGN 4·5절의 제안) */
+@media (max-width: 767px) {
+  :root {
+    --page-gutter: 16px;
+  }
+}

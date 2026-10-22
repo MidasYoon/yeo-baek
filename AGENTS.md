@@ -14,7 +14,7 @@
 | DB | SQLite |
 
 - 기술 스택은 React · FastAPI · SQLite로 고정한다. 다른 프레임워크·DB를 들이지 않는다.
-- 버전과 설치·실행 명령은 아직 미정이다. (`README.md`의 실행 방법은 제안이다.)
+- 버전과 설치·실행 명령은 `docs/DECISIONS.md`의 D-024를 따른다. (`README.md`의 실행 방법과 같다.)
 
 ## 범위
 
@@ -31,7 +31,7 @@
 | 여행 다이어리 (날짜별 일기) | 건용 |
 
 - 공통 파일(라우터 등록 `backend/main.py`, 화면 레이아웃, DB 설정) 관리자: 건용
-- 공통 스타일 파일(`tokens.css`, `global.css`), `vite.config.js`, `App.jsx`: 팀 공동 관리, 합의 후 수정 (D-010, D-013)
+- 공통 스타일 파일(`tokens.css`, `global.css`), `vite.config.js`, `App.jsx`, 공통 부품(`components/`, `Layout/` 제외): 팀 공동 관리, 합의 후 수정 (D-010, D-013, D-028)
 - 첫 화면(Home) 담당: 은희
 - 요청한 사람이 맡은 기능 밖의 파일을 고쳐야 하면 멈추고 사람에게 묻는다.
 - 공통 문서(README, AGENTS, DECISIONS 등)와 공통 설계 문서(PRD, ARCHITECTURE, DATA-MODEL, API-SPEC)는 팀이 합의한 뒤에만 고친다. 담당자별 절도 마찬가지다.
@@ -42,7 +42,7 @@
 | --- | --- |
 | 날짜 형식 | `YYYY-MM-DD` |
 | 포트 | 백엔드 8000, 프론트엔드 5173 (Vite 기본값) |
-| 이름 규칙 | 미정 |
+| 이름 규칙 | DB 필드 snake_case (D-016), 토큰·컴포넌트 파일 (D-025), JS camelCase·Python snake_case (D-027). CSS 클래스는 미정 |
 | 스타일 방식 | CSS Module + 공통 토큰 파일 (D-008) |
 | 기본 브랜치 | `master` |
 | 브랜치 이름 | 미정 |

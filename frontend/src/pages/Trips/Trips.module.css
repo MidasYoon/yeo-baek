@@ -1,0 +1,25 @@
+/* 여행기록 화면 배치: DESIGN 4절 (콘텐츠 최대 폭 960px) */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: var(--content-width-trip);
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

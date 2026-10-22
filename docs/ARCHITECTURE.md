@@ -34,11 +34,11 @@
 | 프론트엔드 | React | 확정 |
 | 빌드 도구 | Vite | 확정 (D-008) |
 | 스타일 | CSS Module + 공통 토큰 파일 | 확정 (D-008) |
-| 화면 주소 | React Router | 확정 (D-012). 설치는 따로 승인 |
+| 화면 주소 | React Router | 확정 (D-012). P-12에서 설치함 |
 | 백엔드 | FastAPI | 확정 |
 | DB | SQLite | 확정 |
 | DB 접근 방식 | `sqlite3` | 확정 (D-009) |
-| 버전, 설치·실행 명령 | — | 미정 |
+| 버전, 설치·실행 명령 | Python 3.10+, Node.js 20+. 명령은 `README.md` "실행 방법" | 확정 (D-024) |
 
 React · FastAPI · SQLite 외의 프레임워크·DB는 쓰지 않는다.
 
@@ -66,12 +66,12 @@ frontend/
    │  ├─ Trips/       서준
    │  ├─ Places/      은희
    │  └─ Diary/       건용
-   ├─ components/     공통 컴포넌트
-   │  └─ Layout/      공통 레이아웃, 네비 포함 (건용)
+   ├─ components/     공통 컴포넌트 (팀 공동, D-028)
+   │  └─ Layout/      공통 레이아웃, 네비 포함 (건용). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)
 backend/
 ├─ main.py            앱 생성, 라우터 등록 (건용)
-├─ database.py        SQLite 연결 (건용)
+├─ database.py        SQLite 연결 (건용). 테이블 만들기 포함, DB 파일 yeoback.db (D-026)
 ├─ routers/
 │  ├─ trips.py        서준
 │  ├─ places.py       은희
@@ -79,7 +79,7 @@ backend/
 └─ requirements.txt
 ```
 
-- 변수·함수 이름 같은 일반 이름 규칙은 미정이다 (AGENTS).
+- 컴포넌트 파일 이름은 PascalCase로 짓는다 (D-025). 변수·함수 이름은 JS camelCase, Python snake_case로 짓는다 (D-027). CSS 클래스 이름 규칙은 미정이다 (AGENTS).
 
 ## 4. 공통 파일과 담당자
 
@@ -91,6 +91,7 @@ backend/
 | 공통 스타일 | `frontend/src/styles/tokens.css`, `global.css` | 팀 공동 (합의 후 수정) | D-010 |
 | 프록시 설정 | `frontend/vite.config.js` | 팀 공동 (합의 후 수정) | D-010, D-011 |
 | 화면 주소 등록 | `frontend/src/App.jsx` | 팀 공동 (합의 후 수정) | D-013 |
+| 공통 부품 (상태 표시, 확인 창, 버튼, 여행 select) | `frontend/src/components/` (`Layout/` 제외) | 팀 공동 (합의 후 수정) | D-028 |
 | 첫 화면 Home (`/`) | `frontend/src/pages/Home/` | 은희 | D-004 |
 | 여행기록 화면·API 호출·라우터 | `pages/Trips/`, `api/trips.js`, `routers/trips.py` | 서준 | AGENTS 역할 분담 |
 | 여행지 정보 화면·API 호출·라우터 | `pages/Places/`, `api/places.js`, `routers/places.py` | 은희 | AGENTS 역할 분담 |
@@ -118,7 +119,7 @@ Home은 세 기능의 API를 가져다 쓰기만 한다 (PRD 5절 Home "5. 다�
 
 | 항목 | 내용 | 상태 |
 | --- | --- | --- |
-| 화면 주소를 나누는 방법 | React Router | 확정 (D-012). 새 라이브러리라 설치 전에 승인 필요 |
+| 화면 주소를 나누는 방법 | React Router | 확정 (D-012). P-12에서 설치함 |
 | 화면 주소를 등록하는 파일 | `frontend/src/App.jsx` (팀 공동) | 확정 (D-013) |
 | Home | `/` | 확정 (README, PRD, D-012) |
 | 여행기록 | `/trip` | 확정 (D-012) |

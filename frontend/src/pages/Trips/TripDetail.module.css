@@ -1,0 +1,40 @@
+/* 여행 상세 */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.title {
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.info {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.blocked {
+  margin: 0;
+  color: var(--color-accent-deep);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}

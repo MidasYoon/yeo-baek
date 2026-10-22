@@ -29,6 +29,12 @@
 | D-021 | 공백만 적은 필수 글자 값은 서버가 `422`로 막고, 화면은 `422`를 받으면 공통 저장 실패 문구를 보인다 | 유효 | 2026-10-21 |
 | D-022 | 자동 테스트 도구를 쓰지 않고, TEST-PLAN의 검사를 손으로 한다 | 유효 | 2026-10-21 |
 | D-023 | `docs/DESIGN.md`를 만들고, 화면 모양은 "한지 노을" 시안을 따른다. 글꼴은 Google Fonts로 불러온다 | 유효 | 2026-10-21 |
+| D-024 | 도구 버전과 설치·실행 명령을 README 제안대로 정한다 | 유효 | 2026-10-22 |
+| D-025 | 토큰 이름은 DESIGN 제안대로, 컴포넌트 파일 이름은 PascalCase로 정한다 | 유효 | 2026-10-22 |
+| D-026 | DB 파일은 `backend/yeoback.db`, 테이블 만들기는 `database.py`에 모으고, 백엔드 패키지 버전을 고정하고, PowerShell venv 명령을 더한다 | 유효 | 2026-10-22 |
+| D-027 | 변수·함수 이름은 프론트엔드 camelCase·백엔드 snake_case, `api/` 함수는 실패하면 Error를 던지고, 공통 부르기 코드는 기능별 파일에 각각 둔다 | 유효 | 2026-10-22 |
+| D-028 | 작업 계획을 메뉴별(P-22~P-34)로 다시 짜고, 공통 부품은 팀 공동으로 관리하고, 지도는 사람이 넣은 파일을 쓴다 | 유효 | 2026-10-22 |
+| D-029 | 글자 값은 앞뒤 공백을 빼고 저장하고, `PUT` 검사 순서는 422 → 404 → 409로 한다 | 유효 | 2026-10-22 |
 
 ## D-001 여행기록
 
@@ -356,5 +362,143 @@
 - **다시 볼 조건:** 시안의 Home 문구·그림이나 여행지 정보 2단 배치를 SCREEN-SPEC에서 넣지 않기로 할 때 (DESIGN.md 11절), Google Fonts를 쓸 수 없을 때
 - **상태:** 유효
 - **날짜:** 2026-10-21
+
+## D-024 도구 버전과 설치·실행 명령
+
+- **결정:**
+  - 버전은 Python 3.10 이상, Node.js 20 이상을 쓴다.
+  - 처음 한 번 설치한다.
+    - `backend/`에서 `python -m venv venv`, `venv\Scripts\activate`, `pip install -r requirements.txt`
+    - `frontend/`에서 `npm install`
+  - 매번 켤 때는 터미널 2개를 열고 백엔드부터 켠다.
+    - `backend/`에서 venv를 켠 상태로 `uvicorn main:app --reload --port 8000`
+    - `frontend/`에서 `npm run dev`
+  - 서버는 `backend/` 안에서 켠다. 저장소 맨 위에서 `backend.main:app`으로 켜지 않는다.
+- **배경:** 구현 단계 P-11(도구 확인)의 완료 조건이다. 버전과 설치·실행 명령이 "미정"으로 남아 있었다 (AGENTS.md "환경", PLAN "남은 문제").
+- **이유:** README "실행 방법"에 이미 적힌 제안이라 팀원이 따로 익힐 것이 없다. 포트 8000·5173(AGENTS.md 공통 규칙)과 맞는다. 2026-10-22에 확인한 PC 한 대의 버전(Node v22.23.3, npm 10.9.9, Python 3.12.10)이 기준을 충족한다.
+- **다른 선택지:** 저장소 맨 위에서 `uvicorn backend.main:app`으로 켜는 안. 버전을 하나로 고정하는 안(예: Python 3.12, Node 22).
+- **누가·근거:** 사람이 README 제안대로 확정함 (PLAN P-11). 팀원 모두의 합의인지는 확인 필요.
+- **영향:**
+  - `README.md` "실행 방법"의 "제안" 표시와 "현재 상태"
+  - `AGENTS.md` "환경"의 "버전과 설치·실행 명령은 아직 미정"
+  - `docs/PLAN.md` "남은 문제"의 "버전, 설치·실행 명령"과 P-11 상태
+  - P-12·P-13에서 `frontend/package.json`과 `backend/requirements.txt`를 이 명령에 맞춰 만든다. 서준·은희 PC의 버전은 아직 확인하지 않았다.
+- **다시 볼 조건:** 팀원 PC가 버전 기준에 못 미칠 때, Windows가 아닌 PC에서 venv를 켜야 할 때(`source venv/bin/activate`), `backend/` 밖에서 서버를 켜야 할 일이 생길 때
+- **상태:** 유효
+- **날짜:** 2026-10-22
+
+## D-025 토큰 이름과 컴포넌트 파일 이름
+
+- **결정:**
+  - `frontend/src/styles/tokens.css`의 이름을 아래처럼 쓴다.
+    - 색: DESIGN 2절 이름 그대로 (`--color-bg`, `--color-accent` 등)
+    - 글꼴: `--font-heading`(Hahmlet), `--font-body`(IBM Plex Sans KR)
+    - 간격: `--space-4` ~ `--space-96` (DESIGN 4절 간격 단계의 px 값을 이름에 붙인다)
+    - 폭·높이: `--content-width-wide`(1200px), `--content-width-trip`(960px), `--content-width-diary`(880px), `--page-gutter`, `--header-height`
+    - 모양: `--radius`, `--shadow-card`, `--shadow-row`, `--shadow-hover`
+  - 컴포넌트 파일과 그 CSS Module은 PascalCase로 짓는다 (예: `Layout.jsx`, `Layout.module.css`, `Home.jsx`). 폴더 이름과 같게 한다.
+  - 없는 주소 화면은 `frontend/src/components/Layout/NotFound.jsx`에 둔다.
+- **배경:** P-12(화면 틀)에서 `tokens.css`와 화면 파일을 만들어야 했다. DESIGN 2절의 토큰 이름은 "제안"이었고 코드 이름 규칙은 미정이었다. 없는 주소 화면은 README 폴더 구조에 자리가 없었다.
+- **이유:** DESIGN에 이미 적힌 이름이라 문서와 코드가 같다. PascalCase는 Vite 기본 파일 `App.jsx`(D-013)와 같은 방식이다. 없는 주소 화면은 SCREEN-SPEC 2절에서 공통 레이아웃(건용) 담당이라, 같은 폴더에 두면 폴더를 늘리지 않는다.
+- **다른 선택지:** `tokens.css`를 비워 두고 이름을 나중에 정하는 안. 폴더마다 `index.jsx`를 두는 안. 없는 주소 화면을 `pages/NotFound/`에 두는 안.
+- **누가·근거:** 팀이 함께 P-12를 하며 AI 제안대로 정함 (PLAN P-12)
+- **영향:**
+  - `docs/DESIGN.md` 2절의 "토큰 이름은 제안이다"
+  - `docs/PLAN.md` "남은 문제"의 이름 규칙 줄
+  - `README.md`·`docs/ARCHITECTURE.md` 폴더 구조에 `NotFound.jsx`
+  - 변수·함수 이름, CSS Module 안의 클래스 이름 규칙은 여전히 미정이다.
+- **다시 볼 조건:** DESIGN에 새 값이 생겨 토큰 이름을 더해야 할 때, 담당자가 화면 안에서 쓸 작은 부품 파일의 이름 규칙이 따로 필요할 때
+- **상태:** 유효
+- **날짜:** 2026-10-22
+
+## D-026 DB 파일, 테이블 만들기 위치, 백엔드 패키지 버전
+
+- **결정:**
+  - DB 파일은 `backend/yeoback.db` 하나다. `database.py`가 있는 폴더를 기준으로 경로를 잡아, 어디서 켜도 같은 파일을 쓴다.
+  - 테이블 3개의 `CREATE TABLE IF NOT EXISTS`는 모두 `backend/database.py`(건용)에 둔다. `trips`를 먼저 만들고 `places`·`diaries`를 만든다. 서버가 시작할 때 `main.py`가 `init_db()`를 부른다.
+  - `backend/requirements.txt`에는 설치된 버전을 고정해 적는다 (`fastapi==0.159.1`, `uvicorn==0.54.0`). 따라 설치되는 의존 패키지는 적지 않는다.
+  - venv 켜기는 D-024의 cmd 명령(`venv\Scripts\activate`)에 PowerShell 명령 `.\venv\Scripts\Activate.ps1`을 더한다. 실행 정책 때문에 `Activate.ps1`이 막히면, venv를 켜지 않고 `backend/`에서 `.\venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000`으로 켠다.
+- **배경:** P-13(서버 틀)에서 DB 파일 이름과 테이블을 만드는 곳을 정해야 했다. 어느 문서에도 없었다. `requirements.txt`의 버전 규칙도 없었다. PowerShell에서 venv를 켜지 않고 `uvicorn`을 실행하자 명령을 찾지 못하는 오류가 났다.
+- **이유:** 앱 이름을 딴 파일 이름이라 무슨 파일인지 알 수 있다. `places`·`diaries`가 `trips(id)`를 가리키므로 만드는 순서를 한 곳에서 지키는 편이 안전하다. 버전을 고정하면 세 사람 PC가 같은 버전을 쓴다 (프론트엔드의 `package-lock.json`과 같은 역할).
+- **다른 선택지:** DB 파일 이름을 `app.db`로 하는 안. 각 라우터 파일에 자기 테이블의 `CREATE TABLE`을 두는 안. `requirements.txt`에 이름만 적는 안. README에 cmd 명령만 두는 안.
+- **누가·근거:** 팀이 함께 P-13을 하며 AI 제안대로 정함 (PLAN P-13)
+- **영향:**
+  - 테이블 필드를 바꾸려면 `database.py`(건용)를 고쳐야 한다. 필드 변경은 원래 팀 합의 대상이다 (AGENTS "멈추고 물어볼 때").
+  - `CREATE TABLE IF NOT EXISTS`는 이미 있는 테이블을 고치지 않는다. 필드를 바꾸면 DB 파일을 지우고 다시 켜야 한다 (README "실행 방법").
+  - `README.md` 현재 상태·실행 방법(DB 파일 이름, venv 켜기 줄), `docs/ARCHITECTURE.md` 3절 `database.py` 줄
+- **다시 볼 조건:** 테이블을 지우지 않고 필드를 바꿔야 할 때, 고정한 버전이 팀원 PC에서 설치되지 않을 때
+- **상태:** 유효
+- **날짜:** 2026-10-22
+
+## D-027 변수·함수 이름과 서버 호출 모양
+
+- **결정:**
+  - 프론트엔드(JavaScript)의 변수·함수 이름은 camelCase로 짓는다.
+  - 백엔드(Python)의 변수·함수 이름은 snake_case로 짓는다 (PEP 8, DB 필드 이름 D-016과 같다). 라우터 함수는 `list_trips`, `get_trip`, `create_trip`, `update_trip`, `delete_trip` 모양으로 짓는다 (장소·일기도 같다).
+  - `frontend/src/api/` 함수 이름은 "동사 + 대상"으로 짓는다.
+    - 지금 있는 것: `getTrips()`, `getPlaces(tripId)`, `getDiaries(tripId)`
+    - 앞으로 만들 것: `getTrip(id)`, `createTrip(data)`, `updateTrip(id, data)`, `deleteTrip(id)` 같은 모양 (장소·일기도 같다)
+  - `api/` 함수는 성공하면 응답 JSON을 돌려준다 (`204`이면 `null`). 실패하면 `Error`를 던지고, 그 `Error`에 `status`(422·404·409 등)와 `detail`(서버의 `detail`, 없으면 `null`)을 담는다. 화면은 `try`/`catch`로 받는다.
+  - 서버에 닿지 못하면 `fetch`가 던지는 오류를 그대로 둔다 (`status` 없음).
+  - 오류를 던지는 공통 부르기 함수(`request`)는 `trips.js` · `places.js` · `diaries.js`에 각각 둔다. 공통 파일을 따로 만들지 않는다.
+- **배경:** P-14(화면·서버 연결)에서 `api/` 함수를 처음 만들었다. 변수·함수 이름 규칙이 미정이었고(AGENTS 공통 규칙), 화면이 오류를 받는 모양도 정하지 않았다.
+- **이유:** camelCase는 JavaScript와 React에서 흔히 쓰는 방식이다. snake_case는 Python 표준 방식이고, 이미 만든 라우터 함수(`list_trips` 등)와 같다. `Error`에 `status`와 `detail`을 담으면 화면이 409의 개수(`place_count`, `diary_count`)로 안내를 만들 수 있고, 422는 공통 저장 실패 문구로 보일 수 있다 (D-019, D-021). 공통 코드를 세 파일에 두면 정한 폴더 구조(D-010)와 "기능별 파일 하나씩"(AGENTS 코드 규칙)을 바꾸지 않는다.
+- **다른 선택지:** `fetch` 앞붙임(`fetchTrips`). 실패해도 던지지 않고 `{ ok, status, data }`를 돌려주는 안. 공통 코드를 `api/request.js` 한 곳에 두는 안. 백엔드 이름 규칙은 미정으로 두는 안.
+- **누가·근거:** 팀이 함께 P-14를 하며 AI 제안대로 정함 (PLAN P-14)
+- **영향:**
+  - `request`를 고치면 세 파일을 같이 고쳐야 한다.
+  - `AGENTS.md` 공통 규칙의 "이름 규칙: 미정", `docs/ARCHITECTURE.md` 3절, `docs/API-SPEC.md` 1절 "주고받는 값", `docs/PLAN.md` "남은 문제"의 이름 규칙 줄
+  - 이름 규칙에서 남은 것은 CSS Module 클래스 이름과 브랜치 이름이다.
+- **다시 볼 조건:** `request`를 세 파일에서 따로 고치다 서로 달라질 때, 화면에서 서버에 닿지 못한 오류를 따로 다뤄야 할 때
+- **상태:** 유효
+- **날짜:** 2026-10-22
+
+## D-028 메뉴별 작업 계획과 공통 부품 관리
+
+- **결정:**
+  - PLAN의 P-15~P-18을 빼고, 메뉴별 작업 P-22~P-34로 다시 짠다. 순서는 공통 부품 → 여행기록 → 여행지 정보 → 다이어리 → Home → 기능 연결이고, 그다음 P-19(전체 오류 검사로 바꿈) → P-20 → P-21이다.
+  - 공통 부품(`frontend/src/components/` 안의 상태 표시, 지우기 확인 창, 버튼, 여행 select)은 담당자를 두지 않고 팀 공동으로 관리한다. 팀이 합의한 뒤에만 고친다. `components/Layout/`은 그대로 건용이 맡는다 (D-004, D-010).
+  - 지도 그림은 사람이 이미지 폴더에 넣어 둔 파일을 쓴다. 폴더 위치와 파일 이름은 P-29를 시작하기 전에 정한다.
+- **배경:** P-15~P-18이 기능을 가로질러 나뉘어 있어("카드 만들기", "수정·삭제") 담당자와 화면이 섞였고, "카드"의 뜻도 정해지지 않았다. 지우기 확인 창과 여행 select는 여러 메뉴가 함께 쓰는데 담당이 없었다. DESIGN 10절은 지도 그림을 "개발 단계"로 넘겨 두었다.
+- **이유:** 메뉴별로 나누면 담당자(AGENTS 역할 분담)와 SCREEN-SPEC·TEST-PLAN 절이 한 작업에 맞는다. 장소·일기는 여행에 붙고 Home은 세 기능의 API를 쓰므로 이 순서로 한다. 여러 메뉴가 쓰는 부품은 `tokens.css`·`App.jsx`처럼 팀 공동으로 둔다.
+- **다른 선택지:** P-15~P-18을 그대로 두고 "카드"의 뜻만 정하는 안. 공통 부품을 건용이 맡는 안. 여행 select만 은희가 맡는 안. 지도를 직접 그린 단순 윤곽이나 공개 무료 SVG로 하는 안.
+- **누가·근거:** 사람이 메뉴별 작업으로 다시 짜라고 요청하고, AI 초안에서 P-19 처리·부품 담당·지도 파일을 골라 정함 (PLAN)
+- **영향:**
+  - `docs/PLAN.md` 작업 목록·구현 인계
+  - `README.md`·`AGENTS.md`·`docs/ARCHITECTURE.md` 4절의 팀 공동 파일 목록
+  - `docs/DESIGN.md` 10절 지도 줄
+  - 공통 부품을 고칠 때마다 합의가 필요하다.
+- **다시 볼 조건:** 공통 부품을 고칠 때마다 합의를 기다리느라 일정이 밀릴 때, 지도 파일을 쓸 수 없을 때
+- **상태:** 유효
+- **날짜:** 2026-10-22
+
+## D-029 글자 값의 앞뒤 공백과 `PUT` 검사 순서
+
+- **결정:**
+  - 필수 글자 값(여행명·여행지, 장소 이름, 일기 제목)은 서버가 앞뒤 공백을 빼고 저장한다. 글자 수(20자·50자)도 뺀 뒤 센다. 빼고 나서 비면 `422`다 (D-021).
+  - 선택 글자 값(여행 정보, 장소 메모, 일기 본문)은 앞뒤 공백을 빼고 저장한다. 비우거나 공백만 적으면 `null`로 저장한다.
+  - 날짜는 `YYYY-MM-DD` 꼴이고 실제로 있는 날짜만 받는다. `20260101`처럼 꼴이 다르면 `422`다.
+  - `PUT`의 검사 순서는 본문 규칙 `422` → 없는 `id` `404` → 장소·일기 때문에 막힘 `409`(여행만)다. FastAPI가 본문을 라우터보다 먼저 검사하는 순서를 그대로 쓴다. `DELETE`는 `404` → `409`(여행만)다.
+  - 이것으로 API-SPEC 1절 열린 질문 A-02를 닫는다.
+- **배경:**
+  - P-23(여행기록 API)을 만들며 정해야 했다. D-021은 "공백만이면 422"만 정했고, 저장할 때 공백을 빼는지는 정하지 않았다.
+  - A-02는 API-SPEC의 `404 → 422 → 409`(AI 제안)가 FastAPI에서 지켜지는지 묻는 열린 질문이었다.
+- **이유:**
+  - 공백을 빼고 저장하면 목록·select·Home 카드에 빈칸이 생기지 않고, 글자 수도 보이는 만큼만 센다.
+  - FastAPI 기본 순서를 쓰면 세 라우터의 코드가 간단하고 서로 같아진다.
+  - TEST-PLAN은 순서를 검사하지 않는다 (TEST-PLAN 3절 6번). 없는 `id`에 틀린 본문을 보내는 일은 화면에서는 생기지 않는다.
+- **다른 선택지:**
+  - 공백만인지 검사하고, 적은 값은 그대로 저장하는 안
+  - `404 → 422 → 409`를 지키려고 본문을 라우터에서 직접 검사하는 안
+  - A-02를 열어 두는 안
+  - 공백 규칙을 여행기록에만 적용하는 안
+- **누가·근거:** 팀이 함께 P-23을 하며 AI 제안대로 정함 (PLAN P-23)
+- **영향:**
+  - `backend/routers/trips.py`(P-23)에 적용했다. `places.py`(P-26)와 `diaries.py`(P-30)도 같은 규칙으로 만든다.
+  - `docs/API-SPEC.md` 1절 열린 질문 A-02, 2~4절 "3. 요청 본문과 서버 검사" 표, "4. API별 규칙"의 `PUT` 검사 순서 줄
+  - `docs/PLAN.md` "남은 문제"의 `PUT` 검사 순서 줄
+- **다시 볼 조건:** 화면이 `422`를 받아 칸별 안내를 보여야 할 때 (D-019·D-021과 같음), 없는 `id`에 `404`를 먼저 보여야 할 화면이 생길 때
+- **상태:** 유효
+- **날짜:** 2026-10-22
 
 ## 열린 질문

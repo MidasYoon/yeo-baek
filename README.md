@@ -5,7 +5,7 @@
 
 ## 현재 상태
 
-- 기획 단계입니다. 아직 코드가 없습니다.
+- 구현 단계입니다. 화면 틀(`frontend/`: 네비와 빈 화면 4개, 없는 주소 화면)을 만들었습니다. 서버 틀(`backend/`)과 테이블 3개(`trips`, `places`, `diaries`)를 만들었습니다. 목록 API 3개와 화면·서버 연결(Vite 프록시)을 만들었습니다. 공통 부품 4개(버튼, 상태 표시, 지우기 확인 창, 여행 select)를 만들었습니다. 여행기록 API(목록·하나·만들기·고치기·지우기)와 여행 목록·추가·상세·수정·삭제 화면(`/trip`, `/trip/new`, `/trip/:id`, `/trip/:id/edit`)을 만들었습니다. 여행 상세 안의 장소·일기 목록은 아직 없습니다.
 - 제품 요구 문서(`docs/PRD.md`)를 작성했습니다.
 - 구조 문서(`docs/ARCHITECTURE.md`)를 작성했습니다.
 - 화면 명세(`docs/SCREEN-SPEC.md`)를 작성했습니다.
@@ -39,7 +39,7 @@
 | 건용 | 여행 다이어리 |
 
 - 공통 파일(라우터 등록 `backend/main.py`, 화면 레이아웃, DB 설정) 관리자: 건용
-- 공통 스타일 파일(`tokens.css`, `global.css`), `vite.config.js`, `App.jsx`: 팀 공동 관리, 합의 후 수정 (D-010, D-013)
+- 공통 스타일 파일(`tokens.css`, `global.css`), `vite.config.js`, `App.jsx`, 공통 부품(`components/`, `Layout/` 제외): 팀 공동 관리, 합의 후 수정 (D-010, D-013, D-028)
 - 첫 화면(Home) 담당: 은희
 
 ## 기술 스택
@@ -81,8 +81,8 @@ frontend/
    │  ├─ Trips/       서준
    │  ├─ Places/      은희
    │  └─ Diary/       건용
-   ├─ components/     공통 컴포넌트
-   │  └─ Layout/      공통 레이아웃, 네비 포함 (공통 파일)
+   ├─ components/     공통 컴포넌트 (팀 공동, D-028)
+   │  └─ Layout/      공통 레이아웃, 네비 포함 (공통 파일). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)
 backend/
 ├─ main.py            앱 생성, 라우터 등록 (공통 파일)
@@ -133,7 +133,7 @@ backend/
 
 ## 실행 방법
 
-> ⚠️ 코드가 아직 없어 아래 명령은 **제안**입니다. 뼈대를 만든 뒤 실제 명령으로 고쳐 주세요.
+> 아래 버전과 명령은 D-024로 확정했습니다. 코드가 아직 없어 실제로 실행해 보지는 않았습니다.
 
 **준비물:** Python 3.10+, Node.js 20+
 
@@ -142,7 +142,8 @@ backend/
 ```bash
 cd backend
 python -m venv venv
-venv\Scripts\activate
+venv\Scripts\activate          (cmd)
+.\venv\Scripts\Activate.ps1    (PowerShell)
 pip install -r requirements.txt
 ```
 
@@ -159,7 +160,8 @@ npm install
 | `frontend/` | `npm run dev` | http://localhost:5173 |
 
 - 포트는 백엔드 8000(FastAPI 기본값), 프론트엔드 5173(Vite 기본값)으로 확정했습니다.
-- DB 파일(`*.db`)은 Git에 올리지 않습니다. 데이터를 초기화하려면 서버를 끄고 지운 뒤 다시 켜면 됩니다.
+- PowerShell에서 `Activate.ps1`이 실행 정책 때문에 막히면, venv를 켜지 않고 `backend/`에서 `.\venv\Scripts\python.exe -m uvicorn main:app --reload --port 8000`으로 켭니다 (D-026).
+- DB 파일(`backend/yeoback.db`, D-026)은 Git에 올리지 않습니다. 데이터를 초기화하려면 서버를 끄고 지운 뒤 다시 켜면 됩니다.
 
 ## 확인과 기록
 

@@ -1,0 +1,61 @@
+/* 입력 칸·상태 표시: DESIGN 6절 "입력 칸", "상태 표시" */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.input {
+  height: 48px;
+  padding: 0 var(--space-12);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.textarea {
+  min-height: 160px;
+  padding: var(--space-12);
+  resize: vertical;
+}
+
+.invalid {
+  border-color: var(--color-accent);
+}
+
+.error {
+  color: var(--color-accent-deep);
+  font-size: 13px;
+}
+
+.dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-16);
+}
+
+.saveError {
+  margin: 0;
+  color: var(--color-accent-deep);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
