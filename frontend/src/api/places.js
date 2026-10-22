@@ -16,3 +16,27 @@ async function request(url, options) {
 export function getPlaces(tripId) {
   return request(`/api/places?trip_id=${encodeURIComponent(tripId)}`)
 }
+
+export function getPlace(id) {
+  return request(`/api/places/${encodeURIComponent(id)}`)
+}
+
+export function createPlace(data) {
+  return request('/api/places', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+}
+
+export function updatePlace(id, data) {
+  return request(`/api/places/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+}
+
+export function deletePlace(id) {
+  return request(`/api/places/${encodeURIComponent(id)}`, { method: 'DELETE' })
+}

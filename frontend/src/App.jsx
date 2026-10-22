@@ -7,6 +7,8 @@ import TripNew from './pages/Trips/TripNew.jsx'
 import TripDetail from './pages/Trips/TripDetail.jsx'
 import TripEdit from './pages/Trips/TripEdit.jsx'
 import Places from './pages/Places/Places.jsx'
+import PlaceNew from './pages/Places/PlaceNew.jsx'
+import PlaceEdit from './pages/Places/PlaceEdit.jsx'
 import Diary from './pages/Diary/Diary.jsx'
 
 // 팀 공동 파일 (D-013). 화면 주소를 넣을 때는 팀이 합의한다.
@@ -21,6 +23,8 @@ export default function App() {
         <Route path="/trip/:id" element={<TripDetail />} />
         <Route path="/trip/:id/edit" element={<TripEdit />} />
         <Route path="/place" element={<Places />} />
+        <Route path="/place/new" element={<PlaceNew />} />
+        <Route path="/place/:id/edit" element={<PlaceEdit />} />
         <Route path="/diary" element={<Diary />} />
         <Route path="*" element={<NotFound />} />
       </Route>

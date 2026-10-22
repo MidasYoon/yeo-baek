@@ -1,0 +1,32 @@
+/* 여행지 정보 화면 배치: DESIGN 4절(최대 폭 1200px), SCREEN-SPEC 4절(위에서 아래로 쌓기) */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: var(--content-width-wide);
+  margin: 0 auto;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-16);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toolbar {
+  display: flex;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .list {
+    grid-template-columns: 1fr;
+  }
+}

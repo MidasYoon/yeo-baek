@@ -7,18 +7,22 @@ import styles from './TripSelect.module.css'
 // 여행 select (팀 공동, D-028). SCREEN-SPEC 1절, DESIGN 6절 "여행 select".
 // value: 고른 여행 번호 (없으면 빈 select). 목록에 없는 번호여도 빈 select로 보인다.
 // onChange(trip): 여행을 고르면 그 여행 객체를 넘긴다. 주소(?trip=)는 화면이 바꾼다.
-export default function TripSelect({ value, onChange }) {
+// onLoad(trips): (선택) 여행 목록을 불러오면 넘긴다. 화면이 주소의 번호가 있는 여행인지 볼 때 쓴다.
+export default function TripSelect({ value, onChange, onLoad }) {
   const [trips, setTrips] = useState([])
   const [status, setStatus] = useState('loading')
 
   const loadTrips = useCallback(async () => {
     setStatus('loading')
     try {
-      setTrips(await getTrips())
+      const loaded = await getTrips()
+      setTrips(loaded)
       setStatus('done')
+      onLoad?.(loaded)
     } catch {
       setStatus('error')
     }
+    // onLoad가 바뀔 때마다 다시 불러오지 않도록 처음 한 번만 만든다.
   }, [])
 
   useEffect(() => {

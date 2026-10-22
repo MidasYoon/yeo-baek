@@ -67,6 +67,7 @@ frontend/
    │  ├─ Places/      은희
    │  └─ Diary/       건용
    ├─ components/     공통 컴포넌트 (팀 공동, D-028)
+   ├─ assets/         지도 그림 등 (팀 공동, D-030)
    │  └─ Layout/      공통 레이아웃, 네비 포함 (건용). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)
 backend/
@@ -92,6 +93,7 @@ backend/
 | 프록시 설정 | `frontend/vite.config.js` | 팀 공동 (합의 후 수정) | D-010, D-011 |
 | 화면 주소 등록 | `frontend/src/App.jsx` | 팀 공동 (합의 후 수정) | D-013 |
 | 공통 부품 (상태 표시, 확인 창, 버튼, 여행 select) | `frontend/src/components/` (`Layout/` 제외) | 팀 공동 (합의 후 수정) | D-028 |
+| 그림 (지도 그림 등) | `frontend/src/assets/` | 팀 공동 (합의 후 수정) | D-030 |
 | 첫 화면 Home (`/`) | `frontend/src/pages/Home/` | 은희 | D-004 |
 | 여행기록 화면·API 호출·라우터 | `pages/Trips/`, `api/trips.js`, `routers/trips.py` | 서준 | AGENTS 역할 분담 |
 | 여행지 정보 화면·API 호출·라우터 | `pages/Places/`, `api/places.js`, `routers/places.py` | 은희 | AGENTS 역할 분담 |

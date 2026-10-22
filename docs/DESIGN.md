@@ -182,7 +182,7 @@ https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700;800&family=IBM+Ple
 | 2절 색, 3절 글자, 4절 여백·모양을 `tokens.css`에 옮기기. 글꼴 불러오기(`global.css`의 `@import` 제안) | 개발 단계 (팀 공동 파일, D-010) |
 | Home 큰 문구와 그림, 여행지 정보 PC 2단 배치 (11절) | `SCREEN-SPEC` 4·6절 (은희) |
 | 장식(색동·조각보 등)이 들어가도 화면이 깨지지 않는지, 768px 전후 배치 검사 | `TEST-PLAN` |
-| 지도 그림(시·도 17개 핀 좌표) | 사람이 이미지 폴더에 넣은 파일을 쓴다. 위치·파일 이름은 PLAN P-29 전에 정한다 (D-028) |
+| 지도 그림(시·도 17개 핀 좌표) | `frontend/src/assets/Map_of_South_Korea-blank.svg`를 쓰고 색은 CSS로 덮는다. 핀 위치는 `frontend/src/pages/Places/regions.js` (D-030) |
 
 ## 11. 열린 질문
 

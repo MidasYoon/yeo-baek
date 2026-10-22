@@ -31,7 +31,7 @@
 | 여행 다이어리 (날짜별 일기) | 건용 |
 
 - 공통 파일(라우터 등록 `backend/main.py`, 화면 레이아웃, DB 설정) 관리자: 건용
-- 공통 스타일 파일(`tokens.css`, `global.css`), `vite.config.js`, `App.jsx`, 공통 부품(`components/`, `Layout/` 제외): 팀 공동 관리, 합의 후 수정 (D-010, D-013, D-028)
+- 공통 스타일 파일(`tokens.css`, `global.css`), `vite.config.js`, `App.jsx`, 공통 부품(`components/`, `Layout/` 제외), 그림(`assets/`): 팀 공동 관리, 합의 후 수정 (D-010, D-013, D-028, D-030)
 - 첫 화면(Home) 담당: 은희
 - 요청한 사람이 맡은 기능 밖의 파일을 고쳐야 하면 멈추고 사람에게 묻는다.
 - 공통 문서(README, AGENTS, DECISIONS 등)와 공통 설계 문서(PRD, ARCHITECTURE, DATA-MODEL, API-SPEC)는 팀이 합의한 뒤에만 고친다. 담당자별 절도 마찬가지다.
