@@ -1,0 +1,222 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 380" role="img" aria-hidden="true">
+  <!-- Home 첫 화면 한옥 그림 (팀 공동, D-030). 2026-10-22 P-33에서 그림.
+       DESIGN 2절 색과 7절 장식 규칙을 따른다. 빨간 원은 쓰지 않는다 (달은 미색). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3DCD6"/>
+      <stop offset="0.45" stop-color="#F6E7E6"/>
+      <stop offset="1" stop-color="#FAF5EC"/>
+    </linearGradient>
+    <linearGradient id="farHill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2C4A6B" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#2C4A6B" stop-opacity="0.04"/>
+    </linearGradient>
+    <linearGradient id="midHill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2C4A6B" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#2C4A6B" stop-opacity="0.10"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EDE2D2"/>
+      <stop offset="1" stop-color="#E2D3BE"/>
+    </linearGradient>
+    <linearGradient id="roofFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3A2E27"/>
+      <stop offset="1" stop-color="#241B16"/>
+    </linearGradient>
+    <pattern id="munsal" width="18" height="18" patternUnits="userSpaceOnUse">
+      <path d="M18 0H0V18" fill="none" stroke="#2C4A6B" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <pattern id="tileLines" width="8" height="80" patternUnits="userSpaceOnUse">
+      <rect x="5.5" width="1.6" height="80" fill="#FFFDF8" fill-opacity="0.09"/>
+    </pattern>
+    <pattern id="dancheong" width="16" height="10" patternUnits="userSpaceOnUse">
+      <rect width="16" height="10" fill="#2C4A6B"/>
+      <path d="M8 1.5l3.5 3.5L8 8.5 4.5 5z" fill="#3E7A6A"/>
+      <path d="M8 3.6l1.4 1.4L8 6.4 6.6 5z" fill="#C99A2E"/>
+      <rect y="8.8" width="16" height="1.2" fill="#B23A2B"/>
+    </pattern>
+    <pattern id="ttisal" width="7" height="7" patternUnits="userSpaceOnUse">
+      <rect width="7" height="7" fill="#FFFDF8"/>
+      <path d="M0 0H7M0 3.5H7M0 0V7" stroke="#8A5A3B" stroke-opacity="0.5" stroke-width="0.7"/>
+    </pattern>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#C99A2E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#C99A2E" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moonGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.55" stop-color="#FFFDF8" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#FFFDF8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-10%" y="-50%" width="120%" height="200%">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <clipPath id="frame">
+      <rect width="560" height="380" rx="4"/>
+    </clipPath>
+    <clipPath id="roofClip">
+      <path d="M152 186C196 172 214 146 210 130H390C386 146 404 172 448 186Q300 176 152 186Z"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <!-- 하늘, 문살 격자 -->
+    <rect width="560" height="380" fill="url(#sky)"/>
+    <rect width="560" height="380" fill="url(#munsal)"/>
+
+    <!-- 달 -->
+    <circle cx="436" cy="80" r="52" fill="url(#moonGlow)"/>
+    <circle cx="436" cy="80" r="28" fill="#FFFDF8"/>
+    <circle cx="436" cy="80" r="28" fill="none" stroke="#C99A2E" stroke-opacity="0.3" stroke-width="1.2"/>
+
+    <!-- 구름 문양 -->
+    <g fill="#FFFDF8" fill-opacity="0.75" stroke="#C99A2E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M46 104c4-13 20-17 29-8 5-11 22-11 27 0 11-3 21 5 17 15H40c-7 0-8-6 6-7z"/>
+      <path d="M470 140c3-10 15-13 22-6 4-8 17-8 21 0 8-2 15 4 12 11h-59c-5 0-6-5 4-5z"/>
+    </g>
+    <g fill="none" stroke="#C99A2E" stroke-width="1.6" stroke-linecap="round">
+      <path d="M64 108c-3-6 4-10 8-6"/>
+      <path d="M484 143c-2-4 3-7 6-4"/>
+    </g>
+
+    <!-- 새 -->
+    <g fill="none" stroke="#2B211B" stroke-width="1.5" stroke-linecap="round" opacity="0.55">
+      <path d="M372 58q6-5 11 0q5-5 11 0"/>
+      <path d="M394 72q4-3.5 8 0q4-3.5 8 0"/>
+    </g>
+
+    <!-- 먼 산, 가까운 산 -->
+    <path d="M0 232C40 214 64 186 104 190C134 193 150 170 182 160C214 150 234 176 262 168C300 156 318 128 356 132C392 136 410 160 446 150C484 140 520 152 560 170V380H0Z" fill="url(#farHill)"/>
+    <path d="M0 262C30 248 60 226 100 230C138 234 160 212 200 210C236 208 252 226 288 220C322 214 344 194 380 196C420 198 440 218 478 210C512 203 536 210 560 220V380H0Z" fill="url(#midHill)"/>
+    <!-- 안개 -->
+    <g filter="url(#soft)" fill="#FFFDF8">
+      <ellipse cx="120" cy="250" rx="150" ry="9" opacity="0.7"/>
+      <ellipse cx="440" cy="238" rx="160" ry="8" opacity="0.6"/>
+    </g>
+
+    <!-- 땅 -->
+    <path d="M0 314Q280 296 560 314V380H0Z" fill="url(#ground)"/>
+    <ellipse cx="300" cy="319" rx="178" ry="7" fill="#C9B79E" opacity="0.45"/>
+
+    <!-- 돌담 -->
+    <g>
+      <path d="M440 298H560V318H440Z" fill="#D6C5AE"/>
+      <g fill="#E8DCCB" stroke="#C9B79E" stroke-width="1">
+        <ellipse cx="452" cy="305" rx="10" ry="6"/><ellipse cx="474" cy="304" rx="11" ry="6"/>
+        <ellipse cx="498" cy="305" rx="10" ry="6"/><ellipse cx="520" cy="304" rx="11" ry="6"/>
+        <ellipse cx="544" cy="305" rx="10" ry="6"/>
+        <ellipse cx="462" cy="314" rx="10" ry="5"/><ellipse cx="486" cy="314" rx="11" ry="5"/>
+        <ellipse cx="510" cy="314" rx="10" ry="5"/><ellipse cx="534" cy="314" rx="11" ry="5"/>
+      </g>
+      <path d="M436 298Q498 290 564 298L560 292Q498 284 440 292Z" fill="#2B211B"/>
+    </g>
+
+    <!-- 장독대 -->
+    <g>
+      <path d="M470 318c-5-15 0-27 13-29h6c13 2 18 14 13 29z" fill="#6E5D50"/>
+      <path d="M473 296h26" stroke="#8A7A6B" stroke-width="1.2"/>
+      <rect x="472" y="286" width="28" height="5" rx="2.5" fill="#4A3B32"/>
+      <path d="M506 318c-3-10 0-18 9-20h4c9 2 12 10 9 20z" fill="#6E5D50"/>
+      <rect x="508" y="295" width="20" height="4" rx="2" fill="#4A3B32"/>
+    </g>
+
+    <!-- 소나무 -->
+    <g>
+      <path d="M84 324C74 290 100 262 86 228C80 210 92 192 106 178" fill="none" stroke="#5A3A26" stroke-width="9" stroke-linecap="round"/>
+      <path d="M88 254C106 248 122 240 136 226" fill="none" stroke="#5A3A26" stroke-width="5" stroke-linecap="round"/>
+      <path d="M84 216C70 210 56 206 42 208" fill="none" stroke="#5A3A26" stroke-width="4" stroke-linecap="round"/>
+      <path d="M86 290c-4-4-4-10 0-14" fill="none" stroke="#3E2818" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+      <g fill="#2F5F52">
+        <path d="M22 212q18-15 42-9q17-8 32 2q-6 11-28 10q-25 5-46-3z"/>
+        <path d="M104 232q16-12 35-7q15-6 27 4q-8 9-27 7q-19 5-35-4z"/>
+        <path d="M74 182q21-16 46-9q19-8 33 4q-8 12-31 10q-28 5-48-5z"/>
+      </g>
+      <g fill="#3E7A6A">
+        <path d="M28 206q16-11 35-6q14-6 25 2q-6 8-23 7q-21 4-37-3z"/>
+        <path d="M110 226q14-9 29-5q12-5 22 3q-6 7-21 6q-17 3-30-4z"/>
+        <path d="M80 176q18-12 40-7q16-6 28 3q-7 9-26 8q-23 4-42-4z"/>
+      </g>
+      <g fill="#FFFDF8" opacity="0.18">
+        <path d="M40 204q12-6 24-3q-10 2-24 3z"/>
+        <path d="M92 172q14-7 28-4q-12 2-28 4z"/>
+      </g>
+    </g>
+
+    <!-- 풀 -->
+    <g fill="none" stroke="#3E7A6A" stroke-width="1.5" stroke-linecap="round" opacity="0.7">
+      <path d="M140 326l-3-8M144 326l1-9M148 326l4-7"/>
+      <path d="M420 324l-3-7M424 324l1-8M428 324l4-6"/>
+    </g>
+
+    <!-- 한옥: 기단, 계단 -->
+    <rect x="168" y="290" width="264" height="24" rx="2" fill="#DCCBB5"/>
+    <path d="M168 302H432M212 290V302M256 302V314M300 290V302M344 302V314M388 290V302" stroke="#C9B79E" stroke-width="1.1"/>
+    <rect x="274" y="314" width="52" height="7" rx="1.5" fill="#C9B79E"/>
+    <rect x="282" y="321" width="36" height="6" rx="1.5" fill="#DCCBB5"/>
+
+    <!-- 마루 -->
+    <rect x="184" y="278" width="232" height="12" fill="#8A5A3B"/>
+    <path d="M184 283H416" stroke="#6E4630" stroke-width="1"/>
+
+    <!-- 벽, 창호 -->
+    <rect x="200" y="210" width="200" height="68" fill="#FFFDF8"/>
+    <rect x="208" y="218" width="42" height="52" fill="url(#ttisal)"/>
+    <rect x="350" y="218" width="42" height="52" fill="url(#ttisal)"/>
+    <rect x="270" y="214" width="60" height="64" fill="#F6E7E6"/>
+    <rect x="270" y="214" width="60" height="64" fill="url(#glow)"/>
+    <rect x="270" y="214" width="28" height="64" fill="url(#ttisal)"/>
+    <path d="M298 214V278" stroke="#8A5A3B" stroke-width="1.4"/>
+    <rect x="308" y="236" width="12" height="10" fill="#C99A2E" opacity="0.35"/>
+
+    <!-- 기둥, 창방 -->
+    <g fill="#5A3A26">
+      <rect x="190" y="204" width="10" height="74"/>
+      <rect x="258" y="204" width="10" height="74"/>
+      <rect x="332" y="204" width="10" height="74"/>
+      <rect x="400" y="204" width="10" height="74"/>
+    </g>
+    <rect x="184" y="200" width="232" height="9" fill="#5A3A26"/>
+
+    <!-- 단청 띠 -->
+    <rect x="176" y="190" width="248" height="10" fill="url(#dancheong)"/>
+
+    <!-- 서까래 (처마 밑 나무) -->
+    <path d="M122 184Q168 194 210 192Q300 186 390 192Q432 194 478 184Q470 194 440 196Q300 190 160 196Q130 194 122 184Z" fill="#8A5A3B"/>
+    <g fill="#C99A2E">
+      <circle cx="168" cy="193" r="2.2"/><circle cx="182" cy="192.5" r="2.2"/>
+      <circle cx="418" cy="192.5" r="2.2"/><circle cx="432" cy="193" r="2.2"/>
+    </g>
+
+    <!-- 지붕 앞면 (오목한 곡선 + 기와골) -->
+    <path d="M152 186C196 172 214 146 210 130H390C386 146 404 172 448 186Q300 176 152 186Z" fill="url(#roofFace)"/>
+    <rect x="150" y="128" width="300" height="60" fill="url(#tileLines)" clip-path="url(#roofClip)"/>
+
+    <!-- 처마: 양 끝이 살짝 올라간 곡선 -->
+    <path d="M86 168Q120 186 172 188Q300 180 428 188Q480 186 514 168Q504 186 470 192Q300 184 130 192Q96 186 86 168Z" fill="#2B211B"/>
+    <path d="M94 172Q124 186 172 186Q300 178 428 186Q476 186 506 172" fill="none" stroke="#C9B79E" stroke-opacity="0.6" stroke-width="1.2"/>
+
+    <!-- 용마루 -->
+    <path d="M198 132Q300 118 402 132Q414 128 422 116Q410 122 400 122Q300 108 200 122Q190 122 178 116Q186 128 198 132Z" fill="#2B211B"/>
+    <path d="M202 126Q300 113 398 126" fill="none" stroke="#FFFDF8" stroke-opacity="0.3" stroke-width="1.4"/>
+
+    <!-- 청사초롱 -->
+    <g>
+      <circle cx="216" cy="228" r="22" fill="url(#glow)"/>
+      <path d="M216 198V213" stroke="#2B211B" stroke-width="1"/>
+      <rect x="209" y="213" width="14" height="9" rx="3.5" fill="#2C4A6B"/>
+      <rect x="209" y="222" width="14" height="11" rx="3.5" fill="#B23A2B"/>
+      <path d="M216 233V240" stroke="#C99A2E" stroke-width="1.5"/>
+      <circle cx="384" cy="228" r="22" fill="url(#glow)"/>
+      <path d="M384 198V213" stroke="#2B211B" stroke-width="1"/>
+      <rect x="377" y="213" width="14" height="9" rx="3.5" fill="#2C4A6B"/>
+      <rect x="377" y="222" width="14" height="11" rx="3.5" fill="#B23A2B"/>
+      <path d="M384 233V240" stroke="#C99A2E" stroke-width="1.5"/>
+    </g>
+
+    <!-- 디딤돌 -->
+    <g fill="#DCCBB5">
+      <ellipse cx="300" cy="338" rx="16" ry="4.5"/>
+      <ellipse cx="290" cy="352" rx="18" ry="5"/>
+      <ellipse cx="304" cy="367" rx="20" ry="5.5"/>
+    </g>
+  </g>
+</svg>

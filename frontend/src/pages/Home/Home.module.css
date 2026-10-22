@@ -1,0 +1,198 @@
+/* Home: DESIGN 3절(큰 문구 54px, 블록 제목 30px, 카드 제목 26px, 이름표), 5절, 7절(색동 띠, 처마 곡선) */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-64);
+  max-width: var(--content-width-wide);
+  margin: 0 auto;
+}
+
+/* 첫 화면: 왼쪽 큰 문구, 오른쪽 한옥 그림 */
+.hero {
+  display: grid;
+  /* 두 칸을 같은 폭으로 둔다. 768px 근처에서도 큰 문구 칸이 너무 좁아지지 않게 한다. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-48);
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 54px;
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.intro {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1.8;
+  word-break: keep-all;
+}
+
+.heroAction {
+  display: flex;
+  margin-top: var(--space-8);
+}
+
+.firstVisit {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.heroImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+/* 최근 기록 */
+.recent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.eave {
+  width: 48px;
+  height: 12px;
+  color: var(--color-accent);
+}
+
+.blocks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-20);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  min-height: 168px;
+  padding: var(--space-28) var(--space-24) var(--space-24);
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.cardLink {
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.cardLink:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+/* 색동 띠: 주홍·송화·청록·쪽빛·연한 살구색 5칸, 높이 7px */
+.stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background: linear-gradient(
+    90deg,
+    var(--color-accent) 0 20%,
+    var(--color-gold) 20% 40%,
+    var(--color-green) 40% 60%,
+    var(--color-indigo) 60% 80%,
+    #f2c9b1 80% 100% /* 연한 살구색 (DESIGN 7절, 토큰 없음) */
+  );
+}
+
+.label {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.cardTitle {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.oneLine {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mood {
+  font-size: 24px;
+}
+
+.cardMeta {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.cardState {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardState > * {
+  padding: var(--space-8) 0;
+}
+
+@media (max-width: 767px) {
+  .page {
+    gap: var(--space-48);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-32);
+  }
+
+  .headline {
+    font-size: 38px;
+  }
+
+  .blocks {
+    grid-template-columns: 1fr;
+  }
+}

@@ -17,6 +17,11 @@ export function getDiaries(tripId) {
   return request(`/api/diaries?trip_id=${encodeURIComponent(tripId)}`)
 }
 
+// 모든 여행에 걸친 최근 일기 1개. 없으면 null (API-SPEC 4절, Home C 블록에서 씀)
+export function getRecentDiary() {
+  return request('/api/diaries/recent')
+}
+
 export function getDiary(id) {
   return request(`/api/diaries/${encodeURIComponent(id)}`)
 }

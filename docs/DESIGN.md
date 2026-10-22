@@ -60,7 +60,7 @@ https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700;800&family=IBM+Ple
 | 단계 | 크기 / 굵기 | 글꼴 | 쓰는 곳 |
 | --- | --- | --- | --- |
 | 화면 제목 | 44px / 800 | Hahmlet | "여행기록", "여행지 정보", "여행 다이어리" |
-| Home 큰 문구 | 54px / 800, 줄 간격 1.25 | Hahmlet | Home 첫 화면 (11절 열린 질문) |
+| Home 큰 문구 | 54px / 800, 줄 간격 1.25 | Hahmlet | Home 첫 화면 (11절 닫은 질문) |
 | 블록 제목 | 30px / 800 | Hahmlet | Home "최근 기록" |
 | 카드 제목 | 26px / 700 | Hahmlet | 여행 카드, Home 카드 |
 | 작은 카드 제목 | 21~22px / 700 | Hahmlet | 장소 카드, 날짜 묶음 제목 |
@@ -180,16 +180,16 @@ https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700;800&family=IBM+Ple
 | 내용 | 문서 |
 | --- | --- |
 | 2절 색, 3절 글자, 4절 여백·모양을 `tokens.css`에 옮기기. 글꼴 불러오기(`global.css`의 `@import` 제안) | 개발 단계 (팀 공동 파일, D-010) |
-| Home 큰 문구와 그림, 여행지 정보 PC 2단 배치 (11절) | `SCREEN-SPEC` 4·6절 (은희) |
+| Home 큰 문구와 그림, 여행지 정보 PC 2단 배치 (11절) | `SCREEN-SPEC` 4·6절에 반영함 (2026-10-22) |
 | 장식(색동·조각보 등)이 들어가도 화면이 깨지지 않는지, 768px 전후 배치 검사 | `TEST-PLAN` |
 | 지도 그림(시·도 17개 핀 좌표) | `frontend/src/assets/Map_of_South_Korea-blank.svg`를 쓰고 색은 CSS로 덮는다. 핀 위치는 `frontend/src/pages/Places/regions.js` (D-030) |
 
 ## 11. 열린 질문
 
-- Home 첫 화면의 큰 문구("처마 끝에 걸린 오늘의 여행을 적어 두세요")와 소개 문장, 한옥 그림: SCREEN-SPEC 6절 블록 목록에 없다. 넣을지 은희가 정해 SCREEN-SPEC에 적는다.
 - 6절의 "제안" 표시(상태 표시, 입력 칸, 확인 창): 팀이 확인한 뒤 표시를 뗀다.
 
 - 닫은 질문 (2026-10-22)
   - 토큰 이름: 2절 이름대로 확정했다 (D-025).
+  - Home 첫 화면의 큰 문구와 한옥 그림: 넣는다 (사람이 정함, SCREEN-SPEC 6절 2번). 큰 문구는 시안의 "처마 끝에 걸린 오늘의 여행을 적어 두세요". 한옥 그림은 AI가 SVG로 그려 `frontend/src/assets/hanok-illustration.svg`에 두었다 (2·7절 색과 장식 규칙, 빨간 원 없음). 원래 은희가 정하기로 했던 질문이다.
   - 여행지 정보의 PC 배치: 시안대로 왼쪽 지도, 오른쪽 카드 2단으로 한다 (사람이 정함, SCREEN-SPEC 4절 2번). 원래 은희가 정하기로 했던 질문이다.
   - 여행기록 카드의 조각보 무늬: 오방색 배치가 다른 무늬 3가지를 목록 순서대로 돌려 쓴다 (1·2·3·1…). 무늬는 `frontend/src/pages/Trips/TripCard.jsx`에 있다 (PLAN P-24).

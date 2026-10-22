@@ -17,6 +17,11 @@ export function getPlaces(tripId) {
   return request(`/api/places?trip_id=${encodeURIComponent(tripId)}`)
 }
 
+// 모든 여행에 걸친 최근 장소 1개. 없으면 null (API-SPEC 3절, Home B 블록)
+export function getRecentPlace() {
+  return request('/api/places/recent')
+}
+
 export function getPlace(id) {
   return request(`/api/places/${encodeURIComponent(id)}`)
 }
