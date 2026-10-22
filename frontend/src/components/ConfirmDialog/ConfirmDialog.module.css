@@ -8,6 +8,7 @@
   justify-content: center;
   padding: var(--page-gutter);
   background: rgba(43, 33, 27, 0.45);
+  animation: fade-in 0.15s ease-out;
 }
 
 .dialog {
@@ -16,7 +17,21 @@
   padding: var(--space-24);
   border-radius: var(--radius);
   background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 24px 64px rgba(43, 33, 27, 0.18);
+  animation: rise-in 0.18s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 .title {

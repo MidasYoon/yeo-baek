@@ -128,7 +128,7 @@ Home은 세 기능의 API를 가져다 쓰기만 한다 (PRD 5절 Home "5. 다�
 | 여행지 정보 | `/place` | 확정 (D-012) |
 | 여행 다이어리 | `/diary` | 확정 (D-012) |
 | 각 화면 안쪽 주소 (여행 상세·추가 등) | 그 기능의 담당자가 정한다. 여행기록: 상세 `/trip/:id`, 추가 `/trip/new`, 수정 `/trip/:id/edit`. 여행지 정보: 여행을 고른 목록 `/place?trip=:tripId`, 추가 `/place/new?trip=:tripId`, 수정 `/place/:id/edit`. 다이어리: 여행을 고른 목록 `/diary?trip=:tripId`, 쓰기 `/diary/new?trip=:tripId`, 고치기 `/diary/:id/edit` | 정함 (`docs/SCREEN-SPEC.md` 3·4·5절, D-012) |
-| 네비 메뉴 | trip · place · diary 3개 (PRD L-07) | 확정 (D-012) |
+| 네비 메뉴 | 여행 · 장소 · 일기 3개 (PRD L-07), 주소는 `/trip` · `/place` · `/diary` | 확정 (D-012, 이름은 D-032) |
 | 반응형 구조 | 화면 폭 768px을 기준으로 모바일·PC를 나눈다. 모바일에서도 네비는 맨 위 가로 한 줄 | 정함 (`docs/SCREEN-SPEC.md` 2절) |
 | "새 여행 만들기" 버튼이 가는 곳 | 여행 추가 화면 `/trip/new`. 저장은 그 화면에서 서버를 부른다 (PRD H-04) | 정함 (`docs/SCREEN-SPEC.md` 3절) |
 

@@ -109,7 +109,7 @@ export default function Places() {
     // 장소가 없으면 지도도 보이지 않는다 (2026-10-22 사람이 정함).
     content = <StatusMessage kind="empty" message="아직 넣은 장소가 없어요." />
   } else if (status === 'done') {
-    // PC(768px 이상)는 왼쪽 지도·오른쪽 카드 2단, 모바일은 지도 → 카드로 쌓는다.
+    // PC(768px 이상)는 왼쪽 지도·오른쪽 장소 목록, 모바일은 지도 → 목록으로 쌓는다.
     content = (
       <div className={styles.layout}>
         <div className={styles.mapColumn}>

@@ -47,7 +47,19 @@ export default function Home() {
       <section className={styles.hero}>
         <div className={styles.heroText}>
           <p className={styles.eyebrow}>여백 · 여행 다이어리</p>
-          <h1 className={styles.headline}>처마 끝에 걸린 오늘의 여행을 적어 두세요</h1>
+          {/* "여백" 이행시: 두 줄의 첫 글자를 한자 旅(여행)·白(백지)로 쓰고 주홍으로 (2026-10-22 사람이 정함).
+              화면 읽기 프로그램은 한자 대신 한글로 읽게 aria-label을 둔다. */}
+          <h1
+            className={styles.headline}
+            aria-label="여행으로 채워지는 하루 백지 위에 펼쳐지는 나만의 이야기"
+          >
+            <span className={styles.headlineLine}>
+              <em className={styles.accentLetter} aria-hidden="true">旅</em>행으로 채워지는 하루
+            </span>{' '}
+            <span className={styles.headlineLine}>
+              <em className={styles.accentLetter} aria-hidden="true">白</em>지 위에 펼쳐지는 나만의 이야기
+            </span>
+          </h1>
           <p className={styles.intro}>
             다녀온 곳은 지도에, 그날의 마음은 일기에. 여행 한 편을 차곡차곡 남겨 보세요.
           </p>
@@ -63,13 +75,12 @@ export default function Home() {
         <section className={styles.recent} aria-labelledby="recent-title">
           <h2 id="recent-title" className={styles.sectionTitle}>
             최근 기록
-            <svg className={styles.eave} viewBox="0 0 48 12" aria-hidden="true">
-              <path d="M2 10Q8 4 24 4T46 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <span className={styles.titleRule} aria-hidden="true" />
           </h2>
           <div className={styles.blocks}>
             <RecentBlock
               label="최근 여행"
+              tone="trip"
               state={trip}
               to={trip.data ? `/trip/${trip.data.id}` : '/trip'}
               emptyMessage="아직 기록한 여행이 없어요."
@@ -78,14 +89,16 @@ export default function Home() {
               renderCard={(data) => (
                 <>
                   <span className={styles.cardTitle}>{data.name}</span>
-                  <span className={styles.cardMeta}>
-                    {data.destination} · {data.start_date} ~ {data.end_date}
+                  <span className={styles.cardSub}>{data.destination}</span>
+                  <span className={styles.cardDate}>
+                    {data.start_date} ~ {data.end_date}
                   </span>
                 </>
               )}
             />
             <RecentBlock
               label="최근 장소"
+              tone="place"
               state={place}
               to="/place"
               emptyMessage="아직 넣은 장소가 없어요."
@@ -94,14 +107,14 @@ export default function Home() {
               renderCard={(data) => (
                 <>
                   <span className={styles.cardTitle}>{data.name}</span>
-                  <span className={styles.cardMeta}>
-                    {data.region} · {data.visit_date}
-                  </span>
+                  <span className={styles.cardSub}>{data.region}</span>
+                  <span className={styles.cardDate}>{data.visit_date}</span>
                 </>
               )}
             />
             <RecentBlock
               label="최근 일기"
+              tone="diary"
               state={diary}
               to="/diary"
               emptyMessage="아직 쓴 일기가 없어요."
@@ -116,7 +129,7 @@ export default function Home() {
                     </span>{' '}
                     {data.title}
                   </span>
-                  <span className={styles.cardMeta}>{data.date}</span>
+                  <span className={styles.cardDate}>{data.date}</span>
                 </>
               )}
             />

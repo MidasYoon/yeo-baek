@@ -7,7 +7,7 @@
   margin: 0 auto;
 }
 
-/* PC(768px 이상): 왼쪽 지도, 오른쪽 카드 2단. 지도는 카드를 내려도 화면에 붙어 있다. */
+/* PC(768px 이상): 왼쪽 지도, 오른쪽 장소 목록. 지도는 목록을 내려도 화면에 붙어 있다. */
 .layout {
   display: grid;
   grid-template-columns: minmax(280px, 400px) 1fr;
@@ -20,13 +20,20 @@
   top: var(--space-24);
 }
 
+/* 장소 목록: 미색 판 하나에 줄을 쌓고, 줄 사이에 1px 선 (시안 "한지 노을 · 여행지 정보") */
 .list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-16);
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-row);
   list-style: none;
+}
+
+.list > li + li {
+  border-top: 1px solid var(--color-line);
 }
 
 .toolbar {
@@ -38,7 +45,7 @@
   justify-content: center;
 }
 
-/* 모바일(768px 미만): 지도 → 카드 순서로 쌓고, 카드는 한 줄에 하나 */
+/* 모바일(768px 미만): 지도 → 목록 순서로 쌓는다 */
 @media (max-width: 767px) {
   .layout {
     grid-template-columns: 1fr;
@@ -46,9 +53,5 @@
 
   .mapColumn {
     position: static;
-  }
-
-  .list {
-    grid-template-columns: 1fr;
   }
 }

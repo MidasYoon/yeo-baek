@@ -1,4 +1,4 @@
-/* Home: DESIGN 3절(큰 문구 54px, 블록 제목 30px, 카드 제목 26px, 이름표), 5절, 7절(색동 띠, 처마 곡선) */
+/* Home: DESIGN 3절(큰 문구 54px, 블록 제목 30px, 카드 제목 26px, 이름표), 5절, 7절(색동 띠) */
 .page {
   display: flex;
   flex-direction: column;
@@ -37,6 +37,19 @@
   font-weight: 800;
   line-height: 1.25;
   word-break: keep-all;
+}
+
+/* 이행시 한 줄씩 끊어 보인다. 좁은 화면에서는 줄 안에서 낱말 단위로 넘어간다 */
+.headlineLine {
+  display: block;
+}
+
+/* 이행시 첫 글자 한자 旅·白만 주홍. Hahmlet에 한자가 없어 Noto Serif KR 900으로 (D-031) */
+.accentLetter {
+  color: var(--color-accent);
+  font-family: 'Noto Serif KR', var(--font-heading);
+  font-style: normal;
+  font-weight: 900;
 }
 
 .intro {
@@ -83,25 +96,26 @@
   font-weight: 800;
 }
 
-.eave {
-  width: 48px;
-  height: 12px;
-  color: var(--color-accent);
+/* 제목 오른쪽으로 이어지는 가는 선 (시안) */
+.titleRule {
+  flex: 1;
+  height: 1px;
+  background: var(--color-line);
 }
 
 .blocks {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-20);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-28);
 }
 
 .card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  min-height: 168px;
-  padding: var(--space-28) var(--space-24) var(--space-24);
+  gap: var(--space-12);
+  min-height: 196px;
+  padding: var(--space-32) var(--space-28) var(--space-28);
   overflow: hidden;
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
@@ -137,11 +151,47 @@
   );
 }
 
+/* 색동 순서를 카드마다 돌린다 (시안) */
+.stripe_place {
+  background: linear-gradient(
+    90deg,
+    var(--color-indigo) 0 20%,
+    var(--color-accent) 20% 40%,
+    var(--color-gold) 40% 60%,
+    var(--color-green) 60% 80%,
+    #f2c9b1 80% 100%
+  );
+}
+
+.stripe_diary {
+  background: linear-gradient(
+    90deg,
+    var(--color-green) 0 20%,
+    var(--color-indigo) 20% 40%,
+    var(--color-accent) 40% 60%,
+    var(--color-gold) 60% 80%,
+    #f2c9b1 80% 100%
+  );
+}
+
 .label {
   color: var(--color-text-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+}
+
+/* 이름표 색: 카드마다 다르게 (시안). 모두 미색 바탕 대비 4.5:1 이상 */
+.label_trip {
+  color: var(--color-accent-deep);
+}
+
+.label_place {
+  color: var(--color-indigo);
+}
+
+.label_diary {
+  color: #2f6253; /* 짙은 청록 (청록에 검정을 섞은 값, 토큰 없음) */
 }
 
 .cardTitle {
@@ -161,8 +211,15 @@
   font-size: 24px;
 }
 
-.cardMeta {
+.cardSub {
   color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+/* 날짜는 카드 아래쪽에 맞춰 세 카드가 같은 높이에 보이게 한다 */
+.cardDate {
+  margin-top: auto;
+  padding-top: var(--space-8);
   font-size: 14px;
   font-weight: 500;
 }

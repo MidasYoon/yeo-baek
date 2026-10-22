@@ -12,12 +12,23 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
+  word-break: keep-all; /* 한국어는 낱말 단위로 줄을 바꾼다 */
+  overflow-wrap: break-word; /* 띄어쓰기 없이 긴 글은 칸 끝에서 끊는다 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
 }
 
 h1,
 h2,
 h3 {
   font-family: var(--font-heading);
+  letter-spacing: -0.02em;
 }
 
 h1 {
@@ -42,4 +53,15 @@ textarea {
 :focus-visible {
   outline: 2px solid var(--color-indigo);
   outline-offset: 2px;
+}
+
+/* 움직임 줄이기를 켠 사용자에게는 전환·움직임을 끈다 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,34 +1,31 @@
-/* 장소 카드: DESIGN 3절(작은 카드 제목), 6절(카드, 강조 카드) */
-.card {
+/* 장소 목록 줄: DESIGN 3절(작은 카드 제목), 6절(카드, 강조 카드). 시안의 줄 모양을 따른다. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-16);
+  padding: var(--space-20) var(--space-24);
+  background: var(--color-surface);
+  transition: background-color 0.15s;
+}
+
+/* 강조 줄: 옅은 주홍 바탕 + 왼쪽 4px 주홍 띠 */
+.highlighted {
+  background: var(--color-accent-soft);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+.body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
-  height: 100%;
-  padding: var(--space-20);
-  border: 1px solid var(--color-line);
-  border-left: 4px solid transparent;
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-}
-
-.highlighted {
-  border-left-color: var(--color-accent);
-  background: var(--color-accent-soft);
-}
-
-.name {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: 21px;
-  font-weight: 700;
-  overflow-wrap: anywhere;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
 .meta {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -37,14 +34,30 @@
   font-weight: 700;
 }
 
-.memo {
+.name {
   margin: 0;
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.memo {
+  margin: var(--space-4) 0 0;
+  color: var(--color-text-muted);
   font-size: 15px;
   overflow-wrap: anywhere;
 }
 
 .actions {
   display: flex;
-  gap: var(--space-8);
-  margin-top: auto;
+  gap: var(--space-4);
+  margin-top: calc(-1 * var(--space-8));
+}
+
+@media (max-width: 767px) {
+  .row {
+    padding: var(--space-16);
+  }
 }
