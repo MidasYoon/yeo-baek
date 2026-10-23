@@ -254,7 +254,7 @@
 
 ## 3. `places` (담당: 은희)
 
-> 근거: D-002, D-006, D-014, D-036, PRD 3절, SCREEN-SPEC 4절, DATA-MODEL 3절. 라우터는 `backend/routers/places.py`, 부르는 곳은 `frontend/src/api/places.js`.
+> 근거: D-002, D-006, D-014, D-036, D-042, PRD 3절, SCREEN-SPEC 4절, DATA-MODEL 3절. 라우터는 `backend/routers/places.py`, 부르는 곳은 `frontend/src/api/places.js`.
 
 ### 1. API 목록
 
@@ -282,6 +282,7 @@
   "name": "해운대",
   "visit_date": "2026-05-02",
   "memo": "바람이 셌음",
+  "rating": 4,
   "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg", "0f9e8d7c6b5a49382716f5e4d3c2b1a0.png"],
   "lat": 35.1587,
   "lng": 129.1604,
@@ -299,6 +300,7 @@
 | `name` | 장소 이름 | — | DATA-MODEL 3절 |
 | `visit_date` | 방문 날짜 (`YYYY-MM-DD`) | — | DATA-MODEL 3절 |
 | `memo` | 메모 | `null` | DATA-MODEL 3절, 1절 "주고받는 값" |
+| `rating` | 별점 1~5 (정수) | `null` (D-042 전에 넣은 장소) | DATA-MODEL 3절, D-042 |
 | `photos` | 사진 파일 이름 목록 (0~4개). `place_photos.id`가 작은 것이 앞 | `[]` | DATA-MODEL 5절, D-033 |
 | `lat`, `lng` | 위도·경도 (숫자) | `null` (D-036 전에 넣은 장소) | DATA-MODEL 3절, D-036 |
 | `kakao_place_id` | 카카오 장소 id (글자) | `null` (D-036 전에 넣은 장소) | DATA-MODEL 3절, D-036 |
@@ -306,7 +308,7 @@
 
 - 핀은 화면이 `lat`·`lng`에 찍고, 같은 `kakao_place_id`끼리 묶는다. `lat`·`lng`가 `null`이면 `region`의 시·도 가운데에 찍는다 (R-P-026, D-036).
 - 핀 위의 개수는 화면이 목록에서 같은 곳(카카오맵) 또는 같은 `region`(그림 지도)을 세어 보인다. 개수만 돌려주는 API는 두지 않는다 (R-P-006, R-P-026, D-014, AI 제안).
-- 칸이 늘기만 했으므로 장소 객체를 쓰는 다른 화면(여행 상세, Home)은 고치지 않아도 된다 (D-036).
+- 칸이 늘기만 했으므로 장소 객체를 쓰는 다른 화면(여행 상세, Home)은 고치지 않아도 된다 (D-036). `rating`(D-042)도 칸이 늘기만 한다. 초롱 줄은 `PlaceCard`와 Home 화면이 보인다.
 - `photos`는 `place_photos` 테이블에서 모아 넣는다. 사진만 따로 가져오는 API는 두지 않는다 (AI 제안).
 
 ### 3. 요청 본문과 서버 검사
@@ -320,6 +322,7 @@
   "name": "해운대",
   "visit_date": "2026-05-02",
   "memo": "바람이 셌음",
+  "rating": 4,
   "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg"],
   "lat": 35.1587,
   "lng": 129.1604,
@@ -338,12 +341,14 @@
 | `name` | 필수 | 글자 수 제한 없음 (D-036, 전에는 20자). 공백만 적으면 비운 것으로 본다 (D-021) | PRD 3절 3번 |
 | `visit_date` | 필수 | `YYYY-MM-DD`이고 실제 있는 날짜. 그 여행의 `start_date`~`end_date` 안 | PRD 3절 3번, L-05 |
 | `memo` | 선택 | 20자 이하. 빼거나 `null`이면 비운 것 | PRD 3절 3번 |
+| `rating` | 필수 | 1~5 정수. 빼거나 `null`이거나, 범위 밖(0, 6)·소수(3.5)·숫자가 아닌 글자(`"abc"`)면 `422` | PRD 3절 3번, D-042 |
 | `photos` | 선택 | 파일 이름 목록 0~4개. 5개 이상이거나 같은 이름이 두 번 있으면 `422`. 빼면 `[]`. 1절 "사진 올리기와 보기"의 사진 칸 규칙 | PRD 3절 3번, R-P-022, D-033 |
 | `lat` | 선택 | 숫자, 33 이상 39 이하. 빼면 `null` | D-036 |
 | `lng` | 선택 | 숫자, 124 이상 132 이하. 빼면 `null` | D-036 |
 | `kakao_place_id` | 선택 | 숫자로만 된 글자 1~20자. 빼거나 비우면 `null` | D-036, AI 제안 |
 
 - `lat`·`lng`·`kakao_place_id`는 셋 다 있거나 셋 다 없어야 한다. 하나라도 어긋나면 `422` (D-036. `kakao_place_id`까지 묶는 것은 AI 제안).
+- `rating`은 `POST`·`PUT` 모두 필수다. DB에는 비어 있는 기존 장소가 있지만, 그 장소를 고칠 때도 `rating`을 넣어야 저장된다 (R-P-029, D-042).
 - 장소 검색은 화면에서 필수지만 서버는 세 칸이 없는 것도 받는다. 서버는 `region`을 좌표로 다시 계산하지 않고 17개 이름인지만 본다 (D-036).
 
 - 기간 검사에 쓰는 여행은 `POST`는 본문의 `trip_id`, `PUT`은 그 장소에 저장된 `trip_id`의 여행이다.
@@ -391,7 +396,7 @@
 | 쓰는 곳 | API | 쓰는 것 | 근거 |
 | --- | --- | --- | --- |
 | 여행 상세의 장소 목록 (서준) | `GET /api/places?trip_id={tripId}` | 목록 전체, 같은 순서. "삭제"를 누를 때의 장소 개수도 이 목록으로 센다 | R-T-009, R-P-012, 2절 4번 |
-| Home 최근 장소(B) | `GET /api/places/recent` | `name`, `region`, `visit_date`. `null`이면 빈 상태. `photos`는 쓰지 않는다 | R-P-013, R-H-002 |
+| Home 최근 장소(B) | `GET /api/places/recent` | `name`, `region`, `visit_date`, `rating`. `null`이면 빈 상태. `photos`는 쓰지 않는다 | R-P-013, R-H-002, R-H-013 |
 
 - 이 기능이 쓰는 남의 API: 여행 select는 `GET /api/trips`, 폼의 여행 이름·기간은 `GET /api/trips/{id}` (2절 5번).
 - 여행 지우기·기간 수정의 장소 개수는 `trips` 라우터가 `places` 테이블을 직접 세어 409에 넣는다 (2절 4번, D-015). 은희가 따로 만드는 API는 없다.
@@ -402,6 +407,7 @@
 | --- | --- |
 | 목록 순서·최근 1개 순서(날짜가 같을 때 `id`), 빈 목록 `[]`·최근 `null`, `region`·기간 밖 `422`, 고친 뒤 `updated_at`이 바뀌는지 검사 | `TEST-PLAN` |
 | 사진 0~4장 저장, 5장·같은 이름 `422`, 고칠 때 뺀 사진·지운 장소의 사진 파일이 지워지는지 검사 | `TEST-PLAN` |
+| `rating` 1~5 저장, 빠짐·`null`·0·6·소수·글자 `422`, 기존 장소(`null`) 응답 검사 | `TEST-PLAN` |
 
 ### 7. 열린 질문
 
@@ -562,7 +568,7 @@
 | 블록 | API | 쓰는 필드 | 비었을 때 | 근거 |
 | --- | --- | --- | --- | --- |
 | A. 최근 여행 | `GET /api/trips` (2절)의 첫 번째 | `id`, `name`, `destination`, `start_date`, `end_date` | `[]` → 첫 방문 화면 | PRD H-01, R-H-001, R-H-012 |
-| B. 최근 장소 | `GET /api/places/recent` (3절) | `name`, `region`, `visit_date` | `null` → "아직 넣은 장소가 없어요." | PRD H-01, R-H-002, R-P-013 |
+| B. 최근 장소 | `GET /api/places/recent` (3절) | `name`, `region`, `visit_date`, `rating` (`null`이면 초롱 줄 없음, D-042) | `null` → "아직 넣은 장소가 없어요." | PRD H-01, R-H-002, R-P-013 |
 | C. 최근 일기 | `GET /api/diaries/recent` (4절) | `date`, `mood`, `title` (`time`은 쓰지 않는다) | `null` → "아직 쓴 일기가 없어요." | PRD H-01, R-H-003, R-D-013 |
 | D. 바로가기 | 없음 | — | — | R-H-006 |
 

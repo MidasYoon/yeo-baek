@@ -130,12 +130,14 @@ places (1) ──< place_photos (0~4개)   place_photos.place_id → places.id
 | `kakao_place_id` | 카카오 장소 id | `TEXT` | 선택 | 카카오 장소 검색 결과의 `id` (숫자로만 된 글자). 같은 곳 핀을 묶는 데 쓴다 | D-036 |
 | `visit_date` | 방문 날짜 | `TEXT NOT NULL` | 필수 | `YYYY-MM-DD`. 그 여행의 `start_date`~`end_date` 안 | PRD 3절 3번 |
 | `memo` | 메모 | `TEXT` | 선택 | 20자 이하, 한 줄 | PRD 3절 3번 |
+| `rating` | 별점 (청사초롱 수) | `INTEGER` | 새로 저장·고칠 때 필수 | 1~5 정수. DB는 비울 수 있고(기존 장소는 `NULL`), 필수는 서버가 지킨다 | PRD 3절 3번, D-042 |
 | `created_at` | 만든 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | `YYYY-MM-DD HH:MM:SS`. 기록용 | 1절 |
 | `updated_at` | 마지막으로 고친 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | `YYYY-MM-DD HH:MM:SS`. 고칠 때 라우터가 넣는다 | 1절 |
 
 - `region`에 저장하는 값 (D-016): 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종, 경기, 강원, 충북, 충남, 전북, 전남, 경북, 경남, 제주
 - 핀은 `lat`·`lng`에 찍고, 같은 `kakao_place_id`끼리 핀 하나로 묶는다. `lat`·`lng`가 없는 장소는 `region`의 시·도 가운데에 찍는다 (R-P-026, D-036. 시·도 가운데 좌표표는 개발 단계).
 - `lat`·`lng`·`kakao_place_id`는 D-036에서 더한 칸이다. 이미 있는 DB에는 `backend/database.py`가 시작할 때 칸이 없으면 `ALTER TABLE places ADD COLUMN`으로 더한다. 넣어 둔 장소는 그대로이고 세 칸은 `NULL`이다 (D-036).
+- `rating`은 D-042에서 더한 칸이다. 이미 있는 DB에는 `backend/database.py`가 시작할 때 칸이 없으면 `ALTER TABLE places ADD COLUMN rating INTEGER`로 더한다. 넣어 둔 장소는 그대로이고 `rating`은 `NULL`이다. 기존 장소 때문에 `NOT NULL`로 두지 않는다 (D-042).
 - 사진(0~4장)은 이 테이블에 두지 않고 5절 `place_photos`에 둔다. (R-P-022, D-033)
 
 ### 2. 순서
@@ -153,6 +155,7 @@ places (1) ──< place_photos (0~4개)   place_photos.place_id → places.id
 | --- | --- |
 | `region`이 17개 이름 중 하나인지, 20자·기간 안 검사를 서버도 하는지와 오류 응답 모양 | `API-SPEC` |
 | `lat`·`lng`·`kakao_place_id`의 서버 검사와 응답 모양 | `API-SPEC` |
+| `rating`이 꼭 있고 1~5 정수인지 서버 검사 | `API-SPEC` |
 | `created_at`, `updated_at`을 API 응답에 넣을지 | `API-SPEC` |
 
 ### 5. 열린 질문
