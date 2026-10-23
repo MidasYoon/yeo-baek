@@ -204,8 +204,10 @@
   }
 }
 
+/* 아래 여백 160px: 오른쪽 아래에 떠 있는 AI 추천 버튼 + 맨 위로 버튼(24 + 56 + 12 + 48 = 140px, 768px 미만은 132px)보다
+   커서, 맨 아래까지 내리면 맨 아래 버튼("댓글 쓰기", 페이지 버튼 등)을 가리지 않는다 (DESIGN 4절, PLAN P-82) */
 .main {
   max-width: var(--content-width-wide);
   margin: 0 auto;
-  padding: var(--space-64) var(--page-gutter) var(--space-96);
+  padding: var(--space-64) var(--page-gutter) calc(var(--space-96) + var(--space-64));
 }

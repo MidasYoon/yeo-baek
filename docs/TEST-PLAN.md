@@ -140,6 +140,7 @@ DB 파일을 지우고 빈 DB에서 시작해, 아래 예시 데이터를 순서
 | T-L-09 | 화면 폭을 767px과 768px로 바꿔 본다 (개발자 도구 기기 모드) | 두 폭 모두 네비가 맨 위 가로 한 줄 그대로다 | SCREEN-SPEC 2절 2번 |
 | T-L-10 | 없는 주소 `/abc`를 연다 | 네비가 보이고, 그 아래에 "찾을 수 없는 화면이에요." + "Home으로" 버튼 | SCREEN-SPEC 2절 1·5번 |
 | T-L-11 | T-L-10 화면에서 "Home으로"를 누른다 | `/`로 간다 | SCREEN-SPEC 2절 3번 |
+| T-L-12 | 1024px와 375px에서 회원 1로 `/trip/1`, `/place`(전체 보기), `/diary`(전체 보기), `/trip/new`, `/me/edit`를 맨 아래까지 내린다 | 맨 위로 버튼이 나타나 있어도, 맨 아래 버튼("댓글 쓰기", 페이지 버튼, "저장"·"취소" 등)이 AI 추천 버튼·맨 위로 버튼에 가려지지 않고 마우스로 누를 수 있다 | DESIGN 4·6절, PLAN P-82 |
 
 ### 3. API 검사
 
@@ -657,7 +658,7 @@ Home만을 위한 API는 없다. 쓰는 API(`GET /api/trips`, `GET /api/places/r
 | `backend/database.py` (DB 연결) | 건용 | T-C-01 ~ T-C-12, T-T-31, T-P-38, T-D-34, T-X-01 ~ T-X-11, T-P-86, T-P-100 |
 | `frontend/vite.config.js` (프록시) | 팀 공동 | T-C-14, T-T-01, T-P-01, T-D-01, T-H-01 |
 | `frontend/src/App.jsx` (화면 주소) | 팀 공동 | T-L-01 ~ T-L-11, T-T-02, T-T-06, T-T-09, T-P-12, T-P-46, T-D-08, T-D-42, T-H-06 ~ T-H-09 |
-| `frontend/src/components/Layout/` | 건용 | T-L-01 ~ T-L-11, T-A-01, T-A-10 |
+| `frontend/src/components/Layout/` | 건용 | T-L-01 ~ T-L-12, T-A-01, T-A-10 |
 | `frontend/src/styles/tokens.css`, `global.css` | 팀 공동 | T-L-01, T-L-09, T-T-01, T-P-25, T-D-20, T-H-11 |
 | `backend/routers/trips.py` | 서준 | T-T-22 ~ T-T-34, T-C-23, T-H-02, T-X-01 ~ T-X-07 |
 | `backend/routers/places.py` | 은희 | T-P-26 ~ T-P-40, T-T-03, T-H-03, T-X-08, T-X-10, T-P-65 ~ T-P-70, T-P-97 ~ T-P-100 |
