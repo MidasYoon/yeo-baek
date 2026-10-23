@@ -50,6 +50,8 @@ export default function Diary() {
   const ownTripIds = new Set(
     (trips ?? []).filter((trip) => isTripOwner(user, trip.user_id)).map((trip) => trip.id),
   )
+  // 여행 번호 → 그 여행 주인의 닉네임. 일기의 작성자로 보인다 (D-046). 주인 없는 여행은 null
+  const writerByTrip = new Map((trips ?? []).map((trip) => [trip.id, trip.user_nickname]))
 
   const loadDiaries = useCallback(
     async (tripId, pageNumber, isCurrent = () => true) => {
@@ -183,6 +185,8 @@ export default function Diary() {
           diaries={diaries}
           renderActions={renderActions}
           initialOpenId={openDiaryId}
+          // 작성자는 전체 보기의 줄에만. 여행을 고르면 select 아래에 한 번 보인다 (D-046)
+          writerOf={showAll ? (diary) => writerByTrip.get(diary.trip_id) ?? null : undefined}
         />
         {showAll && (
           <Pagination
@@ -212,6 +216,10 @@ export default function Diary() {
         <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
         {/* 전체 보기에서는 "일기 추가" 대신 안내를 둔다 (SCREEN-SPEC 5절 2번, AI 제안 문구) */}
         {showAll && user && <p className={styles.guide}>여행을 고르면 일기를 쓸 수 있어요.</p>}
+        {/* 고른 여행의 작성자를 한 번 보인다. 주인 없는 여행이면 없다 (D-046, SCREEN-SPEC 5절 2번) */}
+        {selectedTrip?.user_nickname && (
+          <p className={styles.guide}>기록한 사람 {selectedTrip.user_nickname}</p>
+        )}
       </div>
       {content}
       <ConfirmDialog

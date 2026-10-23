@@ -680,6 +680,7 @@ Home만을 위한 API는 없다. 쓰는 API(`GET /api/trips`, `GET /api/places/r
 | `backend/routers/comments.py`, `frontend/src/api/comments.js`, `components/Comments/` | 팀 공동 | T-M-19 ~ T-M-23, T-M-41, T-M-42, T-M-46 |
 | 여행 상세 버튼 줄의 좋아요·"댓글 N" 바로가기 (`pages/Trips/TripDetail`) | 서준 (D-044) | T-M-39 ~ T-M-42, T-M-46, T-M-47 |
 | 여행 객체의 `comment_count`(`backend/routers/trips.py`), 여행 카드의 댓글 수(`pages/Trips/TripCard`) | 서준 (D-045) | T-M-24, T-M-39 |
+| 장소·일기 화면의 작성자 (`pages/Places/Places`·`PlaceCard`, `pages/Diary/Diary`·`DiaryList`) | 은희·건용 (D-046) | T-M-48, T-P-59, T-D-49 |
 | `frontend/src/api/users.js`, `components/Auth/`, `components/UserModal/`, `pages/Account/` | 팀 공동 | T-M-30 ~ T-M-38, T-M-43 |
 | 세 기능 라우터의 권한 검사 (`trips.py`·`places.py`·`diaries.py`의 `401`·`403`) | 각 담당 | T-M-10 ~ T-M-13, T-M-37, T-M-38, T-M-44 |
 
@@ -791,6 +792,7 @@ Home만을 위한 API는 없다. 쓰는 API(`GET /api/trips`, `GET /api/places/r
 | T-M-44 | 회원 1로 로그인한 채 T-T-01, T-T-07, T-P-01, T-D-01, T-H-01을 다시 한다. 로그인하지 않고 T-H-01, T-A-07을 다시 한다 | 모두 이전 기대 결과와 같다 (Home·AI 추천은 로그인 없이도 같다) | D-042 "영향" |
 | T-M-46 | `/trip/1`에 댓글 2개를 둔 뒤: 위쪽 "댓글 2"를 마우스로 누름 → 맨 위로 올라가 Tab으로 "댓글 2"에 가서 Enter → 움직임 줄이기를 켜고 다시 누름 | 버튼 줄 오른쪽 끝에 "좋아요 N" 다음 "댓글 2"(아이콘 없음). 누르면 맨 아래 댓글 칸으로 부드럽게 내려가고 포커스가 "댓글" 제목에 있다(다음 Tab은 댓글 칸 안으로 간다). 주소는 `/trip/1` 그대로. 키보드로도 같다. 움직임 줄이기를 켜면 한 번에 간다 | SCREEN-SPEC 8절 2·3번, R-M-016, D-044 |
 | T-M-47 | 375px로 줄이고 `/trip/1`을 회원 1(주인) / 회원 2 / 로그인 안 함으로 본다 | 가로 넘침이 없다. 회원 1: "목록으로·수정·삭제" 다음 줄 오른쪽 끝에 "좋아요"·"댓글" 두 버튼이 함께 있다(하나만 넘어가지 않는다). 회원 2·로그인 안 함: "목록으로"와 같은 줄 오른쪽 끝에 두 버튼 | DESIGN 6절 "좋아요·댓글 버튼 자리", D-044 |
+| T-M-48 | 회원 2로 여행 5(대구 · 2026-06-01 ~ 2026-06-02)와 그 장소 1곳·일기 1편을 만든 뒤, 로그인하지 않고 `/place`, `/diary`(전체 보기) → `/place?trip=1`, `/diary?trip=5` → `/trip/1`을 본다. 375px로도 본다 | 전체 보기: 장소 카드 "부산 바다 · 검사 하나 · 부산 · 2026-05-11"처럼 여행명 뒤에 작성자, 여행 5의 장소·일기는 "검사 둘". 일기 접힌 줄 제목 아래 "제주 봄 여행 · 검사 하나". 여행을 고르면 select 아래 "기록한 사람 검사 하나"(여행 5는 "검사 둘")가 한 번이고 카드·줄에는 작성자가 없다. 여행 상세 안의 장소·일기에는 작성자가 없다. 375px 가로 넘침이 없다 | SCREEN-SPEC 1·4·5절 2번, D-046 |
 
 ### 3. API 검사
 
@@ -838,6 +840,7 @@ Home만을 위한 API는 없다. 쓰는 API(`GET /api/trips`, `GET /api/places/r
 | 댓글 목록·쓰기·지우기·오류, 여행과 함께 지워짐 | API-SPEC 9절 6번 | T-M-19 ~ T-M-23 |
 | 화면·행동·문구, 주인 버튼 보이기 | SCREEN-SPEC 8절 6번 | T-M-30 ~ T-M-45 |
 | 좋아요 버튼 자리, "댓글 N" 바로가기, 좁은 화면 | D-044, SCREEN-SPEC 8절 2·3번, DESIGN 6절 | T-M-39, T-M-41, T-M-42, T-M-46, T-M-47 |
+| 장소·일기 화면의 작성자 | D-046, SCREEN-SPEC 1·4·5절 | T-M-48 |
 
 ### 6. 열린 질문
 
