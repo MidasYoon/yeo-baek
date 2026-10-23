@@ -43,14 +43,14 @@ export default function PlaceNew() {
 
   if (status === 'done') {
     return (
-      <section className={styles.page}>
+      <section className={styles.formPage}>
         <PlaceForm title="장소 추가" trip={trip} onSubmit={handleSubmit} onCancel={backToList} />
       </section>
     )
   }
 
   return (
-    <section className={styles.page}>
+    <section className={styles.formPage}>
       <h1>장소 추가</h1>
       {status === 'loading' && <StatusMessage kind="loading" />}
       {status === 'error' && (

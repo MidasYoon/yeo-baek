@@ -81,7 +81,8 @@
    모바일은 화면 폭에 맞춰 4:3 (2026-10-23) */
 .frame,
 .map {
-  --map-height: max(360px, calc(100vh - 2 * var(--space-24)));
+  /* 화면 높이에서 위아래 여백과 액자 여백·캡션 몫(56px)을 뺀다 (2026-10-23 답사 수첩 액자) */
+  --map-height: max(360px, calc(100vh - 2 * var(--space-24) - 56px));
 }
 
 /* 카카오맵 칸 (D-036, DESIGN 6절). 지도 색은 덮지 않고, 카카오 로고·저작권 표시는 가리지 않는다. */
@@ -121,13 +122,13 @@
   font-size: 13px;
 }
 
-/* 깃발 핀. 누르는 곳은 48×56px (DESIGN 8절). 깃발 그림은 40×48px이고, 깃대 끝은 (8, 46)px.
-   카카오맵은 CustomOverlay의 기준점(xAnchor·yAnchor)으로 깃대 끝을 좌표에 맞춘다.
-   지도 위에서 잘 보이게 쪽빛으로 채운 깃발 + 흰 테두리 + 흰 숫자 + 그림자 (2026-10-23) */
+/* 솟대 핀 (2026-10-23 사람이 고름. 전에는 깃발 → 노리개). 누르는 곳은 48×64px (DESIGN 8절). 그림은 40×56px이고 장대 끝은 (20, 55)px.
+   카카오맵은 CustomOverlay의 기준점(xAnchor·yAnchor)으로 장대 끝을 좌표에 맞춘다.
+   장소 화면의 색은 쪽빛 하나로 맞춘다: 보통 새는 쪽빛, 고른 솟대는 더 크고 짙은 쪽빛 새에 송화 테 */
 .pin {
   display: block;
   width: 48px;
-  height: 56px;
+  height: 64px;
   margin: 0;
   padding: 0;
   border: none;
@@ -135,66 +136,121 @@
   cursor: pointer;
 }
 
-/* 그림 지도의 핀: 깃대 아래 끝이 핀 위치에 오게 옮긴다. */
+/* 그림 지도의 핀: 장대 끝이 핀 위치에 오게 옮긴다. */
 .svgPin {
   position: absolute;
-  transform: translate(-8px, -46px);
+  transform: translate(-24px, -55px);
 }
 
-.flag {
+.marker {
   display: block;
   width: 40px;
-  height: 48px;
+  height: 56px;
+  margin: 0 4px;
   overflow: visible;
   filter: drop-shadow(0 2px 3px rgba(43, 33, 27, 0.35));
-  transform-origin: 8px 46px;
+  transform-origin: 20px 55px;
   transition: transform 0.15s;
 }
 
-.pin:hover .flag {
+/* 마우스를 올리면 1.1배 커지고 새가 고개를 까딱인다 */
+.pin:hover .marker {
   transform: scale(1.1);
 }
 
-.flagShadow {
-  fill: rgba(43, 33, 27, 0.35);
+.bird {
+  transform-box: fill-box;
+  transform-origin: 40% 100%;
 }
 
-.flagPoleHalo {
+.pin:hover .bird {
+  animation: bird-nod 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes bird-nod {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+.markerShadow {
+  fill: rgba(43, 33, 27, 0.3);
+}
+
+.halo {
   stroke: #fff;
-  stroke-width: 5.5;
+  stroke-width: 5;
   stroke-linecap: round;
 }
 
-.flagPole {
-  stroke: var(--color-text);
-  stroke-width: 2.5;
+.pole {
+  stroke: #6e4630; /* 나무 장대 */
+  stroke-width: 2.4;
   stroke-linecap: round;
 }
 
-.flagBanner {
+.base {
+  stroke: #6e4630;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.birdBody {
   fill: var(--color-indigo);
   stroke: #fff;
-  stroke-width: 2;
+  stroke-width: 1.6;
   stroke-linejoin: round;
 }
 
-.flagCount {
+.beak {
+  fill: var(--color-gold);
+}
+
+.eye {
+  fill: #fff;
+}
+
+.wing {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 1;
+}
+
+.badge {
+  fill: var(--color-indigo);
+  stroke: #fff;
+  stroke-width: 1.4;
+}
+
+.count {
   fill: #fff;
   font-family: var(--font-body);
-  font-size: 15px; /* 그림 좌표 단위 = 화면 px */
+  font-size: 8.5px; /* 그림 좌표 단위 = 화면 px */
   font-weight: 700;
 }
 
-/* 고른 깃발: 더 크게, 주홍 깃발. 크기로도 구분해 색만으로 구분하지 않는다. */
+/* 고른 솟대: 1.25배, 짙은 쪽빛 새에 송화 테. 크기와 테로도 구분해 색만으로 구분하지 않는다. */
 .selected {
   z-index: 1;
 }
 
-.selected .flag,
-.selected:hover .flag {
+.selected .marker,
+.selected:hover .marker {
   transform: scale(1.25);
 }
 
-.selected .flagBanner {
-  fill: var(--color-accent);
+.selected .birdBody,
+.selected .badge {
+  fill: #1e3550; /* 짙은 쪽빛 (쪽빛에 먹을 섞은 값, 토큰 없음) */
+  stroke: var(--color-gold);
+}
+
+/* 고지도 느낌: 카카오 지도 타일 그림에만 은은한 한지빛을 입힌다 (2026-10-23 사람이 고름).
+   카카오 로고(mapjsapi 그림)와 저작권 글자, 핀에는 걸지 않는다 */
+.frame :global(img:not([src*='mapjsapi'])) {
+  filter: sepia(0.35) saturate(0.7) brightness(1.03);
 }

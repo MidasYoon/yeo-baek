@@ -42,7 +42,7 @@ export default function PlaceEdit() {
 
   if (status === 'done') {
     return (
-      <section className={styles.page}>
+      <section className={styles.formPage}>
         <PlaceForm
           title="장소 수정"
           trip={trip}
@@ -55,7 +55,7 @@ export default function PlaceEdit() {
   }
 
   return (
-    <section className={styles.page}>
+    <section className={styles.formPage}>
       <h1>장소 수정</h1>
       {status === 'loading' && <StatusMessage kind="loading" />}
       {status === 'error' && (

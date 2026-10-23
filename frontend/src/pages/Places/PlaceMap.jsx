@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import mapSvg from '../../assets/Map_of_South_Korea-blank.svg?raw'
 import { MAP_VIEW_BOX, PIN_POSITIONS, REGION_CENTERS, REGIONS } from './regions.js'
+import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import styles from './PlaceMap.module.css'
 
-// 지도와 깃발 핀 (담당: 은희). SCREEN-SPEC 4절 2·3번, DESIGN 6절 "지도".
+// 지도와 솟대 핀 (담당: 은희). SCREEN-SPEC 4절 2·3번, DESIGN 6절 "지도".
 // 카카오맵에 장소의 좌표로 핀을 찍고, 같은 곳(kakao_place_id가 같음)은 핀 하나로 묶는다 (D-036).
 // 카카오맵을 불러오지 못하면 그림 지도(SVG)에 시·도 핀을 찍는다 (D-030, D-014).
 // places: 장소 목록. mode: 'loading' | 'kakao' | 'svg'. selectedKey: 눌린 핀의 키 (없으면 null).
@@ -14,17 +15,28 @@ export function pinKeyOf(place, mode) {
   return mode === 'kakao' && place.kakao_place_id ? `k:${place.kakao_place_id}` : `r:${place.region}`
 }
 
-// 깃발 그림 (그림 좌표 40×48, 화면에서도 40×48px). 깃대 아래 끝(8, 46)이 핀 위치를 가리킨다.
-// 깃대 뒤에 흰 테두리를 깔아 어느 지도 바탕에서도 보이게 한다 (2026-10-23).
-function flagMarkup(count) {
-  const text = count === null ? '' : `<text class="${styles.flagCount}" x="20.5" y="18.5" text-anchor="middle">${count}</text>`
+// 솟대 그림 (그림 좌표 40×56, 화면에서도 40×56px, 2026-10-23 사람이 고름. 전에는 깃발 → 노리개).
+// 마을 어귀 장대 위 나무 새. 장대 아래 끝(20, 55)이 핀 위치를 가리킨다.
+// 묶인 핀(2곳 이상)만 장대 옆 작은 패에 개수를 쓴다. 장대 뒤에 흰 테두리를 깔아 어느 지도 바탕에서도 보이게 한다.
+function sotdaeMarkup(count) {
+  const badge =
+    count === null
+      ? ''
+      : `<rect class="${styles.badge}" x="25" y="18" width="13" height="11" rx="2" />` +
+        `<text class="${styles.count}" x="31.5" y="26.6" text-anchor="middle">${count}</text>`
   return (
-    `<svg class="${styles.flag}" viewBox="0 0 40 48" aria-hidden="true">` +
-    `<ellipse class="${styles.flagShadow}" cx="8" cy="46" rx="5" ry="1.6" />` +
-    `<path class="${styles.flagPoleHalo}" d="M8 46V3" />` +
-    `<path class="${styles.flagPole}" d="M8 46V3" />` +
-    `<path class="${styles.flagBanner}" d="M8 3H37L31 13L37 23H8Z" />` +
-    text +
+    `<svg class="${styles.marker}" viewBox="0 0 40 56" aria-hidden="true">` +
+    `<ellipse class="${styles.markerShadow}" cx="20" cy="55" rx="6" ry="1.6" />` +
+    `<path class="${styles.halo}" d="M20 55V16" />` +
+    `<path class="${styles.pole}" d="M20 55V16" />` +
+    `<path class="${styles.base}" d="M15 54h10" />` +
+    `<g class="${styles.bird}">` +
+    `<path class="${styles.birdBody}" d="M9 14Q14 7 22 9Q27 5 31 6Q28 9 29 11L33 12Q28 15 22 15Q14 17 9 14Z" />` +
+    `<path class="${styles.beak}" d="M31 6l3.5-.8-2.3 2.6z" />` +
+    `<circle class="${styles.eye}" cx="28" cy="8.6" r=".9" />` +
+    `<path class="${styles.wing}" d="M12 13.5Q16 11.5 21 12.5" />` +
+    '</g>' +
+    badge +
     '</svg>'
   )
 }
@@ -33,7 +45,9 @@ export default function PlaceMap({ places, mode, selectedKey, onSelect }) {
   if (mode === 'loading') {
     return (
       <div className={styles.frame}>
-        <p className={styles.loading}>지도를 불러오는 중…</p>
+        <div className={styles.loading}>
+          <StatusMessage kind="loading" message="지도를 불러오는 중…" />
+        </div>
       </div>
     )
   }
@@ -106,14 +120,14 @@ function KakaoMap({ places, selectedKey, onSelect }) {
       button.className = styles.pin
       button.setAttribute('aria-label', `${group.label} ${group.count}곳`)
       // 1곳이면 숫자를 쓰지 않는다. 묶인 핀(2곳 이상)만 개수를 보인다 (D-036).
-      button.innerHTML = flagMarkup(group.count >= 2 ? group.count : null)
+      button.innerHTML = sotdaeMarkup(group.count >= 2 ? group.count : null)
       button.addEventListener('click', () => onSelectRef.current(group.key))
-      // 깃대 아래 끝(40×48px 그림에서 8, 46px)이 좌표에 오게 한다. 누르는 곳은 48×56px.
+      // 장대 아래 끝(누르는 곳 48×64px 안에서 24, 55px)이 좌표에 오게 한다.
       const overlay = new maps.CustomOverlay({
         position,
         content: button,
-        xAnchor: 8 / 48,
-        yAnchor: 46 / 56,
+        xAnchor: 24 / 48,
+        yAnchor: 55 / 64,
         clickable: true,
       })
       overlay.setMap(map)
@@ -127,8 +141,8 @@ function KakaoMap({ places, selectedKey, onSelect }) {
         map.setLevel(5)
         map.setCenter(new maps.LatLng(only.lat, only.lng))
       } else if (groups.size > 1) {
-        // 깃발은 깃대 끝에서 위로 약 46px, 오른쪽으로 약 30px 뻗으므로 위·오른쪽을 더 띄운다.
-        map.setBounds(bounds, 64, 48, 24, 24)
+        // 솟대는 장대 끝에서 위로 약 55px, 좌우로 약 15px 뻗으므로 위를 더 띄운다.
+        map.setBounds(bounds, 72, 32, 24, 32)
       }
     }
     fitRef.current()
@@ -184,7 +198,7 @@ function SvgMap({ places, selectedKey, onSelect }) {
             aria-label={`${region} ${counts[region]}곳`}
             aria-pressed={selected}
             onClick={() => onSelect(key)}
-            dangerouslySetInnerHTML={{ __html: flagMarkup(counts[region]) }}
+            dangerouslySetInnerHTML={{ __html: sotdaeMarkup(counts[region]) }}
           />
         )
       })}

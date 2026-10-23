@@ -9,10 +9,23 @@
   transition: background-color 0.15s;
 }
 
-/* 강조 줄: 옅은 주홍 바탕 + 왼쪽 4px 주홍 띠 */
+/* 강조 줄: 옅은 쪽빛 바탕 + 왼쪽 4px 쪽빛 띠. 지도 솟대와 같은 쪽빛 하나로 맞춘다 (2026-10-23. 전에는 주홍) */
 .highlighted {
-  background: var(--color-accent-soft);
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  background: #e9eef4; /* 옅은 쪽빛 (쪽빛에 흰색 90%, 토큰 없음) */
+  box-shadow: inset 4px 0 0 var(--color-indigo);
+  animation: highlight-flash 0.9s ease-out;
+}
+
+/* 솟대를 눌러 강조되면 한 번 진하게 비쳤다가 옅은 쪽빛으로 가라앉는다 (2026-10-23) */
+@keyframes highlight-flash {
+  0% {
+    background: #d3dde9;
+    box-shadow: inset 12px 0 0 var(--color-indigo);
+  }
+  100% {
+    background: #e9eef4;
+    box-shadow: inset 4px 0 0 var(--color-indigo);
+  }
 }
 
 .body {
@@ -27,14 +40,47 @@
   color: var(--color-text-muted);
   font-size: 13px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .highlighted .meta {
-  color: var(--color-accent-deep);
+  color: var(--color-indigo);
   font-weight: 700;
 }
 
+/* 지역 도장 이름표: 쪽빛 1px 사각. 강조 줄에서는 쪽빛 바탕에 흰 글자 */
+.region {
+  display: inline-block;
+  padding: 0 var(--space-4);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  color: var(--color-indigo);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.highlighted .region {
+  border-color: var(--color-indigo);
+  background: var(--color-indigo);
+  color: #fff;
+}
+
+/* 이름 앞 작은 솟대: 지도 솟대와 같은 쪽빛 새, 강조 줄에서는 짙은 쪽빛 */
+.flag {
+  flex: none;
+  width: 14px;
+  height: 20px;
+  margin-top: 0.2em;
+  color: var(--color-indigo);
+}
+
+.highlighted .flag {
+  color: #1e3550; /* 짙은 쪽빛 (고른 솟대와 같음) */
+}
+
 .name {
+  display: flex;
+  gap: var(--space-8);
   margin: 0;
   font-family: var(--font-heading);
   font-size: 21px;
@@ -50,10 +96,10 @@
   overflow-wrap: anywhere;
 }
 
-/* 사진 줄: 64px 정사각형 최대 4장, 사이 8px (DESIGN 6절 "사진") */
+/* 사진 줄: 80px 정사각형 최대 4장, 사이 8px. 미색 3px 대지에 붙인 갤러리 (DESIGN 6절 "사진", 2026-10-23) */
 .photos {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 80px)); /* 칸이 좁으면 4장이 함께 줄어든다 */
   gap: var(--space-8);
   margin: var(--space-8) 0 0;
   padding: 0;
@@ -62,6 +108,7 @@
 
 .photoButton {
   display: block;
+  width: 100%;
   padding: 0;
   border: 0;
   border-radius: var(--radius);
@@ -70,9 +117,10 @@
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
+/* 마우스를 올리면 대지에 붙은 사진을 들어 올리듯 살짝 뜨고 기운다 (2026-10-23) */
 .photoButton:hover {
   box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+  transform: translateY(-3px) rotate(-1.5deg);
 }
 
 .photoButton:focus-visible {
@@ -82,9 +130,12 @@
 
 .photo {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  padding: 3px;
   border: 1px solid var(--color-line);
+  background: #fff;
   border-radius: var(--radius);
   object-fit: cover;
 }
