@@ -1,4 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import ScrollTopButton from '../ScrollTopButton/ScrollTopButton.jsx'
 import styles from './Layout.module.css'
 
 // 공통 레이아웃 (담당: 건용). SCREEN-SPEC 2절. 메뉴 이름은 한글 (D-032), 주소는 그대로 (D-012).
@@ -43,6 +44,8 @@ export default function Layout() {
       <main className={styles.main}>
         <Outlet />
       </main>
+      {/* 화면을 길게 내리면 오른쪽 아래에 나타난다 (2026-10-23) */}
+      <ScrollTopButton />
     </>
   )
 }
