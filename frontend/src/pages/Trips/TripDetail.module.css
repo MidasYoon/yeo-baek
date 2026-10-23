@@ -27,7 +27,7 @@
   box-shadow: var(--shadow-card);
 }
 
-/* "기록한 사람 ○○": 여행명 아래 14px 흐린 먹 (D-042, DESIGN 6절) */
+/* 작성자: 여행명 아래 사진 32px + 닉네임 14px 흐린 먹 (D-047, DESIGN 6절 "작성자 줄") */
 .owner {
   margin: 0;
   color: var(--color-text-muted);

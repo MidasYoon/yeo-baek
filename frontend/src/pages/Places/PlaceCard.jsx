@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { photoUrl } from '../../api/places.js'
+import Writer from '../../components/Writer/Writer.jsx'
 import LanternRating from './LanternRating.jsx'
 import PhotoViewer from './PhotoViewer.jsx'
 import styles from './PlaceCard.module.css'
@@ -35,7 +36,8 @@ function PlacePhoto({ filename, number, onOpen }) {
     </li>
   )
 }
-// writer: 작성자(그 여행 주인의 닉네임). 장소 화면의 전체 보기만 넘긴다. 없으면 보이지 않는다 (D-046).
+// writer: 작성자 { nickname, photo }(그 여행 주인). 장소 화면의 전체 보기만 넘긴다.
+// 장소 이름 아래에 사진 20px + 닉네임으로 보인다. 없으면 보이지 않는다 (D-046, D-047).
 export default function PlaceCard({ place, highlighted = false, actions = null, writer = null }) {
   const className = highlighted ? `${styles.row} ${styles.highlighted}` : styles.row
   // 크게 보기로 연 사진의 순번. null이면 닫힘.
@@ -48,7 +50,6 @@ export default function PlaceCard({ place, highlighted = false, actions = null, 
         {/* 지역은 작은 사각 도장 이름표로 보인다. 글자는 전과 같다 ("여행명 · 지역 · 날짜") (2026-10-23 답사 수첩) */}
         <p className={styles.meta}>
           {place.trip_name && `${place.trip_name} · `}
-          {writer && `${writer} · `}
           <span className={styles.region}>{place.region}</span> · {place.visit_date} · 
         <LanternRating value={place.rating} />
         </p>
@@ -61,6 +62,7 @@ export default function PlaceCard({ place, highlighted = false, actions = null, 
           </svg>
           {place.name}
         </h3>
+        {writer?.nickname && <Writer nickname={writer.nickname} photo={writer.photo} className={styles.writer} />}
         {place.memo && <p className={styles.memo}>{place.memo}</p>}
         {place.photos?.length > 0 && (
           <ul className={styles.photos}>

@@ -11,6 +11,7 @@ import Comments from '../../components/Comments/Comments.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import LikeButton from '../../components/LikeButton/LikeButton.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
+import Writer from '../../components/Writer/Writer.jsx'
 import DiaryList from '../Diary/DiaryList.jsx'
 import PlaceCard from '../Places/PlaceCard.jsx'
 import { countText } from './countMessage.js'
@@ -174,7 +175,12 @@ export default function TripDetail() {
         )}
         <h1 className={styles.title}>{trip.name}</h1>
         {/* 주인 닉네임 (D-042, SCREEN-SPEC 8절 2번). 주인 없는 여행은 이 줄이 없다 */}
-        {trip.user_nickname && <p className={styles.owner}>기록한 사람 {trip.user_nickname}</p>}
+        {/* 사진 32px + 닉네임. "기록한 사람"은 화면 읽기 프로그램에만 읽힌다 (D-047) */}
+        {trip.user_nickname && (
+          <p className={styles.owner}>
+            <Writer nickname={trip.user_nickname} photo={trip.user_profile_photo} size={32} labeled />
+          </p>
+        )}
         <p className={styles.meta}>
           <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </p>

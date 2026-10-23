@@ -89,6 +89,14 @@
   overflow-wrap: anywhere;
 }
 
+/* 전체 보기의 작성자: 장소 이름 아래 4px(.body 사이), 사진 20px + 닉네임 13px 500 흐린 먹 (D-047, DESIGN 6절 "작성자 줄") */
+.writer {
+  align-self: flex-start;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .memo {
   margin: var(--space-4) 0 0;
   color: var(--color-text-muted);

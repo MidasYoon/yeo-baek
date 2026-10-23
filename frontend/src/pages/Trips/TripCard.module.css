@@ -111,21 +111,22 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 카드 글자 칸 맨 아래 한 줄: 주인 닉네임 + 오른쪽 선 하트 14px와 좋아요 수, 선 말풍선 14px와 댓글 수.
+/* 작성자 줄: 여행명 아래, 사진 20px + 닉네임 13px 500 흐린 먹 (D-047, DESIGN 6절 "작성자 줄") */
+.writer {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* 카드 글자 칸 맨 아래 한 줄 오른쪽: 선 하트 14px와 좋아요 수, 선 말풍선 14px와 댓글 수.
    13px 흐린 먹, 아이콘과 수 사이 4px, 두 묶음 사이 12px (D-042, D-045, DESIGN 6절) */
 .footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--space-12);
   color: var(--color-text-muted);
   font-size: 13px;
-}
-
-.owner {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .counts {

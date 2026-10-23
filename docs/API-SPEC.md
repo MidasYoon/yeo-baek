@@ -180,6 +180,7 @@
   "photo": "3f2a9c0d4b1e4f6a8d7c2b5e1a0f9c11.jpg",
   "user_id": 1,
   "user_nickname": "여행하는 곰",
+  "user_profile_photo": null,
   "like_count": 3,
   "liked": true,
   "comment_count": 2,
@@ -198,12 +199,13 @@
 | `photo` | 대표사진 파일 이름. 화면은 `/api/uploads/{photo}`로 보인다 | `null` | DATA-MODEL 2절, D-033 |
 | `user_id` | 주인의 회원 번호. 화면은 로그인한 회원의 `id`(7절 `GET /api/users/me`)와 견주어 수정·삭제·추가 버튼을 보인다 | `null` (주인 없는 여행) | DATA-MODEL 2절, D-042 |
 | `user_nickname` | 주인의 지금 닉네임 (`users.nickname`을 붙여 넣음) | `null` (주인 없는 여행) | DATA-MODEL 6절, D-042, AI 제안 |
+| `user_profile_photo` | 주인의 지금 프로필사진 파일 이름 (`users.profile_photo`를 붙여 넣음). 화면은 `/api/uploads/{이름}`으로 작성자 사진을 보인다 | `null` (사진 없는 회원, 주인 없는 여행) | DATA-MODEL 6절, D-047, 이름은 AI 제안 |
 | `like_count` | 이 여행의 좋아요 수 | `0` | DATA-MODEL 8절, D-042, AI 제안 |
 | `liked` | 지금 로그인한 회원이 좋아요를 눌렀는지. 로그인하지 않았으면 `false` | `false` | D-042, AI 제안 |
 | `comment_count` | 이 여행의 댓글 수. 여행 목록 카드가 보인다 | `0` | DATA-MODEL 9절, D-045, 이름은 AI 제안 |
 | `created_at`, `updated_at` | 만든·고친 시각 | — | D-020 |
 
-- `user_id`·`user_nickname`·`like_count`·`liked`는 D-042로, `comment_count`는 D-045로 더한 칸이다. 칸이 늘기만 했으므로 여행 객체를 쓰는 다른 화면(장소·다이어리의 여행 select, Home)은 고치지 않아도 된다.
+- `user_id`·`user_nickname`·`like_count`·`liked`는 D-042로, `comment_count`는 D-045로, `user_profile_photo`는 D-047로 더한 칸이다. 칸이 늘기만 했으므로 여행 객체를 쓰는 다른 화면(장소·다이어리의 여행 select, Home)은 고치지 않아도 된다.
 - 여행 상세의 "댓글 N"은 `comment_count`를 쓰지 않고 댓글 목록(9절)의 길이로 센다. 댓글을 쓰고 지울 때 바로 바뀌어야 하기 때문이다 (D-044, D-045).
 
 ### 3. 요청 본문과 서버 검사
@@ -233,7 +235,7 @@
 | `photo` | 선택 | 0~1장. 빼거나 `null`이면 사진 없음. 1절 "사진 올리기와 보기"의 사진 칸 규칙 | PRD 2절 3번, R-T-020, D-033 |
 
 - `id`, `created_at`, `updated_at`은 본문에 넣지 않는다 (1절 "주고받는 값").
-- `user_id`, `user_nickname`, `like_count`, `liked`, `comment_count`도 본문에 넣지 않는다. 넣어도 서버가 쓰지 않는다. 주인은 로그인한 회원으로 정한다 (D-042).
+- `user_id`, `user_nickname`, `user_profile_photo`, `like_count`, `liked`, `comment_count`도 본문에 넣지 않는다. 넣어도 서버가 쓰지 않는다. 주인은 로그인한 회원으로 정한다 (D-042).
 - 글자 값은 앞뒤 공백을 빼고 저장한다. 글자 수도 뺀 뒤 센다. 선택 항목을 비우거나 공백만 적으면 `null`이다 (D-029).
 
 ### 4. API별 규칙

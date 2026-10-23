@@ -90,7 +90,7 @@ frontend/
    │  ├─ Diary/       건용
    │  └─ Account/     로그인·회원가입·회원정보수정 화면 (팀 공동, D-042, AI 제안 이름)
    ├─ components/     공통 컴포넌트 (팀 공동, D-028). 사진 칸 부품 `PhotoInput/`도 여기에 둔다 (D-033, P-37). 추천 대화창 `RecommendChat/`도 여기에 둔다 (D-037)
-   │                  로그인 상태 `Auth/`, 프로필사진 `Avatar/`, 회원상세 창 `UserModal/`, 좋아요 버튼 `LikeButton/`, 댓글 `Comments/` (D-042, AI 제안 이름). 여행 상세의 버튼 줄에 좋아요와 "댓글 N" 바로가기, 맨 아래에 댓글 칸 (D-044)
+   │                  로그인 상태 `Auth/`, 프로필사진 `Avatar/`, 작성자 줄(사진 + 닉네임) `Writer/`(D-047), 회원상세 창 `UserModal/`, 좋아요 버튼 `LikeButton/`, 댓글 `Comments/` (D-042, AI 제안 이름). 여행 상세의 버튼 줄에 좋아요와 "댓글 N" 바로가기, 맨 아래에 댓글 칸 (D-044)
    ├─ assets/         지도 그림 등 (팀 공동, D-030)
    │  └─ Layout/      공통 레이아웃, 네비 포함 (건용). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)

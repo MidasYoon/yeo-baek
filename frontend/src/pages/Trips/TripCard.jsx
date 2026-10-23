@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { photoUrl } from '../../api/trips.js'
+import Writer from '../../components/Writer/Writer.jsx'
 import styles from './TripCard.module.css'
 
 // 여행 카드 하나 (담당: 서준). SCREEN-SPEC 3절 2번, DESIGN 5·6·7절.
@@ -38,13 +39,16 @@ export default function TripCard({ trip, index }) {
       </span>
       <span className={styles.body}>
         <span className={styles.name}>{trip.name}</span>
+        {/* 작성자: 여행명과 여행지·기간 줄 사이에 사진 20px + 닉네임. 주인 없는 여행은 없다 (D-047) */}
+        {trip.user_nickname && (
+          <Writer nickname={trip.user_nickname} photo={trip.user_profile_photo} className={styles.writer} />
+        )}
         <span className={styles.meta}>
           <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </span>
-        {/* 맨 아래 한 줄: 왼쪽 주인 닉네임(주인 없는 여행은 비움), 오른쪽 좋아요 수·댓글 수 (D-042, D-045, SCREEN-SPEC 8절 2번).
+        {/* 맨 아래 한 줄 오른쪽: 좋아요 수·댓글 수 (D-042, D-045, SCREEN-SPEC 8절 2번). 닉네임은 위로 옮겼다 (D-047).
             카드의 하트는 채우지 않고, 둘 다 누르지 않는다 (좋아요·댓글은 상세에서만) */}
         <span className={styles.footer}>
-          <span className={styles.owner}>{trip.user_nickname}</span>
           <span className={styles.counts}>
             <span className={styles.count}>
               <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">

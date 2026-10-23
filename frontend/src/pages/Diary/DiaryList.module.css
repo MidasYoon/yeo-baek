@@ -171,6 +171,17 @@
   overflow-wrap: anywhere;
 }
 
+/* 전체 보기의 작성자: 제목 아래 4px, 사진 20px + 닉네임 13px 500 흐린 먹. 제목 글자 모양을 따르지 않는다
+   (D-047, DESIGN 6절 "작성자 줄"). 한 줄을 차지하도록 Writer의 inline-flex를 flex로 바꾼다 */
+.title .writer {
+  display: flex;
+  margin-top: var(--space-4);
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+}
+
 /* 전체 보기의 여행명: 제목 아래 13px 흐린 먹 (DESIGN 6절 "일기 목록") */
 .tripName {
   display: block;

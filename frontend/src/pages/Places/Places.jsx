@@ -9,6 +9,7 @@ import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import Pagination from '../../components/Pagination/Pagination.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import TripSelect from '../../components/TripSelect/TripSelect.jsx'
+import Writer from '../../components/Writer/Writer.jsx'
 import PlaceCard from './PlaceCard.jsx'
 import PlaceMap, { pinKeyOf } from './PlaceMap.jsx'
 import styles from './Places.module.css'
@@ -52,8 +53,10 @@ export default function Places() {
   const ownTripIds = new Set(
     (trips ?? []).filter((trip) => isTripOwner(user, trip.user_id)).map((trip) => trip.id),
   )
-  // 여행 번호 → 그 여행 주인의 닉네임. 장소의 작성자로 보인다 (D-046). 주인 없는 여행은 null
-  const writerByTrip = new Map((trips ?? []).map((trip) => [trip.id, trip.user_nickname]))
+  // 여행 번호 → 그 여행 주인 { nickname, photo }. 장소의 작성자로 보인다 (D-046, D-047). 주인 없는 여행은 nickname이 null
+  const writerByTrip = new Map(
+    (trips ?? []).map((trip) => [trip.id, { nickname: trip.user_nickname, photo: trip.user_profile_photo }]),
+  )
 
   const loadPlaces = useCallback(
     async (tripId, pageNumber, isCurrent = () => true) => {
@@ -250,9 +253,11 @@ export default function Places() {
         {/* 전체 보기에서는 "장소 추가" 대신 안내를 둔다 (SCREEN-SPEC 4절 2번, AI 제안 문구).
             로그인하지 않았으면 추가할 수 없으므로 보이지 않는다 (D-042) */}
         {showAll && user && <p className={styles.guide}>여행을 고르면 장소를 추가할 수 있어요.</p>}
-        {/* 고른 여행의 작성자를 한 번 보인다. 주인 없는 여행이면 없다 (D-046, SCREEN-SPEC 4절 2번) */}
+        {/* 고른 여행의 작성자를 사진 + 닉네임으로 한 번 보인다. 주인 없는 여행이면 없다 (D-046, D-047, SCREEN-SPEC 4절 2번) */}
         {selectedTrip?.user_nickname && (
-          <p className={styles.guide}>기록한 사람 {selectedTrip.user_nickname}</p>
+          <p className={styles.guide}>
+            <Writer nickname={selectedTrip.user_nickname} photo={selectedTrip.user_profile_photo} labeled />
+          </p>
         )}
       </div>
       {content}

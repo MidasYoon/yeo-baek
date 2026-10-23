@@ -1,0 +1,23 @@
+/* 작성자 줄: 사진 + 닉네임 한 줄, 사이 8px, 세로 가운데 (DESIGN 6절 "작성자 줄", D-047) */
+.writer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  max-width: 100%;
+}
+
+/* 닉네임이 길면 줄바꿈한다 */
+.name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 화면에는 안 보이고 화면 읽기 프로그램만 읽는 글자 ("기록한 사람 ○○"으로 읽힌다) */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { photoUrl } from '../../api/diaries.js'
+import Writer from '../../components/Writer/Writer.jsx'
 import { formatTime, formatWeekday } from './diaryFormat.js'
 import MoodMask from './MoodMask.jsx'
 import styles from './DiaryList.module.css'
@@ -9,7 +10,8 @@ import styles from './DiaryList.module.css'
 // renderActions(diary): (선택) 펼친 줄 아래에 둘 버튼. 여행 상세 안 목록(P-34)에서는 넘기지 않는다.
 // initialOpenId: (선택) 처음부터 펼쳐 둘 일기 번호. 그 줄이 화면에 보이도록 목록을 움직인다 (Home C 카드, 2026-10-23 팀 합의).
 // 전체 보기에서는 diary.trip_name이 있어 접힌 줄의 제목 아래에 여행명을 보인다 (D-034).
-// writerOf(diary): (선택) 작성자(그 여행 주인의 닉네임)를 돌려준다. 다이어리 전체 보기만 넘기고, 여행명 뒤에 붙인다 (D-046).
+// writerOf(diary): (선택) 작성자 { nickname, photo }(그 여행 주인)를 돌려준다. 다이어리 전체 보기만 넘긴다.
+//   접힌 줄의 제목 아래, 여행명 위에 사진 20px + 닉네임으로 보인다 (D-046, D-047).
 // 사진이 있으면 펼친 줄의 본문 위에 보인다. 접힌 줄에는 보이지 않는다 (D-033).
 
 // 일기 사진. 불러오지 못하면 숨긴다 (SCREEN-SPEC 1절 "사진 표시").
@@ -99,12 +101,14 @@ export default function DiaryList({ diaries, renderActions, initialOpenId = null
                     </span>
                     <span className={styles.title}>
                       {diary.title}
-                      {diary.trip_name && (
-                        <span className={styles.tripName}>
-                          {diary.trip_name}
-                          {writerOf?.(diary) && ` · ${writerOf(diary)}`}
-                        </span>
+                      {writerOf?.(diary)?.nickname && (
+                        <Writer
+                          nickname={writerOf(diary).nickname}
+                          photo={writerOf(diary).photo}
+                          className={styles.writer}
+                        />
                       )}
+                      {diary.trip_name && <span className={styles.tripName}>{diary.trip_name}</span>}
                     </span>
                     <svg className={styles.arrow} viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2" />
