@@ -1,0 +1,134 @@
+/* 댓글 칸: DESIGN 6절 "댓글 칸·댓글 줄·댓글 쓰기 칸" */
+
+/* 칸과 제목은 여행 상세의 "장소"·"일기"(TripDetail.module.css .part, .partTitle, .count, .rule)와 같은 모양을
+   옮겨 둔다. 바꿀 때 두 곳을 함께 고친다. */
+.part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-20);
+  margin-top: var(--space-16);
+}
+
+.partTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-12);
+  margin: 0;
+}
+
+.count {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  align-self: center;
+  background: var(--color-line);
+}
+
+/* 미색 판(1px 선, 모서리 4px), 줄 사이 1px 선 */
+.list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-16);
+}
+
+.row + .row {
+  border-top: 1px solid var(--color-line);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 첫 줄: 닉네임 15px 700 먹 + 시각 13px 흐린 먹, 사이 8px */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-8);
+  margin: 0;
+}
+
+.nickname {
+  font-size: 15px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.time {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 내용 15px 먹, 줄 간격 1.7, 줄바꿈 그대로 */
+.content {
+  margin: var(--space-4) 0 0;
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* 내 댓글의 "삭제": 줄 오른쪽 위 보조 버튼 */
+.delete {
+  flex: none;
+}
+
+/* 쓰기 칸: 판 아래 16px (.part의 gap 20px에서 4px 줄임) */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-top: calc(var(--space-4) * -1);
+}
+
+/* 여러 줄 입력 칸: 폼의 입력 칸(TripForm.module.css .input·.textarea)과 같은 모양, 높이 96px부터 */
+.textarea {
+  min-height: 96px;
+  padding: var(--space-12);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.formFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+}
+
+.counter {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-accent-deep);
+  font-size: 14px;
+}

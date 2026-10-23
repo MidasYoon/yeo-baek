@@ -7,6 +7,7 @@ import { useAuth } from '../../components/Auth/AuthContext.jsx'
 import AuthErrorText from '../../components/Auth/AuthErrorText.jsx'
 import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
+import Comments from '../../components/Comments/Comments.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import LikeButton from '../../components/LikeButton/LikeButton.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
@@ -245,6 +246,9 @@ export default function TripDetail() {
       <div className={styles.like}>
         <LikeButton key={trip.id} tripId={trip.id} likeCount={trip.like_count} liked={trip.liked} />
       </div>
+
+      {/* 댓글 칸 (D-042, SCREEN-SPEC 8절 2번). 화면 맨 아래. 목록은 따로 불러와 실패해도 여행 내용은 그대로다 */}
+      <Comments key={trip.id} tripId={trip.id} />
 
       <ConfirmDialog
         open={dialogOpen}
