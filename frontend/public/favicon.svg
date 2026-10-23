@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- 파비콘: 헤더 처마 로고를 주홍 타일 위에 한지색으로 다시 그림. 밝은·어두운 탭 모두에서 보이도록 타일을 깐다 -->
+  <rect width="32" height="32" rx="7" fill="#b23a2b"/>
+  <path d="M3.5 15.5Q7 18.5 10 18.5L22 18.5Q25 18.5 28.5 15.5L22.5 9L9.5 9Z" fill="#faf5ec"/>
+  <path d="M7 7.6Q9 9 11 8.6L21 8.6Q23 9 25 7.6" fill="none" stroke="#faf5ec" stroke-width="1.8" stroke-linecap="round"/>
+  <rect x="9.5" y="18.5" width="13" height="2.6" fill="#c99a2e"/>
+  <path d="M11.5 21v4.5M20.5 21v4.5M7 25.8h18" fill="none" stroke="#faf5ec" stroke-width="2" stroke-linecap="round"/>
+</svg>
