@@ -1,4 +1,4 @@
-/* 여행 다이어리 화면 배치: DESIGN 4절(최대 폭 880px), SCREEN-SPEC 5절(위에서 아래로 쌓기) */
+/* 여행 다이어리 화면 배치: DESIGN 4절(최대 폭 1080px), SCREEN-SPEC 5절(위에서 아래로 쌓기) */
 .page {
   display: flex;
   flex-direction: column;
@@ -11,9 +11,37 @@
 .header {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-16);
+  padding-bottom: var(--space-20);
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* 화면 머리: 섹션 이름표("여행 일기장") 위, 화면 제목 아래 (2026-10-23 팀 합의) */
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin: 0;
+  color: #2f6253; /* 짙은 청록 (Home 일기 이름표와 같음) */
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+/* 이름표 앞 짧은 선 (장식) */
+.kicker::before {
+  content: '';
+  width: 20px;
+  height: 2px;
+  background: currentColor;
 }
 
 /* 여행 select와 그 아래 안내 (전체 보기, DESIGN 6절 "여행 select") */
@@ -32,4 +60,13 @@
 .center {
   display: flex;
   justify-content: center;
+}
+
+/* 추가·수정 화면: 제목과 폼을 720px 칸 가운데에 둔다 (DESIGN 4절, 2026-10-23 팀 합의) */
+.formPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: var(--content-width-form);
+  margin: 0 auto;
 }

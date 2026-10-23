@@ -1,6 +1,7 @@
 // 다이어리 화면이 함께 쓰는 표와 글자 바꾸기 (담당: 건용).
 
-// 기분 이름 → 화면 이모지 (DATA-MODEL 4절, D-016). 서버는 이름만 저장한다.
+// 기분 이름 → 이모지 (DATA-MODEL 4절, D-016). 서버는 이름만 저장한다.
+// 화면에는 이모지 대신 하회탈(MoodMask.jsx)을 그린다 (2026-10-23). 이 표는 기분 목록과 순서로 쓴다.
 export const MOOD_EMOJI = {
   설렘: '🤩',
   행복: '😊',
@@ -31,4 +32,13 @@ export function joinTime({ period, hour, minute }) {
   const hour12 = Number(hour) % 12
   const hour24 = period === '오후' ? hour12 + 12 : hour12
   return `${String(hour24).padStart(2, '0')}:${minute}`
+}
+
+// "YYYY-MM-DD" → "일요일" 같은 요일 이름 (날짜 묶음 머리, 2026-10-23 팀 합의).
+// 연·월·일로 나눠 현지 날짜로 만든다. new Date('YYYY-MM-DD')는 UTC로 읽혀 시간대에 따라 하루가 밀릴 수 있다.
+const WEEKDAYS = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+
+export function formatWeekday(date) {
+  const [year, month, day] = date.split('-').map(Number)
+  return WEEKDAYS[new Date(year, month - 1, day).getDay()]
 }

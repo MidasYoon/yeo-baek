@@ -1,4 +1,10 @@
-/* 일기 목록: DESIGN 6절 "일기 목록", 7절 "마름모" */
+/* 일기 목록: DESIGN 6절 "일기 목록", 7절 "마름모".
+   일기장 모양 (2026-10-23 팀 합의): 날짜 칸 아래 두 줄 선, 공책의 주홍 여백선, 펼친 본문은 줄노트 */
+.groups {
+  --margin-line: calc(var(--space-20) + 72px + var(--space-8)); /* 시각 칸 바로 오른쪽 */
+  --rule: 32px; /* 줄노트 한 줄 높이 = 펼친 본문 줄 간격 */
+}
+
 .groups {
   display: flex;
   flex-direction: column;
@@ -7,6 +13,7 @@
 
 /* 날짜 묶음 하나가 카드 한 장 */
 .group {
+  position: relative;
   overflow: hidden;
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
@@ -19,7 +26,8 @@
   align-items: center;
   gap: var(--space-12);
   margin: 0;
-  padding: var(--space-12) var(--space-20);
+  padding: var(--space-16) var(--space-20) var(--space-12);
+  border-bottom: 3px double var(--color-line-strong);
   background: var(--color-surface-sunken);
   font-family: var(--font-heading);
   font-size: 22px;
@@ -33,14 +41,35 @@
   transform: rotate(45deg);
 }
 
+/* 날짜 뒤 요일: 13px 흐린 먹 본문 글꼴 (2026-10-23 팀 합의) */
+.weekday {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .rows {
+  position: relative;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* 공책 왼쪽 여백선: 시각과 내용 사이를 위에서 아래로 (장식) */
+.rows::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--margin-line);
+  width: 1px;
+  background: rgba(178, 58, 43, 0.35); /* 주홍 35% */
+  pointer-events: none;
+}
+
 .row + .row {
-  border-top: 1px solid var(--color-line);
+  border-top: 1px dashed var(--color-line-strong);
 }
 
 .summary {
@@ -57,6 +86,15 @@
   cursor: pointer;
 }
 
+/* 접힌 줄에 마우스를 올리면 옅은 주홍으로 물든다 (2026-10-23) */
+.summary {
+  transition: background-color 0.2s;
+}
+
+.summary:hover {
+  background: rgba(246, 231, 230, 0.6); /* 옅은 주홍 60% */
+}
+
 .time {
   flex: none;
   min-width: 72px;
@@ -66,8 +104,63 @@
 
 .mood {
   flex: none;
-  font-size: 24px;
+  font-size: 28px; /* 하회탈 그림 크기 (2026-10-23. 이모지일 때는 24px) */
   line-height: 1;
+}
+
+.mood svg {
+  display: block;
+}
+
+/* 기분 이름 말풍선: 마우스를 올리면 하회탈 위에 뜬다 (2026-10-23 사람이 정함) */
+.mood {
+  position: relative;
+}
+
+.mood::after {
+  content: attr(data-mood);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius);
+  background: var(--color-text);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.mood:hover::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* 펼친 줄: 하회탈 아래에 기분 이름 (일기 폼 버튼과 같은 모양). 이름이 보이므로 말풍선은 띄우지 않는다 */
+.moodBox {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.moodName {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.open .mood::after {
+  display: none;
 }
 
 /* 긴 제목은 자르지 않고 줄을 바꿔 다 보인다 (SCREEN-SPEC 5절 2번) */
@@ -96,9 +189,9 @@
   transition: transform 0.15s;
 }
 
-/* 펼친 줄: 옅은 주홍 바탕, 제목 Hahmlet 18px, 본문 Hahmlet 17px */
+/* 펼친 줄: 미색 줄노트 바탕(전에는 옅은 주홍), 제목 Hahmlet 18px, 본문 Hahmlet 17px */
 .open {
-  background: var(--color-accent-soft);
+  background: var(--color-surface);
 }
 
 .open .title {
@@ -111,30 +204,88 @@
   transform: rotate(180deg);
 }
 
-.detail {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-16);
-  padding: 0 var(--space-20) var(--space-20);
+/* 펼친 내용은 여백선 오른쪽에서 시작한다. 펼칠 때 위에서 아래로 펼쳐진다 (2026-10-23) */
+@keyframes unfold {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 -40px 0); /* 펼치는 동안 폴라로이드 그림자가 잘리지 않게 아래로 여유 */
+    transform: none;
+  }
 }
 
-/* 사진: 본문 위, 폭 가득(최대 480px), 원래 비율 (DESIGN 6절 "사진") */
+@keyframes pin-photo {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) rotate(-7deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-1.2deg);
+  }
+}
+
+.detail {
+  animation: unfold 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) backwards; /* 끝나면 clip-path가 남지 않는다 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-16);
+  padding: var(--space-8) var(--space-20) var(--space-24) calc(var(--margin-line) + var(--space-16));
+}
+
+/* 사진: 마스킹테이프로 붙인 폴라로이드. 흰 테두리, 살짝 기울임 */
+.polaroid {
+  position: relative;
+  max-width: 480px;
+  margin: var(--space-12) 0 var(--space-8);
+  padding: var(--space-8) var(--space-8) var(--space-24);
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(60, 40, 20, 0.12);
+  transform: rotate(-1.2deg);
+  animation: pin-photo 0.5s cubic-bezier(0.3, 0.8, 0.3, 1) 0.15s backwards;
+}
+
+.tape {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 72px;
+  height: 16px; /* 기울여도 흰 테두리(8px) 안에서 끝나 사진을 덮지 않는다 (DESIGN 7절) */
+  background: rgba(201, 154, 46, 0.35); /* 송화 테이프 */
+  transform: translateX(-50%) rotate(-4deg);
+}
+
+/* 사진: 본문 위, 폴라로이드 폭 가득(최대 480px), 원래 비율 (DESIGN 6절 "사진") */
 .photo {
   display: block;
   width: 100%;
-  max-width: 480px;
   height: auto;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius);
 }
 
+/* 본문 한 줄은 최대 680px. 넓은 화면에서도 읽기 편하게 (2026-10-23 팀 합의) */
+/* 본문 바탕에 줄노트 가로줄. 줄 간격과 같은 간격이라 글줄마다 아래에 선이 온다 */
 .body {
+  align-self: stretch;
+  max-width: 680px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--rule) - 1px),
+    rgba(44, 74, 107, 0.14) calc(var(--rule) - 1px), /* 쪽빛 14% */
+    rgba(44, 74, 107, 0.14) var(--rule)
+  );
   min-height: 1em;
   margin: 0;
+  padding-bottom: var(--rule); /* 본문 아래 빈 줄 하나 (줄노트 선이 이어진다, 2026-10-23 사람이 요청) */
   font-family: var(--font-heading);
   font-size: 17px;
   font-weight: 500;
-  line-height: 1.95;
+  line-height: var(--rule); /* 줄노트 가로줄에 글줄을 맞춘다 */
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -151,7 +302,15 @@
     padding-right: var(--space-16);
   }
 
+  .groups {
+    --margin-line: calc(var(--space-16) + 72px + var(--space-8));
+  }
+
   .detail {
-    padding: 0 var(--space-16) var(--space-16);
+    padding: var(--space-8) var(--space-16) var(--space-16) calc(var(--margin-line) + var(--space-12));
+  }
+
+  .polaroid {
+    max-width: 100%;
   }
 }

@@ -3,6 +3,7 @@ import { photoUrl, uploadDiaryPhoto } from '../../api/diaries.js'
 import Button from '../../components/Button/Button.jsx'
 import PhotoInput from '../../components/PhotoInput/PhotoInput.jsx'
 import { MOOD_EMOJI, joinTime, splitTime } from './diaryFormat.js'
+import MoodMask from './MoodMask.jsx'
 import styles from './DiaryForm.module.css'
 
 // 일기 쓰기·고치기 폼 (담당: 건용). SCREEN-SPEC 5절 2·4·5번.
@@ -211,7 +212,11 @@ export default function DiaryForm({ title, trip, initialValues, onSubmit, onCanc
                 aria-pressed={values.mood === mood}
                 onClick={() => setField('mood', mood)}
               >
-                {MOOD_EMOJI[mood]}
+                <MoodMask mood={mood} />
+                {/* 하회탈만으로는 기분을 알기 어려워 이름을 함께 보인다 (2026-10-23 사람이 정함) */}
+                <span className={styles.moodName} aria-hidden="true">
+                  {mood}
+                </span>
               </button>
             ))}
           </div>

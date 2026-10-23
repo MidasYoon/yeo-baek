@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { photoUrl } from '../../api/diaries.js'
-import { MOOD_EMOJI, formatTime } from './diaryFormat.js'
+import { formatTime, formatWeekday } from './diaryFormat.js'
+import MoodMask from './MoodMask.jsx'
 import styles from './DiaryList.module.css'
 
 // 일기 목록 (담당: 건용). SCREEN-SPEC 5절 2·3번, DESIGN 6절 "일기 목록".
@@ -14,13 +15,17 @@ import styles from './DiaryList.module.css'
 function DiaryPhoto({ filename }) {
   const [broken, setBroken] = useState(false)
   if (broken) return null
+  // 마스킹테이프로 붙인 폴라로이드처럼 보인다 (일기장 모양, 2026-10-23 팀 합의). 테이프는 장식이다.
   return (
-    <img
-      className={styles.photo}
-      src={photoUrl(filename)}
-      alt="일기 사진"
-      onError={() => setBroken(true)}
-    />
+    <figure className={styles.polaroid}>
+      <span className={styles.tape} aria-hidden="true" />
+      <img
+        className={styles.photo}
+        src={photoUrl(filename)}
+        alt="일기 사진"
+        onError={() => setBroken(true)}
+      />
+    </figure>
   )
 }
 
@@ -52,12 +57,13 @@ export default function DiaryList({ diaries, renderActions, initialOpenId = null
   }
 
   return (
-    <div className={styles.groups}>
+    <div className={styles.groups} data-stagger>
       {groups.map((group) => (
         <section key={group.date} className={styles.group}>
           <h2 className={styles.date}>
             <span className={styles.diamond} aria-hidden="true" />
             {group.date}
+            <span className={styles.weekday}>{formatWeekday(group.date)}</span>
           </h2>
           <ul className={styles.rows}>
             {group.items.map((diary) => {
@@ -77,8 +83,16 @@ export default function DiaryList({ diaries, renderActions, initialOpenId = null
                     onClick={() => toggle(diary.id)}
                   >
                     <span className={styles.time}>{formatTime(diary.time)}</span>
-                    <span className={styles.mood} role="img" aria-label={diary.mood}>
-                      {MOOD_EMOJI[diary.mood]}
+                    {/* 접힌 줄은 마우스를 올리면 기분 이름이 말풍선으로 뜨고, 펼친 줄은 하회탈 아래에 이름이 보인다 (2026-10-23 사람이 정함) */}
+                    <span className={styles.moodBox}>
+                      <span className={styles.mood} role="img" aria-label={diary.mood} data-mood={diary.mood}>
+                        <MoodMask mood={diary.mood} />
+                      </span>
+                      {open && (
+                        <span className={styles.moodName} aria-hidden="true">
+                          {diary.mood}
+                        </span>
+                      )}
                     </span>
                     <span className={styles.title}>
                       {diary.title}

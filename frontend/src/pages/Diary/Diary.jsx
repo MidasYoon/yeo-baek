@@ -189,7 +189,11 @@ export default function Diary() {
   return (
     <section className={styles.page}>
       <div className={styles.header}>
-        <h1>여행 일기</h1>
+        {/* 섹션 이름표 + 화면 제목 (2026-10-23 팀 합의, DESIGN 6절 "화면 머리") */}
+        <div className={styles.titleBox}>
+          <p className={styles.kicker}>여행 일기장</p>
+          <h1>여행 일기</h1>
+        </div>
         {hasList && newDiaryLink && <Button to={newDiaryLink}>일기 추가</Button>}
       </div>
       <div className={styles.tripField}>
