@@ -2,15 +2,22 @@
 
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel, field_validator, model_validator
 
 from database import get_connection
 from routers.uploads import check_photo_name, delete_photo
+from routers.users import login_required, require_trip_owner
 
 router = APIRouter(prefix="/api/trips", tags=["trips"])
 
 NOT_FOUND = "여행을 찾을 수 없어요"
+
+# 여행 객체: trips 칸 + 주인의 지금 닉네임(user_nickname). 주인 없는 여행은 null (API-SPEC 2절 2번, D-042)
+TRIP_SELECT = (
+    "SELECT trips.*, users.nickname AS user_nickname"
+    " FROM trips LEFT JOIN users ON users.id = trips.user_id"
+)
 
 
 class TripIn(BaseModel):
@@ -71,7 +78,7 @@ class TripIn(BaseModel):
 
 
 def find_trip(conn, trip_id: int):
-    row = conn.execute("SELECT * FROM trips WHERE id = ?", (trip_id,)).fetchone()
+    row = conn.execute(f"{TRIP_SELECT} WHERE trips.id = ?", (trip_id,)).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail=NOT_FOUND)
     return row
@@ -83,7 +90,7 @@ def list_trips():
     conn = get_connection()
     try:
         rows = conn.execute(
-            "SELECT * FROM trips ORDER BY start_date DESC, id DESC"
+            f"{TRIP_SELECT} ORDER BY trips.start_date DESC, trips.id DESC"
         ).fetchall()
     finally:
         conn.close()
@@ -101,13 +108,17 @@ def get_trip(trip_id: int):
 
 
 @router.post("", status_code=201)
-def create_trip(trip: TripIn):
+def create_trip(trip: TripIn, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 본문 422. 만든 회원이 주인이 된다 (D-042)."""
     conn = get_connection()
     try:
         cursor = conn.execute(
-            "INSERT INTO trips (name, destination, start_date, end_date, info, photo)"
-            " VALUES (?, ?, ?, ?, ?, ?)",
-            (trip.name, trip.destination, trip.start_date, trip.end_date, trip.info, trip.photo),
+            "INSERT INTO trips (name, destination, start_date, end_date, info, photo, user_id)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                trip.name, trip.destination, trip.start_date, trip.end_date,
+                trip.info, trip.photo, user["id"],
+            ),
         )
         conn.commit()
         row = find_trip(conn, cursor.lastrowid)
@@ -117,11 +128,12 @@ def create_trip(trip: TripIn):
 
 
 @router.put("/{trip_id}")
-def update_trip(trip_id: int, trip: TripIn):
-    """검사 순서: 본문 422 → 없는 id 404 → 기간 밖 장소·일기 409."""
+def update_trip(trip_id: int, trip: TripIn, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 본문 422 → 없는 id 404 → 주인 403 → 기간 밖 장소·일기 409."""
     conn = get_connection()
     try:
         old_photo = find_trip(conn, trip_id)["photo"]
+        require_trip_owner(conn, trip_id, user)
         # 새 기간 밖에 있는 장소·일기를 센다 (R-T-017).
         place_count = conn.execute(
             "SELECT COUNT(*) FROM places"
@@ -157,11 +169,12 @@ def update_trip(trip_id: int, trip: TripIn):
 
 
 @router.delete("/{trip_id}", status_code=204)
-def delete_trip(trip_id: int):
-    """검사 순서: 없는 id 404 → 붙은 장소·일기 409 (D-015)."""
+def delete_trip(trip_id: int, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 없는 id 404 → 주인 403 → 붙은 장소·일기 409 (D-015, D-042)."""
     conn = get_connection()
     try:
         photo = find_trip(conn, trip_id)["photo"]
+        require_trip_owner(conn, trip_id, user)
         place_count = conn.execute(
             "SELECT COUNT(*) FROM places WHERE trip_id = ?", (trip_id,)
         ).fetchone()[0]

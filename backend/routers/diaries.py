@@ -3,11 +3,12 @@
 import re
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, field_validator
 
 from database import get_connection
 from routers.uploads import check_photo_name, delete_photo
+from routers.users import login_required, require_trip_owner
 
 router = APIRouter(prefix="/api/diaries", tags=["diaries"])
 
@@ -178,11 +179,12 @@ def get_diary(diary_id: int):
 
 
 @router.post("", status_code=201)
-def create_diary(diary: DiaryIn):
-    """검사 순서: 본문 422 → 없는 여행 422 → 기간 밖 422.
+def create_diary(diary: DiaryIn, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 본문 422 → 없는 여행 422 → 여행 주인 403 → 기간 밖 422 (D-042).
     같은 날짜·시각의 일기가 있어도 저장한다 (R-D-002)."""
     conn = get_connection()
     try:
+        require_trip_owner(conn, diary.trip_id, user)
         check_in_period(conn, diary.trip_id, diary.date)
         cursor = conn.execute(
             "INSERT INTO diaries (trip_id, date, time, title, body, mood, photo)"
@@ -200,12 +202,13 @@ def create_diary(diary: DiaryIn):
 
 
 @router.put("/{diary_id}")
-def update_diary(diary_id: int, diary: DiaryUpdate):
-    """검사 순서: 본문 422 → 없는 id 404 → 기간 밖 422 (D-029).
-    기간은 그 일기에 저장된 trip_id의 여행으로 검사한다."""
+def update_diary(diary_id: int, diary: DiaryUpdate, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 본문 422 → 없는 id 404 → 여행 주인 403 → 기간 밖 422 (D-029, D-042).
+    기간과 주인은 그 일기에 저장된 trip_id의 여행으로 검사한다."""
     conn = get_connection()
     try:
         saved = find_diary(conn, diary_id)
+        require_trip_owner(conn, saved["trip_id"], user)
         check_in_period(conn, saved["trip_id"], diary.date)
         conn.execute(
             "UPDATE diaries SET date = ?, time = ?, title = ?, body = ?, mood = ?, photo = ?,"
@@ -226,10 +229,13 @@ def update_diary(diary_id: int, diary: DiaryUpdate):
 
 
 @router.delete("/{diary_id}", status_code=204)
-def delete_diary(diary_id: int):
+def delete_diary(diary_id: int, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 없는 id 404 → 여행 주인 403 (D-042)."""
     conn = get_connection()
     try:
-        photo = find_diary(conn, diary_id)["photo"]
+        saved = find_diary(conn, diary_id)
+        require_trip_owner(conn, saved["trip_id"], user)
+        photo = saved["photo"]
         conn.execute("DELETE FROM diaries WHERE id = ?", (diary_id,))
         conn.commit()
     finally:

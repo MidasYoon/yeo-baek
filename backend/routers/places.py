@@ -2,11 +2,12 @@
 
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Query, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, field_validator, model_validator
 
 from database import get_connection
 from routers.uploads import check_photo_name, delete_photo
+from routers.users import login_required, require_trip_owner
 
 router = APIRouter(prefix="/api/places", tags=["places"])
 
@@ -237,10 +238,11 @@ def get_place(place_id: int):
 
 
 @router.post("", status_code=201)
-def create_place(place: PlaceIn):
-    """검사 순서: 본문 422 → 없는 여행 422 → 기간 밖 422."""
+def create_place(place: PlaceIn, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 본문 422 → 없는 여행 422 → 여행 주인 403 → 기간 밖 422 (D-042)."""
     conn = get_connection()
     try:
+        require_trip_owner(conn, place.trip_id, user)
         check_in_period(conn, place.trip_id, place.visit_date)
         cursor = conn.execute(
             "INSERT INTO places (trip_id, region, name, visit_date, memo, lat, lng, kakao_place_id)"
@@ -262,12 +264,13 @@ def create_place(place: PlaceIn):
 
 
 @router.put("/{place_id}")
-def update_place(place_id: int, place: PlaceUpdate):
-    """검사 순서: 본문 422 → 없는 id 404 → 기간 밖 422 (D-029).
-    기간은 그 장소에 저장된 trip_id의 여행으로 검사한다."""
+def update_place(place_id: int, place: PlaceUpdate, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 본문 422 → 없는 id 404 → 여행 주인 403 → 기간 밖 422 (D-029, D-042).
+    기간과 주인은 그 장소에 저장된 trip_id의 여행으로 검사한다."""
     conn = get_connection()
     try:
         saved = find_place(conn, place_id)
+        require_trip_owner(conn, saved["trip_id"], user)
         check_in_period(conn, saved["trip_id"], place.visit_date)
         conn.execute(
             "UPDATE places SET region = ?, name = ?, visit_date = ?, memo = ?,"
@@ -299,10 +302,12 @@ def update_place(place_id: int, place: PlaceUpdate):
 
 
 @router.delete("/{place_id}", status_code=204)
-def delete_place(place_id: int):
+def delete_place(place_id: int, user=Depends(login_required)):
+    """검사 순서: 로그인 401 → 없는 id 404 → 여행 주인 403 (D-042)."""
     conn = get_connection()
     try:
-        find_place(conn, place_id)
+        saved = find_place(conn, place_id)
+        require_trip_owner(conn, saved["trip_id"], user)
         photos = photo_names(conn, place_id)
         # 사진 줄은 DB가 ON DELETE CASCADE로 함께 지운다 (DATA-MODEL 5절, DM-01).
         conn.execute("DELETE FROM places WHERE id = ?", (place_id,))
