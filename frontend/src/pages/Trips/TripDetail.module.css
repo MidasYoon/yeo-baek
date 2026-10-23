@@ -1,8 +1,10 @@
-/* 여행 상세 */
+/* 여행 상세: 잡지 기사 머리처럼 (여행 책장, 2026-10-23 팀 합의). 사진 액자 → 제목 → 여행지·기간 → 소개 글 */
 .head {
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
+  gap: var(--space-16);
+  padding-bottom: var(--space-32);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .title {
@@ -17,8 +19,12 @@
   max-width: 100%;
   height: auto;
   max-height: 480px;
+  margin-bottom: var(--space-8);
+  padding: var(--space-8); /* 미색 액자 여백 */
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .meta {
@@ -26,10 +32,22 @@
   color: var(--color-text-muted);
   font-size: 15px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
+.destination {
+  color: var(--color-accent-deep);
+  font-weight: 700;
+}
+
+/* 여행 정보는 기사 첫 문단처럼: 왼쪽 2px 짙은 주홍 선, 17px, 한 줄 최대 680px */
 .info {
-  margin: 0;
+  max-width: 680px;
+  margin: var(--space-8) 0 0;
+  padding-left: var(--space-16);
+  border-left: 2px solid var(--color-accent-deep);
+  font-size: 17px;
+  line-height: 1.8;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -50,11 +68,29 @@
 .part {
   display: flex;
   flex-direction: column;
-  gap: var(--space-16);
+  gap: var(--space-20);
+  margin-top: var(--space-16);
 }
 
 .partTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-12);
   margin: 0;
+}
+
+.count {
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  align-self: center;
+  background: var(--color-line);
 }
 
 /* 장소 목록 판: 장소 화면(Places.module.css .list)과 같은 모양을 옮겨 둔다. 바꿀 때 두 곳을 함께 고친다. */
@@ -63,6 +99,7 @@
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--color-line);
+  border-top: 3px solid var(--color-indigo); /* 수첩 머리 띠 (2026-10-23) */
   border-radius: var(--radius);
   background: var(--color-surface);
   box-shadow: var(--shadow-row);

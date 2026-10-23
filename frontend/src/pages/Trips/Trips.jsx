@@ -41,7 +41,7 @@ export default function Trips() {
     )
   } else {
     content = (
-      <ul className={styles.list}>
+      <ul className={styles.list} data-stagger>
         {trips.map((trip, index) => (
           <li key={trip.id}>
             <TripCard trip={trip} index={index} />
@@ -57,7 +57,11 @@ export default function Trips() {
   return (
     <section className={styles.page}>
       <div className={styles.header}>
-        <h1>여행 기록</h1>
+        {/* 섹션 이름표 + 화면 제목 (2026-10-23 팀 합의, DESIGN 6절 "화면 머리") */}
+        <div className={styles.titleBox}>
+          <p className={styles.kicker}>여행 책장</p>
+          <h1>여행 기록</h1>
+        </div>
         {hasList && <Button to="/trip/new">여행 추가</Button>}
       </div>
       {content}

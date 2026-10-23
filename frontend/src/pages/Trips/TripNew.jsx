@@ -23,7 +23,7 @@ export default function TripNew() {
   }
 
   return (
-    <section className={styles.page}>
+    <section className={styles.formPage}>
       <h1>여행 추가</h1>
       <TripForm onSubmit={handleSubmit} onCancel={handleCancel} />
     </section>

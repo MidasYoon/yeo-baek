@@ -13,28 +13,73 @@
   transition: box-shadow 0.15s, transform 0.15s;
 }
 
+/* 카드는 그림자만 깊어지고, 표지(책)만 들린다 (아래 .cover) */
 .card:hover {
   box-shadow: var(--shadow-hover);
+}
+
+/* 책 표지 자리: 세로가 긴 책 비율(96×128). 조각보 표지에는 왼쪽에 책등 선 두 줄 (장식) */
+.cover {
+  position: relative;
+  flex: none;
+  width: 96px;
+  height: 128px;
+  overflow: hidden;
+  border-radius: 2px var(--radius) var(--radius) 2px;
+  box-shadow: 2px 3px 0 var(--color-line-strong);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s;
+}
+
+/* 마우스를 올리면 책장에서 책을 살짝 들어 올리듯 표지가 6px 뜨고, 두께 그림자가 깊어지고, 책등 선이 밝아진다
+   (2026-10-23. 처음에는 rotateY로 기울였는데 부자연스러워 바꿈) */
+.card:hover .cover {
+  box-shadow: 3px 5px 0 var(--color-line-strong), 0 12px 18px rgba(60, 40, 20, 0.16);
+  transform: translateY(-6px);
+}
+
+.bound::after {
+  transition: border-color 0.3s;
+}
+
+.card:hover .bound::after {
+  border-left-color: rgba(255, 253, 248, 0.9);
+}
+
+.arrow {
+  transition: transform 0.2s, color 0.2s;
+}
+
+.card:hover .arrow {
+  color: var(--color-accent-deep);
   transform: translateX(4px);
+}
+
+.bound::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 8px;
+  width: 3px;
+  border-left: 1px solid rgba(255, 253, 248, 0.55);
+  border-right: 1px solid rgba(43, 33, 27, 0.25);
+  pointer-events: none;
 }
 
 .patchwork {
   display: grid;
   flex: none;
   grid-template-columns: repeat(3, 1fr);
-  width: 96px;
-  height: 96px;
-  overflow: hidden;
-  border-radius: var(--radius);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
 }
 
 /* 대표사진: 조각보와 같은 자리·크기 (DESIGN 6절 "사진") */
 .photo {
-  flex: none;
-  width: 96px;
-  height: 96px;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius);
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
@@ -63,6 +108,13 @@
   color: var(--color-text-muted);
   font-size: 14px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 여행지: 짙은 주홍 굵게 (여행 책장의 종류 색) */
+.destination {
+  color: var(--color-accent-deep);
+  font-weight: 700;
 }
 
 .arrow {
@@ -78,10 +130,9 @@
     padding: var(--space-16);
   }
 
-  .patchwork,
-  .photo {
+  .cover {
     width: 64px;
-    height: 64px;
+    height: 86px;
   }
 
   .name {
