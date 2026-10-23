@@ -308,7 +308,7 @@
 
 - 핀은 화면이 `lat`·`lng`에 찍고, 같은 `kakao_place_id`끼리 묶는다. `lat`·`lng`가 `null`이면 `region`의 시·도 가운데에 찍는다 (R-P-026, D-036).
 - 핀 위의 개수는 화면이 목록에서 같은 곳(카카오맵) 또는 같은 `region`(그림 지도)을 세어 보인다. 개수만 돌려주는 API는 두지 않는다 (R-P-006, R-P-026, D-014, AI 제안).
-- 칸이 늘기만 했으므로 장소 객체를 쓰는 다른 화면(여행 상세, Home)은 고치지 않아도 된다 (D-036). `rating`(D-042)도 칸이 늘기만 한다. 초롱 줄은 `PlaceCard`와 Home 화면이 보인다.
+- 칸이 늘기만 했으므로 장소 객체를 쓰는 다른 화면(여행 상세, Home)은 고치지 않아도 된다 (D-036). `rating`(D-042)도 칸이 늘기만 한다. 초롱 줄은 `PlaceCard`가 보인다. Home은 `rating`을 쓰지 않는다.
 - `photos`는 `place_photos` 테이블에서 모아 넣는다. 사진만 따로 가져오는 API는 두지 않는다 (AI 제안).
 
 ### 3. 요청 본문과 서버 검사
@@ -396,7 +396,7 @@
 | 쓰는 곳 | API | 쓰는 것 | 근거 |
 | --- | --- | --- | --- |
 | 여행 상세의 장소 목록 (서준) | `GET /api/places?trip_id={tripId}` | 목록 전체, 같은 순서. "삭제"를 누를 때의 장소 개수도 이 목록으로 센다 | R-T-009, R-P-012, 2절 4번 |
-| Home 최근 장소(B) | `GET /api/places/recent` | `name`, `region`, `visit_date`, `rating`. `null`이면 빈 상태. `photos`는 쓰지 않는다 | R-P-013, R-H-002, R-H-013 |
+| Home 최근 장소(B) | `GET /api/places/recent` | `name`, `region`, `visit_date`. `null`이면 빈 상태. `photos`·`rating`은 쓰지 않는다 | R-P-013, R-H-002 |
 
 - 이 기능이 쓰는 남의 API: 여행 select는 `GET /api/trips`, 폼의 여행 이름·기간은 `GET /api/trips/{id}` (2절 5번).
 - 여행 지우기·기간 수정의 장소 개수는 `trips` 라우터가 `places` 테이블을 직접 세어 409에 넣는다 (2절 4번, D-015). 은희가 따로 만드는 API는 없다.
@@ -568,7 +568,7 @@
 | 블록 | API | 쓰는 필드 | 비었을 때 | 근거 |
 | --- | --- | --- | --- | --- |
 | A. 최근 여행 | `GET /api/trips` (2절)의 첫 번째 | `id`, `name`, `destination`, `start_date`, `end_date` | `[]` → 첫 방문 화면 | PRD H-01, R-H-001, R-H-012 |
-| B. 최근 장소 | `GET /api/places/recent` (3절) | `name`, `region`, `visit_date`, `rating` (`null`이면 초롱 줄 없음, D-042) | `null` → "아직 넣은 장소가 없어요." | PRD H-01, R-H-002, R-P-013 |
+| B. 최근 장소 | `GET /api/places/recent` (3절) | `name`, `region`, `visit_date` (`rating`은 쓰지 않는다, D-042) | `null` → "아직 넣은 장소가 없어요." | PRD H-01, R-H-002, R-P-013 |
 | C. 최근 일기 | `GET /api/diaries/recent` (4절) | `date`, `mood`, `title` (`time`은 쓰지 않는다) | `null` → "아직 쓴 일기가 없어요." | PRD H-01, R-H-003, R-D-013 |
 | D. 바로가기 | 없음 | — | — | R-H-006 |
 
