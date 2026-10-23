@@ -8,6 +8,7 @@ import AuthErrorText from '../../components/Auth/AuthErrorText.jsx'
 import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
+import LikeButton from '../../components/LikeButton/LikeButton.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import DiaryList from '../Diary/DiaryList.jsx'
 import PlaceCard from '../Places/PlaceCard.jsx'
@@ -239,6 +240,11 @@ export default function TripDetail() {
           <DiaryList key={id} diaries={diaries} />
         )}
       </section>
+
+      {/* 좋아요 버튼 (D-042, SCREEN-SPEC 8절 2번). 내 여행에도 누를 수 있다 */}
+      <div className={styles.like}>
+        <LikeButton key={trip.id} tripId={trip.id} likeCount={trip.like_count} liked={trip.liked} />
+      </div>
 
       <ConfirmDialog
         open={dialogOpen}

@@ -90,6 +90,17 @@ SCHEMA = [
         updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
     )
     """,
+    # trip_likes (담당: 팀 공동) — DATA-MODEL 8절, D-042. 여행을 지우면 함께 지운다
+    """
+    CREATE TABLE IF NOT EXISTS trip_likes (
+        id INTEGER PRIMARY KEY,
+        trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+        user_id INTEGER NOT NULL REFERENCES users(id),
+        created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+        UNIQUE (trip_id, user_id)
+    )
+    """,
 ]
 
 # 나중에 더한 칸 (테이블, 칸, 타입). 이미 있는 DB에는 CREATE TABLE IF NOT EXISTS가 칸을 더하지 않으므로

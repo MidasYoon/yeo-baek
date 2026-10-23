@@ -122,3 +122,8 @@
   display: flex;
   justify-content: center;
 }
+
+/* 좋아요 버튼: 일기 목록 아래 48px(.page 사이 32px + 16px), 왼쪽 정렬 (D-042, DESIGN 6절) */
+.like {
+  margin-top: var(--space-16);
+}

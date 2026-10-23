@@ -111,12 +111,42 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 주인 닉네임: 카드 글자 칸 맨 아래 한 줄, 13px 흐린 먹 (D-042, DESIGN 6절) */
-.owner {
-  overflow: hidden;
+/* 카드 글자 칸 맨 아래 한 줄: 주인 닉네임 + 오른쪽 선 하트 14px와 좋아요 수, 13px 흐린 먹 (D-042, DESIGN 6절) */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
   color: var(--color-text-muted);
   font-size: 13px;
+}
+
+.owner {
+  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.likes {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.heart {
+  width: 14px;
+  height: 14px;
+}
+
+/* 화면에는 안 보이고 화면 읽기 프로그램만 읽는 글자 ("좋아요 3"으로 읽힌다) */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 

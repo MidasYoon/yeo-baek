@@ -7,17 +7,32 @@ from pydantic import BaseModel, field_validator, model_validator
 
 from database import get_connection
 from routers.uploads import check_photo_name, delete_photo
-from routers.users import login_required, require_trip_owner
+from routers.users import current_user, login_required, require_trip_owner
 
 router = APIRouter(prefix="/api/trips", tags=["trips"])
 
 NOT_FOUND = "여행을 찾을 수 없어요"
 
-# 여행 객체: trips 칸 + 주인의 지금 닉네임(user_nickname). 주인 없는 여행은 null (API-SPEC 2절 2번, D-042)
+# 여행 객체: trips 칸 + 주인의 지금 닉네임(user_nickname, 주인 없는 여행은 null),
+# 좋아요 수(like_count), 지금 로그인한 회원이 눌렀는지(liked) (API-SPEC 2절 2번, D-042).
+# ?에는 로그인한 회원의 id를 넣는다. 로그인하지 않았으면 None이라 liked가 0이다.
 TRIP_SELECT = (
-    "SELECT trips.*, users.nickname AS user_nickname"
+    "SELECT trips.*, users.nickname AS user_nickname,"
+    " (SELECT COUNT(*) FROM trip_likes WHERE trip_likes.trip_id = trips.id) AS like_count,"
+    " EXISTS (SELECT 1 FROM trip_likes"
+    " WHERE trip_likes.trip_id = trips.id AND trip_likes.user_id = ?) AS liked"
     " FROM trips LEFT JOIN users ON users.id = trips.user_id"
 )
+
+
+def user_id_of(user):
+    return user["id"] if user else None
+
+
+def trip_dict(row) -> dict:
+    trip = dict(row)
+    trip["liked"] = bool(trip["liked"])  # SQLite는 0·1로 준다
+    return trip
 
 
 class TripIn(BaseModel):
@@ -77,34 +92,35 @@ class TripIn(BaseModel):
         return self
 
 
-def find_trip(conn, trip_id: int):
-    row = conn.execute(f"{TRIP_SELECT} WHERE trips.id = ?", (trip_id,)).fetchone()
+def find_trip(conn, trip_id: int, user_id: int | None = None):
+    row = conn.execute(f"{TRIP_SELECT} WHERE trips.id = ?", (user_id, trip_id)).fetchone()
     if row is None:
         raise HTTPException(status_code=404, detail=NOT_FOUND)
     return row
 
 
 @router.get("")
-def list_trips():
+def list_trips(user=Depends(current_user)):
     """여행 목록. 시작일이 늦은 것이 앞, 같으면 id가 큰 것이 앞."""
     conn = get_connection()
     try:
         rows = conn.execute(
-            f"{TRIP_SELECT} ORDER BY trips.start_date DESC, trips.id DESC"
+            f"{TRIP_SELECT} ORDER BY trips.start_date DESC, trips.id DESC",
+            (user_id_of(user),),
         ).fetchall()
     finally:
         conn.close()
-    return [dict(row) for row in rows]
+    return [trip_dict(row) for row in rows]
 
 
 @router.get("/{trip_id}")
-def get_trip(trip_id: int):
+def get_trip(trip_id: int, user=Depends(current_user)):
     conn = get_connection()
     try:
-        row = find_trip(conn, trip_id)
+        row = find_trip(conn, trip_id, user_id_of(user))
     finally:
         conn.close()
-    return dict(row)
+    return trip_dict(row)
 
 
 @router.post("", status_code=201)
@@ -121,10 +137,10 @@ def create_trip(trip: TripIn, user=Depends(login_required)):
             ),
         )
         conn.commit()
-        row = find_trip(conn, cursor.lastrowid)
+        row = find_trip(conn, cursor.lastrowid, user["id"])
     finally:
         conn.close()
-    return dict(row)
+    return trip_dict(row)
 
 
 @router.put("/{trip_id}")
@@ -159,13 +175,13 @@ def update_trip(trip_id: int, trip: TripIn, user=Depends(login_required)):
             ),
         )
         conn.commit()
-        row = find_trip(conn, trip_id)
+        row = find_trip(conn, trip_id, user["id"])
     finally:
         conn.close()
     # 바꾸거나 뺀 전 사진 파일을 지운다 (D-033).
     if old_photo != trip.photo:
         delete_photo(old_photo)
-    return dict(row)
+    return trip_dict(row)
 
 
 @router.delete("/{trip_id}", status_code=204)

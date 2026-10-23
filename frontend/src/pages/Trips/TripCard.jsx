@@ -41,8 +41,24 @@ export default function TripCard({ trip, index }) {
         <span className={styles.meta}>
           <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </span>
-        {/* 주인 닉네임 (D-042, SCREEN-SPEC 8절 2번). 주인 없는 여행은 보이지 않는다 */}
-        {trip.user_nickname && <span className={styles.owner}>{trip.user_nickname}</span>}
+        {/* 맨 아래 한 줄: 왼쪽 주인 닉네임(주인 없는 여행은 비움), 오른쪽 좋아요 수 (D-042, SCREEN-SPEC 8절 2번).
+            카드의 하트는 채우지 않고 누르지 않는다 (좋아요는 상세에서만) */}
+        <span className={styles.footer}>
+          <span className={styles.owner}>{trip.user_nickname}</span>
+          <span className={styles.likes}>
+            <svg className={styles.heart} viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className={styles.srOnly}>좋아요 </span>
+            {trip.like_count}
+          </span>
+        </span>
       </span>
       <svg className={styles.arrow} viewBox="0 0 24 24" aria-hidden="true">
         <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="2" />
