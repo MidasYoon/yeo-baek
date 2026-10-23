@@ -3,6 +3,7 @@ import { loadKakaoMaps, photoUrl, uploadPlacePhoto } from '../../api/places.js'
 import Button from '../../components/Button/Button.jsx'
 import PhotoInput from '../../components/PhotoInput/PhotoInput.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
+import { LanternRatingInput } from './LanternRating.jsx'
 import PlaceSearchDialog from './PlaceSearchDialog.jsx'
 import { regionFromAddress } from './regions.js'
 import styles from './PlaceForm.module.css'
@@ -11,11 +12,13 @@ import styles from './PlaceForm.module.css'
 // trip: 고른 여행 (이름·기간을 보이고 방문 날짜를 검사한다).
 // initialValues: 수정할 때 지금 값. onSubmit(values): 저장 요청 (실패하면 던진다).
 // 장소는 카카오 장소 검색으로 골라야 저장된다. 고르면 시·도·좌표·카카오 장소 id가 채워진다 (D-036).
+// 별점(청사초롱 1~5)은 꼭 골라야 한다. 별점이 없는 기존 장소도 고를 때까지 저장되지 않는다 (D-042).
 const EMPTY = {
   region: '',
   name: '',
   visit_date: '',
   memo: '',
+  rating: null,
   photos: [],
   lat: null,
   lng: null,
@@ -32,6 +35,7 @@ function validate(values, trip) {
   } else if (values.visit_date < trip.start_date || values.visit_date > trip.end_date) {
     errors.visit_date = `방문 날짜는 여행 기간(${trip.start_date} ~ ${trip.end_date}) 안이어야 해요`
   }
+  if (values.rating == null) errors.rating = '별점을 골라 주세요'
   // 글자 수는 앞뒤 공백을 뺀 길이로 센다 (D-029).
   if (values.memo.trim().length > 20) errors.memo = '20자까지 쓸 수 있어요'
   return errors
@@ -214,6 +218,22 @@ export default function PlaceForm({ title, trip, initialValues = EMPTY, onSubmit
           <input type="date" min={trip.start_date} max={trip.end_date} {...inputProps('visit_date')} />
           {errorLine('visit_date')}
         </label>
+        <div className={styles.field}>
+          <span id="rating-label" className={styles.label}>
+            별점
+          </span>
+          <LanternRatingInput
+            value={values.rating}
+            onChange={(rating) => {
+              setValues((prev) => ({ ...prev, rating }))
+              setErrors((prev) => ({ ...prev, rating: undefined }))
+            }}
+            labelId="rating-label"
+            invalid={Boolean(errors.rating)}
+            describedBy={errors.rating ? 'rating-error' : undefined}
+          />
+          {errorLine('rating')}
+        </div>
         <label className={styles.field}>
           <span className={styles.label}>메모</span>
           <input type="text" {...inputProps('memo')} />
