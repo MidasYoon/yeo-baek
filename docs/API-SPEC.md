@@ -11,7 +11,7 @@
 
 | 항목 | 내용 | 근거 |
 | --- | --- | --- |
-| 부르는 곳 | `frontend/src/api/`의 기능별 파일(`trips.js` · `places.js` · `diaries.js` · `recommend.js`)에서만 부른다 | AGENTS 코드 규칙, D-036 |
+| 부르는 곳 | `frontend/src/api/`의 기능별 파일(`trips.js` · `places.js` · `diaries.js` · `recommend.js`)에서만 부른다 | AGENTS 코드 규칙, D-037 |
 | 주소 | `/api`로 시작하는 상대 주소만 쓴다. Vite 프록시가 백엔드(8000)로 넘긴다 | D-011 |
 | 주고받는 모양 | JSON. 사진 올리기(`POST /api/uploads`)만 `multipart/form-data` | D-033 |
 
@@ -24,7 +24,7 @@
 | 하나 가져오기·고치기·지우기 | 주소 끝에 `id`를 붙인다: `/api/places/3` | D-018 |
 | 최근 1개 | `/api/places/recent`, `/api/diaries/recent`. 라우터에서 `/{id}`보다 먼저 등록해야 `recent`가 `id`로 읽히지 않는다 (AI 제안) | PRD H-01 |
 | 사진 | `/api/uploads`(올리기), `/api/uploads/{filename}`(보기). 세 기능이 함께 쓰는 공통 주소다 | D-033 |
-| AI 여행지 추천 | `/api/recommend` (6절). 저장하는 것이 없는 주소다 | D-036 |
+| AI 여행지 추천 | `/api/recommend` (6절). 저장하는 것이 없는 주소다 | D-037 |
 
 ### 메서드
 
@@ -254,7 +254,7 @@
 
 ## 3. `places` (담당: 은희)
 
-> 근거: D-002, D-006, D-014, PRD 3절, SCREEN-SPEC 4절, DATA-MODEL 3절. 라우터는 `backend/routers/places.py`, 부르는 곳은 `frontend/src/api/places.js`.
+> 근거: D-002, D-006, D-014, D-036, PRD 3절, SCREEN-SPEC 4절, DATA-MODEL 3절. 라우터는 `backend/routers/places.py`, 부르는 곳은 `frontend/src/api/places.js`.
 
 ### 1. API 목록
 
@@ -283,6 +283,9 @@
   "visit_date": "2026-05-02",
   "memo": "바람이 셌음",
   "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg", "0f9e8d7c6b5a49382716f5e4d3c2b1a0.png"],
+  "lat": 35.1587,
+  "lng": 129.1604,
+  "kakao_place_id": "7990409",
   "created_at": "2026-10-21 14:10:00",
   "updated_at": "2026-10-21 14:10:00"
 }
@@ -297,10 +300,13 @@
 | `visit_date` | 방문 날짜 (`YYYY-MM-DD`) | — | DATA-MODEL 3절 |
 | `memo` | 메모 | `null` | DATA-MODEL 3절, 1절 "주고받는 값" |
 | `photos` | 사진 파일 이름 목록 (0~4개). `place_photos.id`가 작은 것이 앞 | `[]` | DATA-MODEL 5절, D-033 |
+| `lat`, `lng` | 위도·경도 (숫자) | `null` (D-036 전에 넣은 장소) | DATA-MODEL 3절, D-036 |
+| `kakao_place_id` | 카카오 장소 id (글자) | `null` (D-036 전에 넣은 장소) | DATA-MODEL 3절, D-036 |
 | `created_at`, `updated_at` | 만든·고친 시각 | — | D-020 |
 
-- 핀 좌표는 응답에 없다. 화면이 `region`으로 시·도 가운데에 핀을 찍는다 (R-P-005, DATA-MODEL 3절).
-- 핀 위의 개수는 화면이 목록에서 같은 `region`을 세어 보인다. 개수만 돌려주는 API는 두지 않는다 (R-P-006, D-014, AI 제안).
+- 핀은 화면이 `lat`·`lng`에 찍고, 같은 `kakao_place_id`끼리 묶는다. `lat`·`lng`가 `null`이면 `region`의 시·도 가운데에 찍는다 (R-P-026, D-036).
+- 핀 위의 개수는 화면이 목록에서 같은 곳(카카오맵) 또는 같은 `region`(그림 지도)을 세어 보인다. 개수만 돌려주는 API는 두지 않는다 (R-P-006, R-P-026, D-014, AI 제안).
+- 칸이 늘기만 했으므로 장소 객체를 쓰는 다른 화면(여행 상세, Home)은 고치지 않아도 된다 (D-036).
 - `photos`는 `place_photos` 테이블에서 모아 넣는다. 사진만 따로 가져오는 API는 두지 않는다 (AI 제안).
 
 ### 3. 요청 본문과 서버 검사
@@ -314,7 +320,10 @@
   "name": "해운대",
   "visit_date": "2026-05-02",
   "memo": "바람이 셌음",
-  "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg"]
+  "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg"],
+  "lat": 35.1587,
+  "lng": 129.1604,
+  "kakao_place_id": "7990409"
 }
 ```
 
@@ -326,10 +335,16 @@
 | --- | --- | --- | --- |
 | `trip_id` | 필수 (`POST`만) | 있는 여행의 `id`. 없는 여행이면 `422` (1절 "오류 응답") | DATA-MODEL 3절 |
 | `region` | 필수 | 시·도 17개 이름 중 하나: 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종, 경기, 강원, 충북, 충남, 전북, 전남, 경북, 경남, 제주 | PRD 3절 3번, D-016 |
-| `name` | 필수 | 20자 이하. 공백만 적으면 비운 것으로 본다 (D-021) | PRD 3절 3번 |
+| `name` | 필수 | 글자 수 제한 없음 (D-036, 전에는 20자). 공백만 적으면 비운 것으로 본다 (D-021) | PRD 3절 3번 |
 | `visit_date` | 필수 | `YYYY-MM-DD`이고 실제 있는 날짜. 그 여행의 `start_date`~`end_date` 안 | PRD 3절 3번, L-05 |
 | `memo` | 선택 | 20자 이하. 빼거나 `null`이면 비운 것 | PRD 3절 3번 |
 | `photos` | 선택 | 파일 이름 목록 0~4개. 5개 이상이거나 같은 이름이 두 번 있으면 `422`. 빼면 `[]`. 1절 "사진 올리기와 보기"의 사진 칸 규칙 | PRD 3절 3번, R-P-022, D-033 |
+| `lat` | 선택 | 숫자, 33 이상 39 이하. 빼면 `null` | D-036 |
+| `lng` | 선택 | 숫자, 124 이상 132 이하. 빼면 `null` | D-036 |
+| `kakao_place_id` | 선택 | 숫자로만 된 글자 1~20자. 빼거나 비우면 `null` | D-036, AI 제안 |
+
+- `lat`·`lng`·`kakao_place_id`는 셋 다 있거나 셋 다 없어야 한다. 하나라도 어긋나면 `422` (D-036. `kakao_place_id`까지 묶는 것은 AI 제안).
+- 장소 검색은 화면에서 필수지만 서버는 세 칸이 없는 것도 받는다. 서버는 `region`을 좌표로 다시 계산하지 않고 17개 이름인지만 본다 (D-036).
 
 - 기간 검사에 쓰는 여행은 `POST`는 본문의 `trip_id`, `PUT`은 그 장소에 저장된 `trip_id`의 여행이다.
 - 메모의 "한 줄"은 입력 칸 모양으로 지킨다. 서버는 줄바꿈을 검사하지 않는다 (AI 제안).
@@ -582,8 +597,8 @@
 
 ## 6. `recommend` AI 여행지 추천 (담당: 팀 공동)
 
-> 근거: D-036, PRD 6절, SCREEN-SPEC 7절. 라우터 `backend/routers/recommend.py`, 부르는 곳 `frontend/src/api/recommend.js`.
-> 주소, 요청·응답 모양, 상태 코드, 오류 문구, 기다리는 시간은 AI 제안을 2026-10-23 사람이 확정했다 (D-036).
+> 근거: D-037, PRD 6절, SCREEN-SPEC 7절. 라우터 `backend/routers/recommend.py`, 부르는 곳 `frontend/src/api/recommend.js`.
+> 주소, 요청·응답 모양, 상태 코드, 오류 문구, 기다리는 시간은 AI 제안을 2026-10-23 사람이 확정했다 (D-037).
 
 ### 1. API 목록
 
@@ -641,15 +656,15 @@
 | 경우 | 응답 |
 | --- | --- |
 | 본문이 3번 규칙을 어김 | `422` (FastAPI 기본 모양, 1절 "오류 응답") |
-| 서버에 AI 키(`GEMINI_API_KEY`, D-037)가 없음 | `503`, `{"detail": "AI 키가 설정되지 않았어요"}`. AI를 부르지 않는다 |
+| 서버에 AI 키(`GEMINI_API_KEY`, D-038)가 없음 | `503`, `{"detail": "AI 키가 설정되지 않았어요"}`. AI를 부르지 않는다 |
 | AI를 부르다 실패함 (키가 틀림, 무료 한도를 넘음(Gemini `429`), 네트워크, 두 모델 모두 시간 초과 등) | `502`, `{"detail": "추천을 받지 못했어요"}` |
 | AI 응답이 2번 모양이 아님 (3곳이 아님, `region`이 17개 이름 밖, `activities`가 2~3개가 아님 등) | `502`, `{"detail": "추천을 받지 못했어요"}` |
 | 그 밖 | `200` + 2번 추천 객체 |
 
 - 검사 순서: 본문 `422` → 키 `503` → AI 호출·응답 `502`.
 - 서버는 AI에게 고른 답만 보낸다. 여행·장소·일기 데이터는 보내지 않는다 (PRD 6절 6번).
-- AI는 Google Gemini 무료 등급의 `gemini-3.8-flash`이고, 응답을 2번 모양(JSON)으로 받도록 서버가 요청한다 (D-037). 처음에는 Claude Opus 5.5였다 (D-036).
-- `gemini-3.8-flash`가 Google 서버 오류(`5xx`: 혼잡 `503`, 시간 초과 `504` 등)를 돌려주면 같은 요청을 `gemini-3.5-flash-lite`로 한 번 더 보낸다. 첫 모델은 20초까지만 기다리고, 넘으면 같은 방식으로 `gemini-3.5-flash-lite`에 보낸다 (D-040). 두 번째 모델은 60초까지 기다린다. 두 번째 모델도 실패하거나 그 밖의 실패(`4xx`, `429`, 응답 모양이 틀림)면 `502`다 (D-038, D-039, D-040). AI에게 보내는 지시문은 `recommend.py` 안에 둔다.
+- AI는 Google Gemini 무료 등급의 `gemini-3.8-flash`이고, 응답을 2번 모양(JSON)으로 받도록 서버가 요청한다 (D-038). 처음에는 Claude Opus 5.5였다 (D-037).
+- `gemini-3.8-flash`가 Google 서버 오류(`5xx`: 혼잡 `503`, 시간 초과 `504` 등)를 돌려주면 같은 요청을 `gemini-3.5-flash-lite`로 한 번 더 보낸다. 첫 모델은 20초까지만 기다리고, 넘으면 같은 방식으로 `gemini-3.5-flash-lite`에 보낸다 (D-041). 두 번째 모델은 60초까지 기다린다. 두 번째 모델도 실패하거나 그 밖의 실패(`4xx`, `429`, 응답 모양이 틀림)면 `502`다 (D-039, D-040, D-041). AI에게 보내는 지시문은 `recommend.py` 안에 둔다.
 - AI 오류의 자세한 내용(키 값, AI 회사의 오류 글)은 응답에 넣지 않는다. 서버 터미널 로그에만 남긴다. 키 값은 로그에도 남기지 않는다.
 - 같은 요청을 보내도 응답은 매번 다를 수 있다.
 

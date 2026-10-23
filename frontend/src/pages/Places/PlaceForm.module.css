@@ -60,6 +60,50 @@
   font-size: 14px;
 }
 
+/* 장소 검색 (D-036, DESIGN 6절 "입력 칸"): 입력 칸 오른쪽에 "검색" 보조 버튼을 붙여 한 줄로 둔다. */
+.searchRow {
+  display: flex;
+  gap: var(--space-8);
+}
+
+.searchRow .input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* "고른 장소" 상자의 주소 (결과 창의 주소와 같은 모양) */
+.resultAddress {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* 고른 장소 상자: 옅은 한지 바탕 + 왼쪽 4px 주홍 띠 (강조 카드와 같음) */
+.picked {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-16);
+  border-radius: var(--radius);
+  background: var(--color-surface-sunken);
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+.pickedLabel {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.pickedName {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pickedRegion {
+  color: var(--color-accent-deep);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

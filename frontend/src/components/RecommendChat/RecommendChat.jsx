@@ -4,7 +4,7 @@ import { getRecommendation } from '../../api/recommend.js'
 import Button from '../Button/Button.jsx'
 import styles from './RecommendChat.module.css'
 
-// AI 여행지 추천 버튼과 대화창 (팀 공동, D-036). SCREEN-SPEC 7절, DESIGN 6절 "AI 추천 버튼과 대화창".
+// AI 여행지 추천 버튼과 대화창 (팀 공동, D-037). SCREEN-SPEC 7절, DESIGN 6절 "AI 추천 버튼과 대화창".
 // 공통 레이아웃이 모든 화면에 붙인다. 고른 답과 추천은 저장하지 않는다 (닫으면 지워짐).
 
 const GREETING = '안녕하세요! 몇 가지만 고르면 어울리는 국내 여행지 3곳을 추천해 드릴게요.'

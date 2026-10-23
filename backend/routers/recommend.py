@@ -1,6 +1,6 @@
-"""AI 여행지 추천 API (담당: 팀 공동). docs/API-SPEC.md 6절, D-036.
+"""AI 여행지 추천 API (담당: 팀 공동). docs/API-SPEC.md 6절, D-037.
 
-고른 답을 받아 Gemini에게 국내 도시 3곳을 추천받는다 (D-037). DB는 쓰지 않는다.
+고른 답을 받아 Gemini에게 국내 도시 3곳을 추천받는다 (D-038). DB는 쓰지 않는다.
 AI 키는 backend/.env의 GEMINI_API_KEY에 둔다 (main.py가 python-dotenv로 읽는다).
 """
 
@@ -20,9 +20,9 @@ router = APIRouter(prefix="/api/recommend", tags=["recommend"])
 
 logger = logging.getLogger(__name__)
 
-MODEL = "gemini-3.8-flash"  # Gemini 무료 등급 (D-037)
-FALLBACK_MODEL = "gemini-3.5-flash-lite"  # MODEL이 Google 서버 오류(5xx)면 한 번 더 보낼 모델 (D-038, D-039)
-# 모델마다 기다리는 최대 시간. 첫 모델은 20초만 기다리고 넘어간다 (D-040, API-SPEC 6절 4번)
+MODEL = "gemini-3.8-flash"  # Gemini 무료 등급 (D-038)
+FALLBACK_MODEL = "gemini-3.5-flash-lite"  # MODEL이 Google 서버 오류(5xx)면 한 번 더 보낼 모델 (D-039, D-040)
+# 모델마다 기다리는 최대 시간. 첫 모델은 20초만 기다리고 넘어간다 (D-041, API-SPEC 6절 4번)
 TIMEOUT_MS = {MODEL: 20_000, FALLBACK_MODEL: 60_000}
 MAX_NOTE = 100
 ITEM_COUNT = 3
@@ -165,8 +165,8 @@ def recommend(body: RecommendIn):
             # 키 값은 남기지 않는다. 오류 종류와 상태 코드만 남긴다 (429는 무료 한도를 넘음).
             code = getattr(error, "code", "")
             logger.warning("AI 호출 실패 (%s): %s %s", model, type(error).__name__, code)
-            # Google 서버 오류(5xx: 혼잡 503, 시간 초과 504 등, D-039)이거나
-            # 첫 모델을 20초 넘게 기다렸을 때(D-040)만 다음 모델로 한 번 더 보낸다
+            # Google 서버 오류(5xx: 혼잡 503, 시간 초과 504 등, D-040)이거나
+            # 첫 모델을 20초 넘게 기다렸을 때(D-041)만 다음 모델로 한 번 더 보낸다
             retry = isinstance(error, (errors.ServerError, httpx.TimeoutException))
             if retry and model != FALLBACK_MODEL:
                 continue

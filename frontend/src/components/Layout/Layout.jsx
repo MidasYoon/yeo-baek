@@ -44,7 +44,7 @@ export default function Layout() {
       <main className={styles.main}>
         <Outlet />
       </main>
-      {/* AI 여행지 추천 버튼과 대화창 (D-036, SCREEN-SPEC 7절). 모든 화면 오른쪽 아래에 뜬다 */}
+      {/* AI 여행지 추천 버튼과 대화창 (D-037, SCREEN-SPEC 7절). 모든 화면 오른쪽 아래에 뜬다 */}
       <RecommendChat />
     </>
   )

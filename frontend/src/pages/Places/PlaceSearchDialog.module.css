@@ -1,0 +1,173 @@
+/* 장소 검색 결과 창: DESIGN 6절 "입력 칸"의 장소 검색. 바탕·창 모양은 "확인 창"과 같다 */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--page-gutter);
+  background: rgba(43, 33, 27, 0.45);
+  animation: fade-in 0.15s ease-out;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 2 * var(--page-gutter));
+  padding: var(--space-24);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: 0 24px 64px rgba(43, 33, 27, 0.18);
+  animation: rise-in 0.18s ease-out;
+}
+
+/* 창이 열릴 때 창 자체에 포커스를 두므로 포커스 테두리는 그리지 않는다 (안의 버튼은 그대로 그림) */
+.dialog:focus-visible {
+  outline: none;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: 700;
+}
+
+/* 닫기: 누르는 곳 44px (DESIGN 8절) */
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: calc(-1 * var(--space-12));
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+.close svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.keyword {
+  margin: var(--space-4) 0 var(--space-16);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+/* 결과가 창보다 길면 이 칸 안에서 스크롤한다 */
+.body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.loading {
+  margin: 0;
+  padding: var(--space-48) 0;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  text-align: center;
+}
+
+/* 결과 목록: 미색 판, 줄 사이 1px 선 */
+.results {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  list-style: none;
+}
+
+.results li + li {
+  border-top: 1px solid var(--color-line);
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-8) var(--space-12);
+  border: none;
+  background: none;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.result:hover,
+.result:focus-visible {
+  background: var(--color-accent-soft);
+}
+
+.resultName {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.resultAddress {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.error {
+  margin: var(--space-12) 0 0;
+  color: var(--color-accent-deep);
+  font-size: 13px;
+}
+
+/* 창 안의 페이지 버튼은 목록과 가깝게 둔다 */
+.dialog > nav {
+  margin-top: var(--space-16);
+}
+
+/* 좁은 화면(390px 등)에서도 페이지 버튼 7개(44px)가 한 줄에 들어가게 창 바깥·안쪽 여백을 줄인다 */
+@media (max-width: 767px) {
+  .backdrop {
+    padding: var(--space-8);
+  }
+
+  .dialog {
+    max-height: calc(100vh - 2 * var(--space-8));
+    padding: var(--space-16);
+  }
+}

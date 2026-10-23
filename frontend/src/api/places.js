@@ -63,3 +63,82 @@ export function uploadPlacePhoto(file) {
 export function photoUrl(filename) {
   return `/api/uploads/${encodeURIComponent(filename)}`
 }
+
+// 카카오맵 JavaScript SDK (D-036, ARCHITECTURE 5절). 키는 frontend/.env의 VITE_KAKAO_MAP_KEY.
+// 백엔드를 거치지 않고 브라우저가 카카오에서 바로 불러온다. 장소 검색(services)도 함께 불러온다.
+const KAKAO_KEY = import.meta.env.VITE_KAKAO_MAP_KEY
+const KAKAO_TIMEOUT_MS = 10000
+let kakaoPromise = null
+
+// SDK를 한 번만 불러와 kakao.maps를 돌려준다. 키가 없거나 불러오지 못하면 Error를 던진다.
+// 실패하면 다음 호출에서 다시 시도한다.
+export function loadKakaoMaps() {
+  if (kakaoPromise) return kakaoPromise
+  kakaoPromise = new Promise((resolve, reject) => {
+    if (!KAKAO_KEY) {
+      reject(new Error('카카오맵 키가 없어요'))
+      return
+    }
+    const ready = () => window.kakao.maps.load(() => resolve(window.kakao.maps))
+    if (window.kakao?.maps) {
+      ready()
+      return
+    }
+    const timer = setTimeout(() => reject(new Error('카카오맵을 불러오지 못했어요')), KAKAO_TIMEOUT_MS)
+    const script = document.createElement('script')
+    script.src =
+      'https://dapi.kakao.com/v2/maps/sdk.js' +
+      `?appkey=${encodeURIComponent(KAKAO_KEY)}&autoload=false&libraries=services`
+    script.async = true
+    script.onload = () => {
+      clearTimeout(timer)
+      if (window.kakao?.maps) ready()
+      else reject(new Error('카카오맵을 불러오지 못했어요'))
+    }
+    script.onerror = () => {
+      clearTimeout(timer)
+      script.remove()
+      reject(new Error('카카오맵을 불러오지 못했어요'))
+    }
+    document.head.appendChild(script)
+  }).catch((error) => {
+    kakaoPromise = null
+    throw error
+  })
+  return kakaoPromise
+}
+
+// 카카오 장소 검색 (D-036, SCREEN-SPEC 4절 2번). 한 페이지에 5개씩, page는 1부터.
+// 카카오는 결과를 최대 45개까지 주므로 페이지는 최대 9개다.
+// 돌려주는 값: { items, totalPages }. 결과가 없으면 { items: [], totalPages: 0 }.
+// 항목: { id, name, address(도로명, 없으면 지번), addressName(지번), lat, lng }
+export const SEARCH_PAGE_SIZE = 5
+
+export async function searchKakaoPlaces(keyword, page = 1) {
+  const maps = await loadKakaoMaps()
+  return new Promise((resolve, reject) => {
+    new maps.services.Places().keywordSearch(
+      keyword,
+      (data, status, pagination) => {
+        if (status === maps.services.Status.ZERO_RESULT) {
+          resolve({ items: [], totalPages: 0 })
+        } else if (status !== maps.services.Status.OK) {
+          reject(new Error('장소를 검색하지 못했어요'))
+        } else {
+          resolve({
+            items: data.map((item) => ({
+              id: item.id,
+              name: item.place_name,
+              address: item.road_address_name || item.address_name,
+              addressName: item.address_name || item.road_address_name,
+              lat: Number(item.y),
+              lng: Number(item.x),
+            })),
+            totalPages: pagination.last,
+          })
+        }
+      },
+      { page, size: SEARCH_PAGE_SIZE },
+    )
+  })
+}

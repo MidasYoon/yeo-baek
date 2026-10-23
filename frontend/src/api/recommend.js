@@ -1,4 +1,4 @@
-// AI 여행지 추천 서버 호출 (담당: 팀 공동). docs/API-SPEC.md 6절, D-036·D-037.
+// AI 여행지 추천 서버 호출 (담당: 팀 공동). docs/API-SPEC.md 6절, D-037·D-038.
 
 // 성공하면 JSON을 돌려주고, 실패하면 status와 detail을 담은 Error를 던진다.
 async function request(url, options) {
