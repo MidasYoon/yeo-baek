@@ -31,6 +31,10 @@ export default function RecentBlock({ label, tone, state, to, linkState, emptyMe
       <span className={`${styles.stripe} ${styles[`stripe_${tone}`]}`} aria-hidden="true" />
       <span className={`${styles.label} ${styles[`label_${tone}`]}`}>{label}</span>
       {renderCard(state.data)}
+      {/* 마우스를 올리면 나타나는 화살표 (장식) */}
+      <svg className={styles.cardArrow} viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
     </Link>
   )
 }

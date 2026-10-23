@@ -1,41 +1,108 @@
-/* Home: DESIGN 3절(큰 문구 54px, 블록 제목 30px, 카드 제목 26px, 이름표), 5절, 7절(색동 띠) */
+/* Home: DESIGN 3절(큰 문구 52px, 블록 제목 28px, 카드 제목 24px, 이름표), 5절, 6절 Home, 7절(색동 띠, 인장).
+   한옥 매거진 모양은 2026-10-23 팀 합의 */
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-64);
+  gap: var(--space-80);
   max-width: var(--content-width-wide);
   margin: 0 auto;
 }
 
-/* 첫 화면: 왼쪽 큰 문구, 오른쪽 한옥 그림 */
+/* 첫 화면 등장 (2026-10-23 팀 합의, DESIGN 6절 "움직임"): 머리글 → 큰 문구 두 줄 → 旅·白 도장 → 소개 → 버튼,
+   그림 액자는 함께 떠오르고, 인장 "여백"은 마지막에 찍힌다 */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes seal-stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.8) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-3deg);
+  }
+}
+
+.eyebrow,
+.headlineLine,
+.intro,
+.heroAction,
+.heroFigure {
+  animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.eyebrow { animation-delay: 0.1s; }
+.headlineLine:nth-child(1) { animation-delay: 0.2s; }
+.headlineLine:nth-child(2) { animation-delay: 0.35s; }
+.intro { animation-delay: 0.55s; }
+.heroAction { animation-delay: 0.65s; }
+.heroFigure { animation-duration: 0.8s; animation-delay: 0.25s; }
+
+/* 旅·白는 각 줄이 나타난 뒤 도장처럼 찍힌다 */
+.headlineLine .accentLetter {
+  display: inline-block;
+  animation: stamp 0.5s cubic-bezier(0.3, 0.8, 0.3, 1) backwards;
+}
+.headlineLine:nth-child(1) .accentLetter { animation-delay: 0.45s; }
+.headlineLine:nth-child(2) .accentLetter { animation-delay: 0.6s; }
+
+/* 첫 화면: 왼쪽 큰 문구 · 오른쪽 한옥 그림 (1 : 1, 2026-10-23 그림을 키움) */
 .hero {
   display: grid;
-  /* 두 칸을 같은 폭으로 둔다. 768px 근처에서도 큰 문구 칸이 너무 좁아지지 않게 한다. */
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: var(--space-48);
+  gap: var(--space-64);
 }
 
-.heroText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-20);
-}
-
+/* 머리글은 큰 문구에 붙여 한 덩어리로 읽히게 한다 (큰 문구와 사이 12px, 2026-10-23 사람이 요청) */
 .eyebrow {
-  margin: 0;
+  margin: 0 0 calc(var(--space-12) - var(--space-24));
   color: var(--color-accent);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.1em;
 }
 
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
 .headline {
   margin: 0;
   font-family: var(--font-heading);
-  font-size: 54px;
+  font-size: 52px;
   font-weight: 800;
-  line-height: 1.25;
+  line-height: 1.3;
   word-break: keep-all;
 }
 
@@ -53,16 +120,19 @@
 }
 
 .intro {
+  max-width: 30em;
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.8;
   word-break: keep-all;
+  text-wrap: pretty; /* 마지막 줄에 낱말 하나만 남지 않게 */
 }
 
+/* 주요 버튼이 소개 문장에 묻히지 않게 위를 더 띄운다 */
 .heroAction {
   display: flex;
-  margin-top: var(--space-8);
+  margin-top: var(--space-12);
 }
 
 /* "새 여행 추가" 앞 + 선 아이콘 (DESIGN 6절 "버튼": 주요 버튼은 앞이나 뒤에 선 아이콘) */
@@ -78,12 +148,73 @@
   font-weight: 500;
 }
 
+/* 한옥 그림: 창호 액자 (DESIGN 7절) */
+.heroFigure {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  margin: 0;
+}
+
+/* 액자 왼쪽 바깥의 세로쓰기 旅白. 큰 문구와 같은 Noto Serif KR 두 글자만 쓴다 (D-031) */
+.vertical {
+  position: absolute;
+  top: var(--space-8);
+  right: calc(100% + var(--space-16));
+  color: var(--color-text-muted);
+  font-family: 'Noto Serif KR', var(--font-heading);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.4em;
+  writing-mode: vertical-rl;
+}
+
+.frame {
+  position: relative;
+  padding: var(--space-8);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
 .heroImage {
   display: block;
   width: 100%;
   height: auto;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-line);
+  border-radius: 2px;
+}
+
+/* 낙관(인장): 주홍 사각, 흰 글자 세로쓰기, 안쪽 흰 테. 빨간 원은 쓰지 않는다 (DESIGN 1절) */
+.seal {
+  position: absolute;
+  right: var(--space-24);
+  bottom: calc(-1 * var(--space-16));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 52px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.1;
+  outline: 1px solid rgba(255, 255, 255, 0.75);
+  outline-offset: -4px;
+  transform: rotate(-3deg);
+  writing-mode: vertical-rl;
+  animation: seal-stamp 0.5s cubic-bezier(0.3, 0.8, 0.3, 1) 1s backwards;
+}
+
+.caption {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
 }
 
 /* 최근 기록 */
@@ -96,10 +227,10 @@
 .sectionTitle {
   display: flex;
   align-items: center;
-  gap: var(--space-12);
+  gap: var(--space-16);
   margin: 0;
   font-family: var(--font-heading);
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 800;
 }
 
@@ -113,16 +244,16 @@
 .blocks {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-28);
+  gap: var(--space-24);
 }
 
 .card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
-  min-height: 196px;
-  padding: var(--space-32) var(--space-28) var(--space-28);
+  gap: var(--space-8);
+  min-height: 208px;
+  padding: var(--space-32) var(--space-28) var(--space-24);
   overflow: hidden;
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
@@ -141,7 +272,36 @@
   transform: translateY(-4px);
 }
 
-/* 색동 띠: 주홍·송화·청록·쪽빛·연한 살구색 5칸, 높이 7px */
+/* 마우스를 올리면 색동 띠가 조금 두꺼워지고, 오른쪽 아래에 화살표가 미끄러져 나온다 (2026-10-23) */
+.stripe {
+  transform-origin: top;
+  transition: transform 0.2s;
+}
+
+.cardLink:hover .stripe {
+  transform: scaleY(1.4);
+}
+
+.cardArrow {
+  position: absolute;
+  right: var(--space-28);
+  bottom: var(--space-24);
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.cardLink:hover .cardArrow,
+.cardLink:focus-visible .cardArrow {
+  opacity: 1;
+  transform: none;
+}
+
+/* 색동 띠: 주홍·송화·청록·쪽빛·연한 살구색 5칸, 높이 7px.
+   (2026-10-23 띠 아래 2px 선을 더했다가 사람의 요청으로 뺌) */
 .stripe {
   position: absolute;
   top: 0;
@@ -201,21 +361,30 @@
   color: #2f6253; /* 짙은 청록 (청록에 검정을 섞은 값, 토큰 없음) */
 }
 
+/* 제목은 세 카드 모두 두 줄까지, 넘치면 끝에 "…" (2026-10-23 사람이 정함).
+   한 줄 제목도 두 줄 높이를 차지해 세 카드의 보조 줄·날짜가 같은 높이에 온다 */
 .cardTitle {
+  display: -webkit-box;
+  min-height: calc(2 * 1.35em);
+  margin-top: var(--space-4);
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-family: var(--font-heading);
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
-.oneLine {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.mood {
+  font-size: 26px; /* 하회탈 그림 크기 (2026-10-23) */
 }
 
-.mood {
-  font-size: 24px;
+.mood svg {
+  display: inline-block;
+  vertical-align: -0.2em;
 }
 
 .cardSub {
@@ -223,12 +392,29 @@
   font-size: 15px;
 }
 
-/* 날짜는 카드 아래쪽에 맞춰 세 카드가 같은 높이에 보이게 한다 */
+/* 최근 일기 본문: 일기 본문처럼 Hahmlet, 두 줄까지 "…" (2026-10-23) */
+.cardExcerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-family: var(--font-heading);
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* 날짜는 카드 아래쪽에 맞춰 세 카드가 같은 높이에 보이게 한다.
+   위에 1px #ccc 구분선 (2026-10-23 팀 합의) */
 .cardDate {
   margin-top: auto;
-  padding-top: var(--space-8);
+  padding-top: var(--space-12);
+  border-top: 1px solid #ccc;
   font-size: 14px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .cardState {
@@ -254,6 +440,11 @@
 
   .headline {
     font-size: 38px;
+  }
+
+  /* 좁은 화면에서는 액자 왼쪽에 자리가 없어 세로쓰기를 감춘다 (장식이라 빠져도 된다) */
+  .vertical {
+    display: none;
   }
 
   .blocks {
