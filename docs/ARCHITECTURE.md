@@ -90,7 +90,7 @@ frontend/
    │  ├─ Diary/       건용
    │  └─ Account/     로그인·회원가입·회원정보수정 화면 (팀 공동, D-042, AI 제안 이름)
    ├─ components/     공통 컴포넌트 (팀 공동, D-028). 사진 칸 부품 `PhotoInput/`도 여기에 둔다 (D-033, P-37). 추천 대화창 `RecommendChat/`도 여기에 둔다 (D-037)
-   │                  로그인 상태 `Auth/`, 프로필사진 `Avatar/`, 회원상세 창 `UserModal/`, 좋아요 버튼 `LikeButton/`, 댓글 `Comments/` (D-042, AI 제안 이름)
+   │                  로그인 상태 `Auth/`, 프로필사진 `Avatar/`, 회원상세 창 `UserModal/`, 좋아요 버튼 `LikeButton/`, 댓글 `Comments/` (D-042, AI 제안 이름). 여행 상세의 버튼 줄에 좋아요와 "댓글 N" 바로가기, 맨 아래에 댓글 칸 (D-044)
    ├─ assets/         지도 그림 등 (팀 공동, D-030)
    │  └─ Layout/      공통 레이아웃, 네비 포함 (건용). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)
@@ -153,6 +153,7 @@ backend/
 | 로그인 | 서버가 가입·로그인 때 세션 토큰을 `HttpOnly` 쿠키로 주고, 브라우저가 이후 요청마다 보낸다. Vite 프록시 덕에 화면과 서버가 같은 주소(5173)라 `vite.config.js`와 `fetch` 옵션을 바꾸지 않는다. 화면 코드는 쿠키를 읽지 않고 `GET /api/users/me`로 로그인 여부를 안다 | 정함 (D-042). 쿠키 속성은 `docs/API-SPEC.md` 1절 (AI 제안) |
 | 로그인 상태 나눠 주기 | `components/Auth/`의 Context 부품이 `App.jsx`의 화면 전체를 감싸 로그인한 회원(`null` 또는 회원 객체)과 로그인·로그아웃 뒤 다시 불러오는 함수를 준다. 네비·여행·장소·다이어리·여행 상세가 이것을 읽어 버튼을 보이거나 숨긴다 | AI 제안 (D-042) |
 | 권한 | 화면은 버튼을 숨기고, 서버는 `401`·`403`으로 한 번 더 막는다. 장소·일기의 주인은 그 여행의 `user_id`로 정한다 | 정함 (D-042) |
+| 여행 상세의 댓글 수 | 댓글 목록은 `components/Comments/`가 불러오고, 불러오거나 쓰고 지울 때마다 지금 댓글 수(불러오는 중·오류면 없음)를 여행 상세(`TripDetail`)에 알려 준다. 여행 상세는 그 수로 버튼 줄의 "댓글 N" 바로가기를 그린다. 바로가기는 새 부품을 만들지 않고 `TripDetail` 안에 두고, 서버를 한 번 더 부르지 않는다 | 정함 (D-044). 알려 주는 방법(속성 이름)은 AI 제안 |
 | 날짜 형식 | `YYYY-MM-DD` | 확정 (AGENTS) |
 | API 주소, 메서드, 요청·응답 모양 | `docs/API-SPEC.md`에 정함 | 정함 (D-018~D-020) |
 | 테이블 구조 | `docs/DATA-MODEL.md`에 정함 | 확정 (D-015~D-017) |
