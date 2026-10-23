@@ -41,22 +41,38 @@ export default function TripCard({ trip, index }) {
         <span className={styles.meta}>
           <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </span>
-        {/* 맨 아래 한 줄: 왼쪽 주인 닉네임(주인 없는 여행은 비움), 오른쪽 좋아요 수 (D-042, SCREEN-SPEC 8절 2번).
-            카드의 하트는 채우지 않고 누르지 않는다 (좋아요는 상세에서만) */}
+        {/* 맨 아래 한 줄: 왼쪽 주인 닉네임(주인 없는 여행은 비움), 오른쪽 좋아요 수·댓글 수 (D-042, D-045, SCREEN-SPEC 8절 2번).
+            카드의 하트는 채우지 않고, 둘 다 누르지 않는다 (좋아요·댓글은 상세에서만) */}
         <span className={styles.footer}>
           <span className={styles.owner}>{trip.user_nickname}</span>
-          <span className={styles.likes}>
-            <svg className={styles.heart} viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinejoin="round"
-              />
-            </svg>
-            <span className={styles.srOnly}>좋아요 </span>
-            {trip.like_count}
+          <span className={styles.counts}>
+            <span className={styles.count}>
+              <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className={styles.srOnly}>좋아요 </span>
+              {trip.like_count}
+            </span>
+            {/* 선 말풍선 14px (D-045). 오른쪽 아래 AI 추천 버튼(주홍 사각 안 흰 말풍선)과 크기·색이 다르다 */}
+            <span className={styles.count}>
+              <svg className={styles.icon} viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5h-8l-4.5 3.5v-3.5H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span className={styles.srOnly}>댓글 </span>
+              {trip.comment_count}
+            </span>
           </span>
         </span>
       </span>

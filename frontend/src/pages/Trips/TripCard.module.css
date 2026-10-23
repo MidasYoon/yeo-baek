@@ -111,7 +111,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 카드 글자 칸 맨 아래 한 줄: 주인 닉네임 + 오른쪽 선 하트 14px와 좋아요 수, 13px 흐린 먹 (D-042, DESIGN 6절) */
+/* 카드 글자 칸 맨 아래 한 줄: 주인 닉네임 + 오른쪽 선 하트 14px와 좋아요 수, 선 말풍선 14px와 댓글 수.
+   13px 흐린 먹, 아이콘과 수 사이 4px, 두 묶음 사이 12px (D-042, D-045, DESIGN 6절) */
 .footer {
   display: flex;
   align-items: center;
@@ -127,15 +128,21 @@
   white-space: nowrap;
 }
 
-.likes {
+.counts {
   display: inline-flex;
   flex: none;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.count {
+  display: inline-flex;
   align-items: center;
   gap: var(--space-4);
   font-variant-numeric: tabular-nums;
 }
 
-.heart {
+.icon {
   width: 14px;
   height: 14px;
 }

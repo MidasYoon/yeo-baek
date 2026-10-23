@@ -14,13 +14,15 @@ router = APIRouter(prefix="/api/trips", tags=["trips"])
 NOT_FOUND = "여행을 찾을 수 없어요"
 
 # 여행 객체: trips 칸 + 주인의 지금 닉네임(user_nickname, 주인 없는 여행은 null),
-# 좋아요 수(like_count), 지금 로그인한 회원이 눌렀는지(liked) (API-SPEC 2절 2번, D-042).
+# 좋아요 수(like_count), 지금 로그인한 회원이 눌렀는지(liked) (API-SPEC 2절 2번, D-042),
+# 댓글 수(comment_count, D-045).
 # ?에는 로그인한 회원의 id를 넣는다. 로그인하지 않았으면 None이라 liked가 0이다.
 TRIP_SELECT = (
     "SELECT trips.*, users.nickname AS user_nickname,"
     " (SELECT COUNT(*) FROM trip_likes WHERE trip_likes.trip_id = trips.id) AS like_count,"
     " EXISTS (SELECT 1 FROM trip_likes"
-    " WHERE trip_likes.trip_id = trips.id AND trip_likes.user_id = ?) AS liked"
+    " WHERE trip_likes.trip_id = trips.id AND trip_likes.user_id = ?) AS liked,"
+    " (SELECT COUNT(*) FROM trip_comments WHERE trip_comments.trip_id = trips.id) AS comment_count"
     " FROM trips LEFT JOIN users ON users.id = trips.user_id"
 )
 
