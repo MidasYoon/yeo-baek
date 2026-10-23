@@ -253,7 +253,7 @@
 
 ## 3. `places` (담당: 은희)
 
-> 근거: D-002, D-006, D-014, PRD 3절, SCREEN-SPEC 4절, DATA-MODEL 3절. 라우터는 `backend/routers/places.py`, 부르는 곳은 `frontend/src/api/places.js`.
+> 근거: D-002, D-006, D-014, D-036, PRD 3절, SCREEN-SPEC 4절, DATA-MODEL 3절. 라우터는 `backend/routers/places.py`, 부르는 곳은 `frontend/src/api/places.js`.
 
 ### 1. API 목록
 
@@ -282,6 +282,9 @@
   "visit_date": "2026-05-02",
   "memo": "바람이 셌음",
   "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg", "0f9e8d7c6b5a49382716f5e4d3c2b1a0.png"],
+  "lat": 35.1587,
+  "lng": 129.1604,
+  "kakao_place_id": "7990409",
   "created_at": "2026-10-21 14:10:00",
   "updated_at": "2026-10-21 14:10:00"
 }
@@ -296,10 +299,13 @@
 | `visit_date` | 방문 날짜 (`YYYY-MM-DD`) | — | DATA-MODEL 3절 |
 | `memo` | 메모 | `null` | DATA-MODEL 3절, 1절 "주고받는 값" |
 | `photos` | 사진 파일 이름 목록 (0~4개). `place_photos.id`가 작은 것이 앞 | `[]` | DATA-MODEL 5절, D-033 |
+| `lat`, `lng` | 위도·경도 (숫자) | `null` (D-036 전에 넣은 장소) | DATA-MODEL 3절, D-036 |
+| `kakao_place_id` | 카카오 장소 id (글자) | `null` (D-036 전에 넣은 장소) | DATA-MODEL 3절, D-036 |
 | `created_at`, `updated_at` | 만든·고친 시각 | — | D-020 |
 
-- 핀 좌표는 응답에 없다. 화면이 `region`으로 시·도 가운데에 핀을 찍는다 (R-P-005, DATA-MODEL 3절).
-- 핀 위의 개수는 화면이 목록에서 같은 `region`을 세어 보인다. 개수만 돌려주는 API는 두지 않는다 (R-P-006, D-014, AI 제안).
+- 핀은 화면이 `lat`·`lng`에 찍고, 같은 `kakao_place_id`끼리 묶는다. `lat`·`lng`가 `null`이면 `region`의 시·도 가운데에 찍는다 (R-P-026, D-036).
+- 핀 위의 개수는 화면이 목록에서 같은 곳(카카오맵) 또는 같은 `region`(그림 지도)을 세어 보인다. 개수만 돌려주는 API는 두지 않는다 (R-P-006, R-P-026, D-014, AI 제안).
+- 칸이 늘기만 했으므로 장소 객체를 쓰는 다른 화면(여행 상세, Home)은 고치지 않아도 된다 (D-036).
 - `photos`는 `place_photos` 테이블에서 모아 넣는다. 사진만 따로 가져오는 API는 두지 않는다 (AI 제안).
 
 ### 3. 요청 본문과 서버 검사
@@ -313,7 +319,10 @@
   "name": "해운대",
   "visit_date": "2026-05-02",
   "memo": "바람이 셌음",
-  "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg"]
+  "photos": ["a1b2c3d4e5f60718293a4b5c6d7e8f90.jpg"],
+  "lat": 35.1587,
+  "lng": 129.1604,
+  "kakao_place_id": "7990409"
 }
 ```
 
@@ -325,10 +334,16 @@
 | --- | --- | --- | --- |
 | `trip_id` | 필수 (`POST`만) | 있는 여행의 `id`. 없는 여행이면 `422` (1절 "오류 응답") | DATA-MODEL 3절 |
 | `region` | 필수 | 시·도 17개 이름 중 하나: 서울, 부산, 대구, 인천, 광주, 대전, 울산, 세종, 경기, 강원, 충북, 충남, 전북, 전남, 경북, 경남, 제주 | PRD 3절 3번, D-016 |
-| `name` | 필수 | 20자 이하. 공백만 적으면 비운 것으로 본다 (D-021) | PRD 3절 3번 |
+| `name` | 필수 | 글자 수 제한 없음 (D-036, 전에는 20자). 공백만 적으면 비운 것으로 본다 (D-021) | PRD 3절 3번 |
 | `visit_date` | 필수 | `YYYY-MM-DD`이고 실제 있는 날짜. 그 여행의 `start_date`~`end_date` 안 | PRD 3절 3번, L-05 |
 | `memo` | 선택 | 20자 이하. 빼거나 `null`이면 비운 것 | PRD 3절 3번 |
 | `photos` | 선택 | 파일 이름 목록 0~4개. 5개 이상이거나 같은 이름이 두 번 있으면 `422`. 빼면 `[]`. 1절 "사진 올리기와 보기"의 사진 칸 규칙 | PRD 3절 3번, R-P-022, D-033 |
+| `lat` | 선택 | 숫자, 33 이상 39 이하. 빼면 `null` | D-036 |
+| `lng` | 선택 | 숫자, 124 이상 132 이하. 빼면 `null` | D-036 |
+| `kakao_place_id` | 선택 | 숫자로만 된 글자 1~20자. 빼거나 비우면 `null` | D-036, AI 제안 |
+
+- `lat`·`lng`·`kakao_place_id`는 셋 다 있거나 셋 다 없어야 한다. 하나라도 어긋나면 `422` (D-036. `kakao_place_id`까지 묶는 것은 AI 제안).
+- 장소 검색은 화면에서 필수지만 서버는 세 칸이 없는 것도 받는다. 서버는 `region`을 좌표로 다시 계산하지 않고 17개 이름인지만 본다 (D-036).
 
 - 기간 검사에 쓰는 여행은 `POST`는 본문의 `trip_id`, `PUT`은 그 장소에 저장된 `trip_id`의 여행이다.
 - 메모의 "한 줄"은 입력 칸 모양으로 지킨다. 서버는 줄바꿈을 검사하지 않는다 (AI 제안).

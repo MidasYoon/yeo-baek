@@ -9,6 +9,8 @@
 [브라우저] React 화면 (5173)
    │  화면 주소는 React Router로 나눔: / · /trip · /place · /diary
    │  서버 호출은 frontend/src/api/ 안에서만 (기능별 파일 하나씩)
+   │  ─────────────▶ [카카오맵 JavaScript SDK] 지도·장소 검색 (D-036)
+   │                 브라우저가 카카오에서 바로 불러옴. 백엔드를 거치지 않음
    ▼
 [Vite 개발 서버 프록시]  /api 로 시작하는 요청만 백엔드로 넘김
    ▼
@@ -29,6 +31,7 @@
 | SQLite | 여행·장소·일기와 사진 파일 이름 저장 | AGENTS 환경, D-009, D-033 |
 | `uploads` 라우터 | 사진 한 장을 받아 검사(형식·용량)하고 `backend/uploads/`에 새 이름으로 저장한다. 기능별 라우터가 아닌 세 기능 공통 | D-033 |
 | `backend/uploads/` | 사진 파일 보관. `main.py`가 `/api/uploads`로 보여 준다. Git에 올리지 않는다 | D-033 |
+| 카카오맵 JavaScript SDK | 여행지 정보의 지도와 장소 검색. 화면이 카카오에서 바로 불러온다. 키는 `frontend/.env`의 `VITE_KAKAO_MAP_KEY`. 불러오는 함수와 장소 검색 함수는 `frontend/src/api/places.js`에 둔다 (AI 제안) | D-036 |
 
 ## 2. 기술 스택
 
@@ -119,6 +122,7 @@ backend/
 | 백엔드 라우터 | `trips` / `places` / `diaries` 기능별 파일. 사진 올리기만 공통 `uploads` | 확정 (AGENTS, D-033) |
 | 데이터 연결 | `places`와 `diaries`는 `trip_id`로 `trips`에 연결. `place_photos`는 `place_id`로 `places`에 연결 | 확정 (AGENTS, D-033) |
 | 사진 | `POST /api/uploads`로 먼저 올려 파일 이름을 받고, 저장할 때 JSON에 그 이름을 넣는다. 보기는 `/api/uploads/{filename}`이라 Vite 프록시 설정을 바꾸지 않는다 | 확정 (D-033) |
+| 카카오맵 | 화면이 SDK 주소(`dapi.kakao.com`)를 `<script>`로 한 번 불러온다(`autoload=false`, `libraries=services`). `index.html`과 Vite 프록시는 바꾸지 않고 npm 라이브러리도 쓰지 않는다. 장소 검색 결과의 좌표·카카오 장소 id·시·도는 장소를 저장할 때 `/api/places` JSON에 넣는다 | 정함 (D-036). 불러오는 방법은 AI 제안 |
 | 날짜 형식 | `YYYY-MM-DD` | 확정 (AGENTS) |
 | API 주소, 메서드, 요청·응답 모양 | `docs/API-SPEC.md`에 정함 | 정함 (D-018~D-020) |
 | 테이블 구조 | `docs/DATA-MODEL.md`에 정함 | 확정 (D-015~D-017) |

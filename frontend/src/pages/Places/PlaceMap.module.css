@@ -3,7 +3,9 @@
 .map {
   position: relative;
   width: 100%;
-  max-width: 267px; /* 2026-10-22 400px의 2/3로 줄임 */
+  /* 칸 폭을 채우되, 그림 비율(641:1200)을 지키며 카카오맵 칸 높이를 넘지 않게 줄인다 (2026-10-23) */
+  max-width: calc(var(--map-height) * 641 / 1200);
+  margin: 0 auto;
   overflow: hidden;
   background: var(--color-bg); /* 바다 = 화면 바탕 (2026-10-22 사람이 정함) */
 }
@@ -75,26 +77,77 @@
   fill: #5b9c95 !important;
 }
 
-/* 깃발 핀. 누르는 곳은 44×48px (DESIGN 8절)이고, 깃대 아래 끝이 핀 위치에 오게 옮긴다.
-   지도를 2/3로 줄이며 깃발 그림은 3/4(30×36px)로 줄였다. 깃대 끝은 그림 좌표 (8, 46) → (6, 34.5)px. */
-.pin {
+/* 지도 칸 높이: PC는 화면 높이에서 위아래 여백을 뺀 만큼(목록을 내려도 붙어 있음), 최소 360px.
+   모바일은 화면 폭에 맞춰 4:3 (2026-10-23) */
+.frame,
+.map {
+  --map-height: max(360px, calc(100vh - 2 * var(--space-24)));
+}
+
+/* 카카오맵 칸 (D-036, DESIGN 6절). 지도 색은 덮지 않고, 카카오 로고·저작권 표시는 가리지 않는다. */
+.frame {
+  position: relative;
+  width: 100%;
+  height: var(--map-height);
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.loading {
   position: absolute;
-  width: 44px;
-  height: 48px;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .frame {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* 그림 지도로 대신 보일 때의 안내 (13px 흐린 먹) */
+.fallbackNote {
+  margin: var(--space-8) 0 0;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* 깃발 핀. 누르는 곳은 48×56px (DESIGN 8절). 깃발 그림은 40×48px이고, 깃대 끝은 (8, 46)px.
+   카카오맵은 CustomOverlay의 기준점(xAnchor·yAnchor)으로 깃대 끝을 좌표에 맞춘다.
+   지도 위에서 잘 보이게 쪽빛으로 채운 깃발 + 흰 테두리 + 흰 숫자 + 그림자 (2026-10-23) */
+.pin {
+  display: block;
+  width: 48px;
+  height: 56px;
   margin: 0;
   padding: 0;
   border: none;
   background: none;
-  transform: translate(-6px, -34.5px);
   cursor: pointer;
+}
+
+/* 그림 지도의 핀: 깃대 아래 끝이 핀 위치에 오게 옮긴다. */
+.svgPin {
+  position: absolute;
+  transform: translate(-8px, -46px);
 }
 
 .flag {
   display: block;
-  width: 30px;
-  height: 36px;
+  width: 40px;
+  height: 48px;
   overflow: visible;
-  transform-origin: 6px 34.5px;
+  filter: drop-shadow(0 2px 3px rgba(43, 33, 27, 0.35));
+  transform-origin: 8px 46px;
   transition: transform 0.15s;
 }
 
@@ -103,7 +156,13 @@
 }
 
 .flagShadow {
-  fill: rgba(43, 33, 27, 0.25);
+  fill: rgba(43, 33, 27, 0.35);
+}
+
+.flagPoleHalo {
+  stroke: #fff;
+  stroke-width: 5.5;
+  stroke-linecap: round;
 }
 
 .flagPole {
@@ -113,34 +172,29 @@
 }
 
 .flagBanner {
-  fill: var(--color-surface);
-  stroke: var(--color-indigo);
+  fill: var(--color-indigo);
+  stroke: #fff;
   stroke-width: 2;
   stroke-linejoin: round;
 }
 
 .flagCount {
-  fill: var(--color-indigo);
+  fill: #fff;
   font-family: var(--font-body);
-  font-size: 15px; /* 그림 좌표 단위. 3/4로 줄어 화면에서는 약 11px */
+  font-size: 15px; /* 그림 좌표 단위 = 화면 px */
   font-weight: 700;
 }
 
-/* 고른 깃발: 더 크게, 주홍 깃발 + 먹 테두리 + 흰 숫자. 색만으로 구분하지 않는다. */
+/* 고른 깃발: 더 크게, 주홍 깃발. 크기로도 구분해 색만으로 구분하지 않는다. */
 .selected {
   z-index: 1;
 }
 
 .selected .flag,
 .selected:hover .flag {
-  transform: scale(1.3);
+  transform: scale(1.25);
 }
 
 .selected .flagBanner {
   fill: var(--color-accent);
-  stroke: var(--color-text);
-}
-
-.selected .flagCount {
-  fill: #fff;
 }

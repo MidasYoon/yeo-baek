@@ -33,6 +33,9 @@ SCHEMA = [
         name TEXT NOT NULL,
         visit_date TEXT NOT NULL,
         memo TEXT,
+        lat REAL,
+        lng REAL,
+        kakao_place_id TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
     )
@@ -64,6 +67,15 @@ SCHEMA = [
     """,
 ]
 
+# 나중에 더한 칸 (테이블, 칸, 타입). 이미 있는 DB에는 CREATE TABLE IF NOT EXISTS가 칸을 더하지 않으므로
+# 시작할 때 없는 칸만 ALTER TABLE로 더한다. 넣어 둔 데이터는 그대로이고 새 칸은 NULL이다.
+ADDED_COLUMNS = [
+    # places 좌표와 카카오 장소 id (담당: 은희) — DATA-MODEL 3절, D-036
+    ("places", "lat", "REAL"),
+    ("places", "lng", "REAL"),
+    ("places", "kakao_place_id", "TEXT"),
+]
+
 
 def get_connection():
     """DB 연결을 연다. 연결마다 외래 키 검사를 켠다 (D-015)."""
@@ -74,11 +86,15 @@ def get_connection():
 
 
 def init_db():
-    """테이블이 없으면 만든다. 이미 있으면 그대로 둔다."""
+    """테이블이 없으면 만든다. 이미 있으면 그대로 두고, 빠진 칸(ADDED_COLUMNS)만 더한다."""
     conn = get_connection()
     try:
         for statement in SCHEMA:
             conn.execute(statement)
+        for table, column, column_type in ADDED_COLUMNS:
+            existing = {row["name"] for row in conn.execute(f"PRAGMA table_info({table})")}
+            if column not in existing:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {column_type}")
         conn.commit()
     finally:
         conn.close()

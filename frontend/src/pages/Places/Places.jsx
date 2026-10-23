@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { deletePlace, getPlacePage, getPlaces } from '../../api/places.js'
+import { deletePlace, getPlacePage, getPlaces, loadKakaoMaps } from '../../api/places.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import Pagination from '../../components/Pagination/Pagination.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import TripSelect from '../../components/TripSelect/TripSelect.jsx'
 import PlaceCard from './PlaceCard.jsx'
-import PlaceMap from './PlaceMap.jsx'
+import PlaceMap, { pinKeyOf } from './PlaceMap.jsx'
 import styles from './Places.module.css'
 
 // 여행지 정보 목록 (담당: 은희). SCREEN-SPEC 4절. 주소: /place, /place?page=:page, /place?trip=:tripId
@@ -28,7 +28,10 @@ export default function Places() {
   const [places, setPlaces] = useState([])
   const [total, setTotal] = useState(0)
   const [status, setStatus] = useState('idle')
-  const [selectedRegion, setSelectedRegion] = useState(null)
+  // 눌린 핀의 키 (pinKeyOf). 카카오맵은 같은 곳, 그림 지도는 시·도로 묶는다 (D-036).
+  const [selectedKey, setSelectedKey] = useState(null)
+  // 지도 종류: 카카오맵을 불러오는 중 → 'kakao', 불러오지 못하면 그림 지도 'svg' (D-036).
+  const [mapMode, setMapMode] = useState('loading')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteFailed, setDeleteFailed] = useState(false)
@@ -70,9 +73,20 @@ export default function Places() {
     [setSearchParams],
   )
 
+  // 카카오맵 SDK는 화면에 들어올 때 한 번 불러온다.
+  useEffect(() => {
+    let current = true
+    loadKakaoMaps()
+      .then(() => current && setMapMode('kakao'))
+      .catch(() => current && setMapMode('svg'))
+    return () => {
+      current = false
+    }
+  }, [])
+
   useEffect(() => {
     // 여행이나 페이지를 바꾸면 핀 강조는 풀린다 (SCREEN-SPEC 4절 3번).
-    setSelectedRegion(null)
+    setSelectedKey(null)
     if (selectedId === null && !showAll) {
       setStatus('idle')
       return
@@ -87,11 +101,11 @@ export default function Places() {
 
   // 핀을 누르면 강조된 카드 중 첫 카드가 화면에 보이도록 목록을 움직인다 (AI 제안).
   useEffect(() => {
-    if (!selectedRegion) return
+    if (!selectedKey) return
     listRef.current
       ?.querySelector('[data-highlighted="true"]')
       ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-  }, [selectedRegion])
+  }, [selectedKey])
 
   function handleTripChange(trip) {
     // "전체 여행"을 고르면 trip이 null이다. 전체 보기 1페이지(/place)로 간다.
@@ -103,9 +117,9 @@ export default function Places() {
     window.scrollTo({ top: 0 })
   }
 
-  function handlePinSelect(region) {
+  function handlePinSelect(key) {
     // 같은 핀을 다시 누르면 강조가 풀린다.
-    setSelectedRegion((prev) => (prev === region ? null : region))
+    setSelectedKey((prev) => (prev === key ? null : key))
   }
 
   function openDelete(place) {
@@ -126,9 +140,9 @@ export default function Places() {
       } else {
         setPlaces(remaining)
       }
-      // 강조한 지역에 장소가 하나도 남지 않으면 강조를 푼다. 남아 있으면 그대로 둔다.
-      if (!remaining.some((place) => place.region === selectedRegion)) {
-        setSelectedRegion(null)
+      // 강조한 곳(그림 지도는 지역)에 장소가 하나도 남지 않으면 강조를 푼다. 남아 있으면 그대로 둔다.
+      if (!remaining.some((place) => pinKeyOf(place, mapMode) === selectedKey)) {
+        setSelectedKey(null)
       }
     } catch {
       // 지우지 못하면 카드는 그대로 둔다 (SCREEN-SPEC 4절 5번).
@@ -157,13 +171,18 @@ export default function Places() {
     content = (
       <div className={styles.layout}>
         <div className={styles.mapColumn}>
-          <PlaceMap places={places} selectedRegion={selectedRegion} onSelect={handlePinSelect} />
+          <PlaceMap
+            places={places}
+            mode={mapMode}
+            selectedKey={selectedKey}
+            onSelect={handlePinSelect}
+          />
         </div>
         {/* 페이지 버튼은 목록 칸 아래 가운데에 둔다 */}
         <div>
           <ul className={styles.list} ref={listRef}>
             {places.map((place) => {
-              const highlighted = place.region === selectedRegion
+              const highlighted = pinKeyOf(place, mapMode) === selectedKey
               return (
                 <li key={place.id} data-highlighted={highlighted}>
                   <PlaceCard

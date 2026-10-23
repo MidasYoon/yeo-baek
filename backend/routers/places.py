@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query, Response
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, model_validator
 
 from database import get_connection
 from routers.uploads import check_photo_name, delete_photo
@@ -20,6 +20,10 @@ REGIONS = (
     "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", "경기",
     "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주",
 )
+
+# 좌표가 들어갈 수 있는 범위 (D-036)
+LAT_RANGE = (33, 39)
+LNG_RANGE = (124, 132)
 
 
 def check_date_text(value: str) -> str:
@@ -41,6 +45,10 @@ class PlaceUpdate(BaseModel):
     visit_date: str
     memo: str | None = None
     photos: list[str] = []  # 사진 파일 이름 목록 (D-033)
+    # 카카오 장소 검색으로 고른 곳의 좌표와 id (D-036). 셋 다 있거나 셋 다 없다.
+    lat: float | None = None
+    lng: float | None = None
+    kakao_place_id: str | None = None
 
     @field_validator("region")
     @classmethod
@@ -53,11 +61,10 @@ class PlaceUpdate(BaseModel):
     @classmethod
     def check_name(cls, value: str) -> str:
         # 앞뒤 공백을 빼고 저장한다. 공백만 적으면 비운 것으로 본다 (D-021, D-029).
+        # 글자 수 제한은 없다 (D-036).
         value = value.strip()
         if not value:
             raise ValueError("비어 있을 수 없어요")
-        if len(value) > 20:
-            raise ValueError("20자까지 쓸 수 있어요")
         return value
 
     @field_validator("visit_date")
@@ -85,6 +92,43 @@ class PlaceUpdate(BaseModel):
         if len(set(value)) != len(value):
             raise ValueError("같은 사진이 두 번 있어요")
         return [check_photo_name(name) for name in value]
+
+    @field_validator("lat")
+    @classmethod
+    def check_lat(cls, value: float | None) -> float | None:
+        low, high = LAT_RANGE
+        if value is not None and not low <= value <= high:
+            raise ValueError(f"위도는 {low}~{high} 안이어야 해요")
+        return value
+
+    @field_validator("lng")
+    @classmethod
+    def check_lng(cls, value: float | None) -> float | None:
+        low, high = LNG_RANGE
+        if value is not None and not low <= value <= high:
+            raise ValueError(f"경도는 {low}~{high} 안이어야 해요")
+        return value
+
+    @field_validator("kakao_place_id")
+    @classmethod
+    def check_kakao_place_id(cls, value: str | None) -> str | None:
+        # 비우거나 공백만 적으면 null. 있으면 숫자로만 된 1~20자 (API-SPEC 3절).
+        if value is None:
+            return None
+        value = value.strip()
+        if not value:
+            return None
+        if not (value.isascii() and value.isdigit()) or len(value) > 20:
+            raise ValueError("카카오 장소 id는 숫자로만 된 20자 이하여야 해요")
+        return value
+
+    @model_validator(mode="after")
+    def check_location_together(self):
+        # 좌표와 카카오 장소 id는 셋 다 있거나 셋 다 없어야 한다 (D-036).
+        given = [v is not None for v in (self.lat, self.lng, self.kakao_place_id)]
+        if any(given) and not all(given):
+            raise ValueError("lat·lng·kakao_place_id는 셋 다 있거나 셋 다 없어야 해요")
+        return self
 
 
 class PlaceIn(PlaceUpdate):
@@ -199,9 +243,12 @@ def create_place(place: PlaceIn):
     try:
         check_in_period(conn, place.trip_id, place.visit_date)
         cursor = conn.execute(
-            "INSERT INTO places (trip_id, region, name, visit_date, memo)"
-            " VALUES (?, ?, ?, ?, ?)",
-            (place.trip_id, place.region, place.name, place.visit_date, place.memo),
+            "INSERT INTO places (trip_id, region, name, visit_date, memo, lat, lng, kakao_place_id)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                place.trip_id, place.region, place.name, place.visit_date, place.memo,
+                place.lat, place.lng, place.kakao_place_id,
+            ),
         )
         conn.executemany(
             "INSERT INTO place_photos (place_id, filename) VALUES (?, ?)",
@@ -224,8 +271,12 @@ def update_place(place_id: int, place: PlaceUpdate):
         check_in_period(conn, saved["trip_id"], place.visit_date)
         conn.execute(
             "UPDATE places SET region = ?, name = ?, visit_date = ?, memo = ?,"
+            " lat = ?, lng = ?, kakao_place_id = ?,"
             " updated_at = datetime('now', 'localtime') WHERE id = ?",
-            (place.region, place.name, place.visit_date, place.memo, place_id),
+            (
+                place.region, place.name, place.visit_date, place.memo,
+                place.lat, place.lng, place.kakao_place_id, place_id,
+            ),
         )
         # 사진은 본문 목록으로 통째로 바꾼다. 남는 사진은 순서 그대로, 새 사진은 뒤에 붙는다 (API-SPEC 3절 4번).
         old_photos = photo_names(conn, place_id)
