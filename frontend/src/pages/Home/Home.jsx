@@ -46,7 +46,7 @@ export default function Home() {
     <div className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroText}>
-          <p className={styles.eyebrow}>여백 · 여행 다이어리</p>
+          <p className={styles.eyebrow}>여행의 빈칸을 채우는 기록장</p>
           {/* "여백" 이행시: 두 줄의 첫 글자를 한자 旅(여행)·白(백지)로 쓰고 주홍으로 (2026-10-22 사람이 정함).
               화면 읽기 프로그램은 한자 대신 한글로 읽게 aria-label을 둔다. */}
           <h1
@@ -63,8 +63,14 @@ export default function Home() {
           <p className={styles.intro}>
             다녀온 곳은 지도에, 그날의 마음은 일기에. 여행 한 편을 차곡차곡 남겨 보세요.
           </p>
+          {/* Home 바로가기만 앞에 + 선 아이콘과 "새 여행 추가" (2026-10-23 사람이 정함) */}
           <div className={styles.heroAction}>
-            <Button to="/trip/new">새 여행 만들기</Button>
+            <Button to="/trip/new">
+              <svg className={styles.plus} viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+              새 여행 추가
+            </Button>
           </div>
           {firstVisit && <p className={styles.firstVisit}>첫 여행을 만들어 보세요</p>}
         </div>

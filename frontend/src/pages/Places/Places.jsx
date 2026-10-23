@@ -171,10 +171,10 @@ export default function Places() {
                     highlighted={highlighted}
                     actions={
                       <>
-                        <Button variant="text" to={`/place/${place.id}/edit`}>
+                        <Button variant="secondary" to={`/place/${place.id}/edit`}>
                           수정
                         </Button>
-                        <Button variant="text" onClick={() => openDelete(place)}>
+                        <Button variant="secondary" onClick={() => openDelete(place)}>
                           삭제
                         </Button>
                       </>
@@ -198,17 +198,16 @@ export default function Places() {
 
   return (
     <section className={styles.page}>
-      <h1>여행지 정보</h1>
+      {/* "장소 추가"는 여행 기록·여행 일기처럼 제목 오른쪽에 둔다 (2026-10-23 사람이 정함). */}
+      <div className={styles.header}>
+        <h1>여행 장소</h1>
+        {selectedTrip && <Button to={`/place/new?trip=${selectedTrip.id}`}>장소 추가</Button>}
+      </div>
       <div className={styles.tripField}>
         <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
         {/* 전체 보기에서는 "장소 추가" 대신 안내를 둔다 (SCREEN-SPEC 4절 2번, AI 제안 문구) */}
         {showAll && <p className={styles.guide}>여행을 고르면 장소를 추가할 수 있어요.</p>}
       </div>
-      {selectedTrip && (
-        <div className={styles.toolbar}>
-          <Button to={`/place/new?trip=${selectedTrip.id}`}>장소 추가</Button>
-        </div>
-      )}
       {content}
       <ConfirmDialog
         open={deleteTarget !== null}

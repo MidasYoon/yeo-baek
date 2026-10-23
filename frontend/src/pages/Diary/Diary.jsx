@@ -154,12 +154,12 @@ export default function Diary() {
       />
     )
   } else if (status === 'done' && diaries.length === 0) {
-    // 전체 보기에서는 쓸 여행이 정해지지 않아 "새 일기 쓰기" 버튼을 두지 않는다 (SCREEN-SPEC 5절 5번).
+    // 전체 보기에서는 쓸 여행이 정해지지 않아 "일기 추가" 버튼을 두지 않는다 (SCREEN-SPEC 5절 5번).
     content = (
       <StatusMessage
         kind="empty"
         message="아직 쓴 일기가 없어요."
-        action={newDiaryLink && <Button to={newDiaryLink}>새 일기 쓰기</Button>}
+        action={newDiaryLink && <Button to={newDiaryLink}>일기 추가</Button>}
       />
     )
   } else if (status === 'done') {
@@ -183,18 +183,18 @@ export default function Diary() {
     )
   }
 
-  // "새 일기 쓰기"는 한 곳에만 둔다: 일기가 있으면 오른쪽 위, 없으면 빈 상태 문구 아래. 전체 보기에는 없다.
+  // "일기 추가"는 한 곳에만 둔다: 일기가 있으면 오른쪽 위, 없으면 빈 상태 문구 아래. 전체 보기에는 없다.
   const hasList = status === 'done' && diaries.length > 0
 
   return (
     <section className={styles.page}>
       <div className={styles.header}>
-        <h1>여행 다이어리</h1>
-        {hasList && newDiaryLink && <Button to={newDiaryLink}>새 일기 쓰기</Button>}
+        <h1>여행 일기</h1>
+        {hasList && newDiaryLink && <Button to={newDiaryLink}>일기 추가</Button>}
       </div>
       <div className={styles.tripField}>
         <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
-        {/* 전체 보기에서는 "새 일기 쓰기" 대신 안내를 둔다 (SCREEN-SPEC 5절 2번, AI 제안 문구) */}
+        {/* 전체 보기에서는 "일기 추가" 대신 안내를 둔다 (SCREEN-SPEC 5절 2번, AI 제안 문구) */}
         {showAll && <p className={styles.guide}>여행을 고르면 일기를 쓸 수 있어요.</p>}
       </div>
       {content}

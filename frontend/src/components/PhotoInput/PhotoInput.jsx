@@ -70,8 +70,8 @@ export default function PhotoInput({
     onChange(photos.filter((name) => name !== filename))
   }
 
-  let pickLabel = '사진 고르기'
-  if (single && photos.length > 0) pickLabel = '다른 사진 고르기'
+  let pickLabel = '사진 추가'
+  if (single && photos.length > 0) pickLabel = '사진 변경'
 
   return (
     <div className={styles.field}>
@@ -79,12 +79,21 @@ export default function PhotoInput({
       {help && <span className={styles.help}>{help}</span>}
       {photos.length > 0 && (
         <ul className={styles.list}>
-          {photos.map((filename) => (
+          {photos.map((filename, index) => (
             <li key={filename} className={styles.item}>
               <img className={styles.preview} src={photoUrl(filename)} alt={alt} />
-              <Button variant="text" onClick={() => remove(filename)} disabled={uploading}>
-                {single ? '사진 빼기' : '빼기'}
-              </Button>
+              {/* 사진 오른쪽 위 × 버튼 (2026-10-23 사람이 정함. 전에는 사진 아래 "사진 빼기" 버튼) */}
+              <button
+                type="button"
+                className={styles.remove}
+                onClick={() => remove(filename)}
+                disabled={uploading}
+                aria-label={single ? '사진 빼기' : `사진 ${index + 1} 빼기`}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </button>
             </li>
           ))}
         </ul>

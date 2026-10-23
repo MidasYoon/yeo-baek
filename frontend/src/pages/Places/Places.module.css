@@ -49,8 +49,13 @@
   font-size: 14px;
 }
 
-.toolbar {
+/* 제목 + "장소 추가" (Trips·Diary의 .header와 같은 모양) */
+.header {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-16);
 }
 
 .center {

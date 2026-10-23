@@ -24,7 +24,7 @@ export default function TripNew() {
 
   return (
     <section className={styles.page}>
-      <h1>새 여행 만들기</h1>
+      <h1>여행 추가</h1>
       <TripForm onSubmit={handleSubmit} onCancel={handleCancel} />
     </section>
   )
