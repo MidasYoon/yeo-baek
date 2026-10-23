@@ -46,7 +46,7 @@ export default function Home() {
     <div className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroText}>
-          <p className={styles.eyebrow}>여백 · 여행 다이어리</p>
+          <p className={styles.eyebrow}>여행의 빈칸을 채우는 기록장</p>
           {/* "여백" 이행시: 두 줄의 첫 글자를 한자 旅(여행)·白(백지)로 쓰고 주홍으로 (2026-10-22 사람이 정함).
               화면 읽기 프로그램은 한자 대신 한글로 읽게 aria-label을 둔다. */}
           <h1
