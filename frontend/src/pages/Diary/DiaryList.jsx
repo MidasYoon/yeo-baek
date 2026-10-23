@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { photoUrl } from '../../api/diaries.js'
 import { MOOD_EMOJI, formatTime } from './diaryFormat.js'
 import styles from './DiaryList.module.css'
@@ -6,6 +6,7 @@ import styles from './DiaryList.module.css'
 // 일기 목록 (담당: 건용). SCREEN-SPEC 5절 2·3번, DESIGN 6절 "일기 목록".
 // diaries: API 순서(날짜 → 시각 → id) 그대로 받은 일기들.
 // renderActions(diary): (선택) 펼친 줄 아래에 둘 버튼. 여행 상세 안 목록(P-34)에서는 넘기지 않는다.
+// initialOpenId: (선택) 처음부터 펼쳐 둘 일기 번호. 그 줄이 화면에 보이도록 목록을 움직인다 (Home C 카드, 2026-10-23 팀 합의).
 // 사진이 있으면 펼친 줄의 본문 위에 보인다. 접힌 줄에는 보이지 않는다 (D-033).
 
 // 일기 사진. 불러오지 못하면 숨긴다 (SCREEN-SPEC 1절 "사진 표시").
@@ -22,9 +23,15 @@ function DiaryPhoto({ filename }) {
   )
 }
 
-export default function DiaryList({ diaries, renderActions }) {
+export default function DiaryList({ diaries, renderActions, initialOpenId = null }) {
   // 줄마다 따로 펼치고 접는다. 여러 줄을 함께 펼칠 수 있다.
-  const [openIds, setOpenIds] = useState(() => new Set())
+  const [openIds, setOpenIds] = useState(() => new Set(initialOpenId === null ? [] : [initialOpenId]))
+  const initialRowRef = useRef(null)
+
+  // 처음 펼친 줄이 화면에 보이도록 한 번만 움직인다 (AI 제안).
+  useEffect(() => {
+    initialRowRef.current?.scrollIntoView({ block: 'nearest' })
+  }, [])
 
   function toggle(id) {
     setOpenIds((prev) => {
@@ -56,7 +63,11 @@ export default function DiaryList({ diaries, renderActions }) {
               const open = openIds.has(diary.id)
               const panelId = `diary-${diary.id}-body`
               return (
-                <li key={diary.id} className={open ? `${styles.row} ${styles.open}` : styles.row}>
+                <li
+                  key={diary.id}
+                  ref={diary.id === initialOpenId ? initialRowRef : undefined}
+                  className={open ? `${styles.row} ${styles.open}` : styles.row}
+                >
                   <button
                     type="button"
                     className={styles.summary}

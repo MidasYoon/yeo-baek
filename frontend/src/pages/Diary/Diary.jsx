@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { deleteDiary, getDiaries } from '../../api/diaries.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
@@ -12,6 +12,10 @@ import styles from './Diary.module.css'
 export default function Diary() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tripParam = searchParams.get('trip')
+  const location = useLocation()
+  const navigate = useNavigate()
+  // Home 최근 일기(C) 카드로 오면 그 일기를 펼친 채로 보인다. 새로고침·여행 바꾸기·네비 메뉴로 오면 없다 (2026-10-23 팀 합의).
+  const [openDiaryId, setOpenDiaryId] = useState(() => location.state?.openDiaryId ?? null)
   const [trips, setTrips] = useState(null)
   const [diaries, setDiaries] = useState([])
   const [status, setStatus] = useState('idle')
@@ -35,6 +39,13 @@ export default function Diary() {
     }
   }, [])
 
+  // 넘겨받은 값은 한 번만 쓴다. 브라우저 기록에서 지워 새로고침하면 접힌 채로 보이게 한다.
+  useEffect(() => {
+    if (location.state?.openDiaryId != null) {
+      navigate({ search: location.search }, { replace: true, state: null })
+    }
+  }, [location, navigate])
+
   useEffect(() => {
     if (selectedId === null) {
       setStatus('idle')
@@ -49,6 +60,7 @@ export default function Diary() {
   }, [selectedId, loadDiaries])
 
   function handleTripChange(trip) {
+    setOpenDiaryId(null)
     if (trip) setSearchParams({ trip: String(trip.id) })
   }
 
@@ -108,7 +120,14 @@ export default function Diary() {
     )
   } else if (status === 'done') {
     // 여행을 바꾸면 펼친 줄이 모두 접히도록 여행마다 새로 그린다.
-    content = <DiaryList key={selectedId} diaries={diaries} renderActions={renderActions} />
+    content = (
+      <DiaryList
+        key={selectedId}
+        diaries={diaries}
+        renderActions={renderActions}
+        initialOpenId={openDiaryId}
+      />
+    )
   } else if (trips?.length > 0 && selectedId === null) {
     // 여행을 고르기 전 안내 (2026-10-22 사람이 요청, AI 제안 문구)
     content = (

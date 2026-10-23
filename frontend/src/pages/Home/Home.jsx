@@ -100,7 +100,7 @@ export default function Home() {
               label="최근 장소"
               tone="place"
               state={place}
-              to="/place"
+              to={place.data ? `/place?trip=${place.data.trip_id}` : '/place'}
               emptyMessage="아직 넣은 장소가 없어요."
               errorMessage="최근 장소를 불러오지 못했어요."
               onRetry={reloadPlace}
@@ -116,7 +116,9 @@ export default function Home() {
               label="최근 일기"
               tone="diary"
               state={diary}
-              to="/diary"
+              to={diary.data ? `/diary?trip=${diary.data.trip_id}` : '/diary'}
+              // 다이어리 화면에서 이 일기를 펼친 채로 보인다 (2026-10-23 팀 합의)
+              linkState={diary.data ? { openDiaryId: diary.data.id } : undefined}
               emptyMessage="아직 쓴 일기가 없어요."
               errorMessage="최근 일기를 불러오지 못했어요."
               onRetry={reloadDiary}

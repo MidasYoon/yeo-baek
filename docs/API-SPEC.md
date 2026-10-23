@@ -536,7 +536,7 @@
   - A: `start_date` 늦은 것, 같으면 `id` 큰 것 (2절 4번)
   - B: `visit_date` 늦은 것, 같으면 `id` 큰 것 (3절 4번)
   - C: `date`·`time` 늦은 것, 같으면 `id` 큰 것 (4절 4번)
-- A 카드를 누르면 받은 `id`로 `/trip/:id`에 간다 (R-H-005). B·C 카드는 `/place`, `/diary`로 가므로 `id`를 쓰지 않는다.
+- A 카드를 누르면 받은 `id`로 `/trip/:id`에 간다 (R-H-005). B·C 카드는 받은 `trip_id`로 `/place?trip=:tripId`, `/diary?trip=:tripId`에 간다 (2026-10-23 팀 합의).
 - C의 기분은 `mood` 이름에 맞는 이모지로 보인다 (D-016, 4절 5번).
 - A·B·C 모두 사진은 보이지 않는다. 응답에 사진 칸이 더해져도 Home은 쓰지 않는다 (D-033).
 
