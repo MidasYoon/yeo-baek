@@ -3,13 +3,15 @@
 import re
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Query, Response
 from pydantic import BaseModel, field_validator
 
 from database import get_connection
 from routers.uploads import check_photo_name, delete_photo
 
 router = APIRouter(prefix="/api/diaries", tags=["diaries"])
+
+PAGE_SIZE = 20  # 전체 보기 한 페이지의 일기 수 (D-034)
 
 NOT_FOUND = "일기를 찾을 수 없어요"
 
@@ -141,6 +143,28 @@ def get_recent_diary():
     finally:
         conn.close()
     return dict(row) if row else None
+
+
+# /page도 /{diary_id}보다 먼저 등록한다 (API-SPEC 4절 1번).
+@router.get("/page")
+def get_diary_page(
+    page: int = Query(1, ge=1),
+    size: int = Query(PAGE_SIZE, ge=1, le=50),
+):
+    """전체 보기 한 페이지 (D-034). 모든 여행에서 날짜·시각이 늦은 것, 같으면 id가 큰 것이 앞.
+    항목마다 그 여행의 이름을 trip_name으로 붙이고, total은 모든 일기 개수다."""
+    conn = get_connection()
+    try:
+        total = conn.execute("SELECT COUNT(*) FROM diaries").fetchone()[0]
+        rows = conn.execute(
+            "SELECT diaries.*, trips.name AS trip_name FROM diaries "
+            "JOIN trips ON trips.id = diaries.trip_id "
+            "ORDER BY diaries.date DESC, diaries.time DESC, diaries.id DESC LIMIT ? OFFSET ?",
+            (size, (page - 1) * size),
+        ).fetchall()
+    finally:
+        conn.close()
+    return {"items": [dict(row) for row in rows], "total": total}
 
 
 @router.get("/{diary_id}")

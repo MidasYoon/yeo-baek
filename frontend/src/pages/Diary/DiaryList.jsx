@@ -7,6 +7,7 @@ import styles from './DiaryList.module.css'
 // diaries: API 순서(날짜 → 시각 → id) 그대로 받은 일기들.
 // renderActions(diary): (선택) 펼친 줄 아래에 둘 버튼. 여행 상세 안 목록(P-34)에서는 넘기지 않는다.
 // initialOpenId: (선택) 처음부터 펼쳐 둘 일기 번호. 그 줄이 화면에 보이도록 목록을 움직인다 (Home C 카드, 2026-10-23 팀 합의).
+// 전체 보기에서는 diary.trip_name이 있어 접힌 줄의 제목 아래에 여행명을 보인다 (D-034).
 // 사진이 있으면 펼친 줄의 본문 위에 보인다. 접힌 줄에는 보이지 않는다 (D-033).
 
 // 일기 사진. 불러오지 못하면 숨긴다 (SCREEN-SPEC 1절 "사진 표시").
@@ -79,7 +80,10 @@ export default function DiaryList({ diaries, renderActions, initialOpenId = null
                     <span className={styles.mood} role="img" aria-label={diary.mood}>
                       {MOOD_EMOJI[diary.mood]}
                     </span>
-                    <span className={styles.title}>{diary.title}</span>
+                    <span className={styles.title}>
+                      {diary.title}
+                      {diary.trip_name && <span className={styles.tripName}>{diary.trip_name}</span>}
+                    </span>
                     <svg className={styles.arrow} viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2" />
                     </svg>

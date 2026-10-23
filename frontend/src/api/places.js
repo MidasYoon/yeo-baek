@@ -22,6 +22,11 @@ export function getRecentPlace() {
   return request('/api/places/recent')
 }
 
+// 전체 보기 한 페이지 (D-034, API-SPEC 3절). { items, total }을 돌려준다. 항목마다 trip_name이 있다.
+export function getPlacePage(page) {
+  return request(`/api/places/page?page=${encodeURIComponent(page)}`)
+}
+
 export function getPlace(id) {
   return request(`/api/places/${encodeURIComponent(id)}`)
 }

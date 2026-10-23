@@ -1,0 +1,87 @@
+/* DESIGN 6절 "페이지 버튼" (D-034). 누르는 곳 높이 44px (DESIGN 8절) */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-8);
+  margin-top: var(--space-32);
+}
+
+.number,
+.step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+}
+
+.number {
+  min-width: 44px;
+  padding: 0 var(--space-8);
+}
+
+/* "이전"·"다음"은 보조 버튼 모양 */
+.step {
+  gap: var(--space-4);
+  padding: 0 var(--space-16);
+  border-color: var(--color-line-strong);
+  font-size: 14px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.number:not(.current):hover,
+.step:not(:disabled):hover {
+  border-color: var(--color-text-muted);
+  background: var(--color-surface-sunken);
+}
+
+.number:not(.current):active,
+.step:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/* 지금 페이지: 먹 바탕, 흰 글자 */
+.current {
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: #fff;
+  font-weight: 700;
+  cursor: default;
+}
+
+.step:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+  .pagination {
+    gap: var(--space-4);
+  }
+
+  /* 좁은 화면에서는 "이전"·"다음" 글자를 감추고 아이콘만 (이름은 aria-label로 남는다) */
+  .step {
+    width: 44px;
+    padding: 0;
+  }
+
+  .stepText {
+    display: none;
+  }
+}

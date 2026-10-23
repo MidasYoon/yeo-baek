@@ -5,8 +5,8 @@ import StatusMessage from '../StatusMessage/StatusMessage.jsx'
 import styles from './TripSelect.module.css'
 
 // 여행 select (팀 공동, D-028). SCREEN-SPEC 1절, DESIGN 6절 "여행 select".
-// value: 고른 여행 번호 (없으면 빈 select). 목록에 없는 번호여도 빈 select로 보인다.
-// onChange(trip): 여행을 고르면 그 여행 객체를 넘긴다. 주소(?trip=)는 화면이 바꾼다.
+// value: 고른 여행 번호. 없거나 목록에 없는 번호면 맨 위 "전체 여행"이 골라진 채로 보인다 (D-034).
+// onChange(trip): 여행을 고르면 그 여행 객체를, "전체 여행"을 고르면 null을 넘긴다. 주소(?trip=)는 화면이 바꾼다.
 // onLoad(trips): (선택) 여행 목록을 불러오면 넘긴다. 화면이 주소의 번호가 있는 여행인지 볼 때 쓴다.
 export default function TripSelect({ value, onChange, onLoad }) {
   const [trips, setTrips] = useState([])
@@ -60,9 +60,7 @@ export default function TripSelect({ value, onChange, onLoad }) {
     <label className={styles.field}>
       <span className={styles.label}>여행</span>
       <select className={styles.select} value={selected} onChange={handleChange}>
-        <option value="" disabled>
-          여행을 골라 주세요
-        </option>
+        <option value="">전체 여행</option>
         {trips.map((trip) => (
           <option key={trip.id} value={trip.id}>
             {trip.name} ({trip.start_date} ~ {trip.end_date})

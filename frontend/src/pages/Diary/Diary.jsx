@@ -1,43 +1,75 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { deleteDiary, getDiaries } from '../../api/diaries.js'
+import { deleteDiary, getDiaries, getDiaryPage } from '../../api/diaries.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
+import Pagination from '../../components/Pagination/Pagination.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import TripSelect from '../../components/TripSelect/TripSelect.jsx'
 import DiaryList from './DiaryList.jsx'
 import styles from './Diary.module.css'
 
-// 여행 다이어리 목록 (담당: 건용). SCREEN-SPEC 5절. 주소: /diary, /diary?trip=:tripId
+// 여행 다이어리 목록 (담당: 건용). SCREEN-SPEC 5절. 주소: /diary, /diary?page=:page, /diary?trip=:tripId
+// 여행 번호가 없으면 "전체 여행"으로 모든 여행의 일기를 최신순으로 20편씩 페이지로 나눠 보인다 (D-034).
+const PAGE_SIZE = 20 // 서버의 기본값과 같다 (API-SPEC 4절 4번)
+
+// ?page=가 숫자가 아니거나 1보다 작으면 1페이지 (SCREEN-SPEC 1절 "잘못된 페이지 번호")
+function readPage(value) {
+  const page = Number(value)
+  return Number.isInteger(page) && page >= 1 ? page : 1
+}
+
 export default function Diary() {
   const [searchParams, setSearchParams] = useSearchParams()
   const tripParam = searchParams.get('trip')
+  const page = readPage(searchParams.get('page'))
   const location = useLocation()
   const navigate = useNavigate()
   // Home 최근 일기(C) 카드로 오면 그 일기를 펼친 채로 보인다. 새로고침·여행 바꾸기·네비 메뉴로 오면 없다 (2026-10-23 팀 합의).
   const [openDiaryId, setOpenDiaryId] = useState(() => location.state?.openDiaryId ?? null)
   const [trips, setTrips] = useState(null)
   const [diaries, setDiaries] = useState([])
+  const [total, setTotal] = useState(0)
   const [status, setStatus] = useState('idle')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteFailed, setDeleteFailed] = useState(false)
 
-  // 주소의 여행 번호가 여행 목록에 있을 때만 고른 것으로 본다 (없는 번호면 빈 select).
+  // 주소의 여행 번호가 여행 목록에 있을 때만 고른 것으로 본다. 아니면 전체 보기 (D-034).
   const selectedTrip = trips?.find((trip) => String(trip.id) === tripParam) ?? null
   const selectedId = selectedTrip?.id ?? null
+  // 여행 목록을 불러와 여행이 하나라도 있어야 일기를 부른다.
+  const showAll = trips?.length > 0 && selectedId === null
 
-  const loadDiaries = useCallback(async (tripId, isCurrent = () => true) => {
-    setStatus('loading')
-    try {
-      const loaded = await getDiaries(tripId)
-      if (!isCurrent()) return
-      setDiaries(loaded)
-      setStatus('done')
-    } catch {
-      if (isCurrent()) setStatus('error')
-    }
-  }, [])
+  const loadDiaries = useCallback(
+    async (tripId, pageNumber, isCurrent = () => true) => {
+      setStatus('loading')
+      try {
+        if (tripId !== null) {
+          const loaded = await getDiaries(tripId)
+          if (!isCurrent()) return
+          // API는 오래된 순이다. 이 화면은 전체 보기와 같이 최신순으로 뒤집어 보인다.
+          // 여행 상세는 API 순서 그대로다 (2026-10-23 사람이 정함, D-034).
+          setDiaries([...loaded].reverse())
+        } else {
+          const { items, total: count } = await getDiaryPage(pageNumber)
+          if (!isCurrent()) return
+          // 마지막 페이지보다 큰 번호면 마지막 페이지로 바꾼다. 지운 뒤 페이지가 비었을 때도 같다.
+          const lastPage = Math.max(1, Math.ceil(count / PAGE_SIZE))
+          if (pageNumber > lastPage) {
+            setSearchParams({ page: String(lastPage) }, { replace: true })
+            return
+          }
+          setDiaries(items)
+          setTotal(count)
+        }
+        setStatus('done')
+      } catch {
+        if (isCurrent()) setStatus('error')
+      }
+    },
+    [setSearchParams],
+  )
 
   // 넘겨받은 값은 한 번만 쓴다. 브라우저 기록에서 지워 새로고침하면 접힌 채로 보이게 한다.
   useEffect(() => {
@@ -47,21 +79,27 @@ export default function Diary() {
   }, [location, navigate])
 
   useEffect(() => {
-    if (selectedId === null) {
+    if (selectedId === null && !showAll) {
       setStatus('idle')
       return
     }
-    // 여행을 빠르게 바꿨을 때 앞서 부른 응답이 늦게 와도 덮어쓰지 않게 한다.
+    // 여행·페이지를 빠르게 바꿨을 때 앞서 부른 응답이 늦게 와도 덮어쓰지 않게 한다.
     let current = true
-    loadDiaries(selectedId, () => current)
+    loadDiaries(selectedId, page, () => current)
     return () => {
       current = false
     }
-  }, [selectedId, loadDiaries])
+  }, [selectedId, showAll, page, loadDiaries])
 
   function handleTripChange(trip) {
     setOpenDiaryId(null)
-    if (trip) setSearchParams({ trip: String(trip.id) })
+    // "전체 여행"을 고르면 trip이 null이다. 전체 보기 1페이지(/diary)로 간다.
+    setSearchParams(trip ? { trip: String(trip.id) } : {})
+  }
+
+  function handlePageChange(nextPage) {
+    setSearchParams({ page: String(nextPage) })
+    window.scrollTo({ top: 0 })
   }
 
   function openDelete(diary) {
@@ -74,9 +112,14 @@ export default function Diary() {
     setDeleteFailed(false)
     try {
       await deleteDiary(deleteTarget.id)
-      // 그 줄만 사라지고 고른 여행은 그대로다 (SCREEN-SPEC 5절 3번).
-      setDiaries((prev) => prev.filter((diary) => diary.id !== deleteTarget.id))
       setDeleteTarget(null)
+      if (showAll) {
+        // 전체 보기는 지금 페이지를 다시 불러와 다음 페이지의 일기로 채운다 (SCREEN-SPEC 5절 3번).
+        await loadDiaries(null, page)
+      } else {
+        // 그 줄만 사라지고 고른 여행은 그대로다 (SCREEN-SPEC 5절 3번).
+        setDiaries((prev) => prev.filter((diary) => diary.id !== deleteTarget.id))
+      }
     } catch {
       // 지우지 못하면 일기는 그대로 둔다 (SCREEN-SPEC 5절 5번).
       setDeleteFailed(true)
@@ -107,44 +150,53 @@ export default function Diary() {
       <StatusMessage
         kind="error"
         message="일기를 불러오지 못했어요."
-        onRetry={() => loadDiaries(selectedId)}
+        onRetry={() => loadDiaries(selectedId, page)}
       />
     )
   } else if (status === 'done' && diaries.length === 0) {
+    // 전체 보기에서는 쓸 여행이 정해지지 않아 "새 일기 쓰기" 버튼을 두지 않는다 (SCREEN-SPEC 5절 5번).
     content = (
       <StatusMessage
         kind="empty"
         message="아직 쓴 일기가 없어요."
-        action={<Button to={newDiaryLink}>새 일기 쓰기</Button>}
+        action={newDiaryLink && <Button to={newDiaryLink}>새 일기 쓰기</Button>}
       />
     )
   } else if (status === 'done') {
-    // 여행을 바꾸면 펼친 줄이 모두 접히도록 여행마다 새로 그린다.
+    // 여행이나 페이지를 바꾸면 펼친 줄이 모두 접히도록 새로 그린다.
     content = (
-      <DiaryList
-        key={selectedId}
-        diaries={diaries}
-        renderActions={renderActions}
-        initialOpenId={openDiaryId}
-      />
-    )
-  } else if (trips?.length > 0 && selectedId === null) {
-    // 여행을 고르기 전 안내 (2026-10-22 사람이 요청, AI 제안 문구)
-    content = (
-      <StatusMessage kind="empty" message="여행을 고르면 그 여행에서 쓴 일기를 날짜별로 볼 수 있어요." />
+      <div>
+        <DiaryList
+          key={showAll ? `page-${page}` : selectedId}
+          diaries={diaries}
+          renderActions={renderActions}
+          initialOpenId={openDiaryId}
+        />
+        {showAll && (
+          <Pagination
+            page={page}
+            totalPages={Math.ceil(total / PAGE_SIZE)}
+            onChange={handlePageChange}
+          />
+        )}
+      </div>
     )
   }
 
-  // "새 일기 쓰기"는 한 곳에만 둔다: 일기가 있으면 오른쪽 위, 없으면 빈 상태 문구 아래.
+  // "새 일기 쓰기"는 한 곳에만 둔다: 일기가 있으면 오른쪽 위, 없으면 빈 상태 문구 아래. 전체 보기에는 없다.
   const hasList = status === 'done' && diaries.length > 0
 
   return (
     <section className={styles.page}>
       <div className={styles.header}>
         <h1>여행 다이어리</h1>
-        {hasList && <Button to={newDiaryLink}>새 일기 쓰기</Button>}
+        {hasList && newDiaryLink && <Button to={newDiaryLink}>새 일기 쓰기</Button>}
       </div>
-      <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
+      <div className={styles.tripField}>
+        <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
+        {/* 전체 보기에서는 "새 일기 쓰기" 대신 안내를 둔다 (SCREEN-SPEC 5절 2번, AI 제안 문구) */}
+        {showAll && <p className={styles.guide}>여행을 고르면 일기를 쓸 수 있어요.</p>}
+      </div>
       {content}
       <ConfirmDialog
         open={deleteTarget !== null}

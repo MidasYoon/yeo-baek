@@ -6,6 +6,7 @@ import styles from './PlaceCard.module.css'
 // 장소 목록의 줄 하나 (담당: 은희). SCREEN-SPEC 4절 2번, DESIGN 6절 "카드".
 // 시안(한지 노을 · 여행지 정보)처럼 한 판 안에 줄로 쌓는다. 판 모양은 목록(ul)이 그린다.
 // highlighted: 핀을 눌렀을 때 강조한다 (P-29).
+// 전체 보기에서는 place.trip_name이 있어 지역·날짜 앞에 여행명을 붙인다 (D-034).
 // actions: 수정·삭제 버튼 자리 (P-28). 여행 상세 안 목록(P-34)에서는 넘기지 않는다.
 // 사진이 있으면 메모 아래에 작은 사진을 한 줄로 보인다. 없으면 줄을 두지 않는다 (D-033).
 // 작은 사진을 누르면 그 사진부터 크게 보기 창이 열린다 (PhotoViewer).
@@ -42,6 +43,7 @@ export default function PlaceCard({ place, highlighted = false, actions = null }
     <article className={className}>
       <div className={styles.body}>
         <p className={styles.meta}>
+          {place.trip_name && `${place.trip_name} · `}
           {place.region} · {place.visit_date}
         </p>
         <h3 className={styles.name}>{place.name}</h3>

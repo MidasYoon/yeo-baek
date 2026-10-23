@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Query, Response
 from pydantic import BaseModel, field_validator
 
 from database import get_connection
@@ -13,6 +13,7 @@ router = APIRouter(prefix="/api/places", tags=["places"])
 NOT_FOUND = "장소를 찾을 수 없어요"
 
 MAX_PHOTOS = 4  # 장소 사진은 0~4장 (D-033)
+PAGE_SIZE = 10  # 전체 보기 한 페이지의 장소 수 (D-034)
 
 # 지역에 저장하는 시·도 17개 이름 (D-016)
 REGIONS = (
@@ -156,6 +157,29 @@ def get_recent_place():
     finally:
         conn.close()
     return place
+
+
+# /page도 /{place_id}보다 먼저 등록한다 (API-SPEC 3절 1번).
+@router.get("/page")
+def get_place_page(
+    page: int = Query(1, ge=1),
+    size: int = Query(PAGE_SIZE, ge=1, le=50),
+):
+    """전체 보기 한 페이지 (D-034). 모든 여행에서 방문 날짜가 늦은 것, 같으면 id가 큰 것이 앞.
+    항목마다 그 여행의 이름을 trip_name으로 붙이고, total은 모든 장소 개수다."""
+    conn = get_connection()
+    try:
+        total = conn.execute("SELECT COUNT(*) FROM places").fetchone()[0]
+        rows = conn.execute(
+            "SELECT places.*, trips.name AS trip_name FROM places "
+            "JOIN trips ON trips.id = places.trip_id "
+            "ORDER BY places.visit_date DESC, places.id DESC LIMIT ? OFFSET ?",
+            (size, (page - 1) * size),
+        ).fetchall()
+        items = [with_photos(conn, row) for row in rows]
+    finally:
+        conn.close()
+    return {"items": items, "total": total}
 
 
 @router.get("/{place_id}")

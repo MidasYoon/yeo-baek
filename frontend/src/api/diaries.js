@@ -22,6 +22,11 @@ export function getRecentDiary() {
   return request('/api/diaries/recent')
 }
 
+// 전체 보기 한 페이지 (D-034, API-SPEC 4절). { items, total }을 돌려준다. 항목마다 trip_name이 있다.
+export function getDiaryPage(page) {
+  return request(`/api/diaries/page?page=${encodeURIComponent(page)}`)
+}
+
 export function getDiary(id) {
   return request(`/api/diaries/${encodeURIComponent(id)}`)
 }
