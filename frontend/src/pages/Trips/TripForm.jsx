@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { photoUrl, uploadTripPhoto } from '../../api/trips.js'
+import AuthErrorText from '../../components/Auth/AuthErrorText.jsx'
 import Button from '../../components/Button/Button.jsx'
 import PhotoInput from '../../components/PhotoInput/PhotoInput.jsx'
 import { countText } from './countMessage.js'
@@ -41,7 +42,8 @@ export default function TripForm({ initialValues = EMPTY, onSubmit, onCancel }) 
   const [values, setValues] = useState({ ...EMPTY, ...initialValues, info: initialValues.info ?? '' })
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
-  const [saveFailed, setSaveFailed] = useState(false)
+  // 저장에 실패한 Error (401·403이면 그 문구, 그 밖은 공통 저장 실패 문구, D-042)
+  const [saveError, setSaveError] = useState(null)
   // 사진을 올리는 동안은 저장할 수 없다 (SCREEN-SPEC 1절 "사진 칸 (폼)").
   const [photoBusy, setPhotoBusy] = useState(false)
 
@@ -54,7 +56,7 @@ export default function TripForm({ initialValues = EMPTY, onSubmit, onCancel }) 
     event.preventDefault()
     const nextErrors = validate(values)
     setErrors(nextErrors)
-    setSaveFailed(false)
+    setSaveError(null)
     if (Object.keys(nextErrors).length > 0) return
 
     setSaving(true)
@@ -68,7 +70,7 @@ export default function TripForm({ initialValues = EMPTY, onSubmit, onCancel }) 
         })
       } else {
         // 422를 받아도 공통 저장 실패 문구를 보인다 (D-021). 입력한 값은 그대로 둔다.
-        setSaveFailed(true)
+        setSaveError(error)
       }
       setSaving(false)
     }
@@ -124,7 +126,11 @@ export default function TripForm({ initialValues = EMPTY, onSubmit, onCancel }) 
         onChange={(photos) => setValues((prev) => ({ ...prev, photo: photos[0] ?? null }))}
         onBusyChange={setPhotoBusy}
       />
-      {saveFailed && <p className={styles.saveError}>저장하지 못했어요. 다시 시도해 주세요.</p>}
+      {saveError && (
+        <p className={styles.saveError}>
+          <AuthErrorText error={saveError} fallback="저장하지 못했어요. 다시 시도해 주세요." />
+        </p>
+      )}
       <div className={styles.actions}>
         <Button variant="secondary" onClick={onCancel}>
           취소

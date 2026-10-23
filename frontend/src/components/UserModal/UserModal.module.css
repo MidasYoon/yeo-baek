@@ -1,0 +1,112 @@
+/* DESIGN 6절 "회원상세 창": 바탕·그림자·나타남은 확인 창(ConfirmDialog)과 같다 */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--page-gutter);
+  background: rgba(43, 33, 27, 0.45);
+  animation: fade-in 0.15s ease-out;
+}
+
+.dialog {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: var(--space-32) var(--space-24) var(--space-24);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: 0 24px 64px rgba(43, 33, 27, 0.18);
+  animation: rise-in 0.18s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* 닫기 ×: 사진 빼기 × 버튼과 같다 (32px, 누르는 곳 44px) */
+.close {
+  position: absolute;
+  top: var(--space-12);
+  right: var(--space-12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.close::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.close:hover {
+  background: var(--color-surface-sunken);
+}
+
+.close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.nickname {
+  margin: var(--space-12) 0 0;
+  font-family: var(--font-heading);
+  font-size: 21px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.loginId {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.joined {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.error {
+  margin: var(--space-16) 0 0;
+  color: var(--color-accent-deep);
+  font-size: 14px;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-8);
+  margin-top: var(--space-24);
+}

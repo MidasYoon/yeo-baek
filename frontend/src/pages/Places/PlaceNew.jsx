@@ -2,18 +2,23 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { createPlace } from '../../api/places.js'
 import { getTrip } from '../../api/trips.js'
+import { useAuth } from '../../components/Auth/AuthContext.jsx'
+import NotOwnerMessage from '../../components/Auth/NotOwnerMessage.jsx'
+import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import PlaceForm from './PlaceForm.jsx'
 import styles from './Places.module.css'
 
 // 장소 추가 (담당: 은희). SCREEN-SPEC 4절. 주소: /place/new?trip=:tripId
+// App.jsx에서 RequireLogin으로 감싼다. 남의 여행이면 폼 대신 안내 (SCREEN-SPEC 1절, D-042).
 export default function PlaceNew() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const tripParam = searchParams.get('trip')
   const [trip, setTrip] = useState(null)
   const [status, setStatus] = useState('loading')
+  const { user } = useAuth()
 
   const loadTrip = useCallback(async () => {
     // 여행 번호가 없으면 없는 여행과 같게 보인다 (TEST-PLAN T-P-44).
@@ -39,6 +44,15 @@ export default function PlaceNew() {
   async function handleSubmit(values) {
     await createPlace({ ...values, trip_id: trip.id })
     backToList()
+  }
+
+  if (status === 'done' && !isTripOwner(user, trip.user_id)) {
+    return (
+      <section className={styles.formPage}>
+        <h1>장소 추가</h1>
+        <NotOwnerMessage to={`/place?trip=${trip.id}`} />
+      </section>
+    )
   }
 
   if (status === 'done') {

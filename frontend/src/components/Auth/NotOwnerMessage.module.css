@@ -1,0 +1,5 @@
+/* "목록으로" 버튼을 가운데에 둔다 (TripDetail.module.css의 .center와 같다) */
+.center {
+  display: flex;
+  justify-content: center;
+}

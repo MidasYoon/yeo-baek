@@ -111,6 +111,15 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 주인 닉네임: 카드 글자 칸 맨 아래 한 줄, 13px 흐린 먹 (D-042, DESIGN 6절) */
+.owner {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 여행지: 짙은 주홍 굵게 (여행 책장의 종류 색) */
 .destination {
   color: var(--color-accent-deep);

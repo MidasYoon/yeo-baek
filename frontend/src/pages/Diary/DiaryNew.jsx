@@ -2,18 +2,23 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { createDiary } from '../../api/diaries.js'
 import { getTrip } from '../../api/trips.js'
+import { useAuth } from '../../components/Auth/AuthContext.jsx'
+import NotOwnerMessage from '../../components/Auth/NotOwnerMessage.jsx'
+import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import DiaryForm from './DiaryForm.jsx'
 import styles from './Diary.module.css'
 
 // 일기 쓰기 (담당: 건용). SCREEN-SPEC 5절. 주소: /diary/new?trip=:tripId
+// App.jsx에서 RequireLogin으로 감싼다. 남의 여행이면 폼 대신 안내 (SCREEN-SPEC 1절, D-042).
 export default function DiaryNew() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const tripParam = searchParams.get('trip')
   const [trip, setTrip] = useState(null)
   const [status, setStatus] = useState('loading')
+  const { user } = useAuth()
 
   const loadTrip = useCallback(async () => {
     // 여행 번호가 없으면 없는 여행과 같게 보인다 (TEST-PLAN T-D-40).
@@ -39,6 +44,15 @@ export default function DiaryNew() {
   async function handleSubmit(values) {
     await createDiary({ ...values, trip_id: trip.id })
     backToList()
+  }
+
+  if (status === 'done' && !isTripOwner(user, trip.user_id)) {
+    return (
+      <section className={styles.formPage}>
+        <h1>일기 추가</h1>
+        <NotOwnerMessage to={`/diary?trip=${trip.id}`} />
+      </section>
+    )
   }
 
   if (status === 'done') {

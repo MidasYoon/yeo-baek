@@ -2,18 +2,23 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getDiary, updateDiary } from '../../api/diaries.js'
 import { getTrip } from '../../api/trips.js'
+import { useAuth } from '../../components/Auth/AuthContext.jsx'
+import NotOwnerMessage from '../../components/Auth/NotOwnerMessage.jsx'
+import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import DiaryForm from './DiaryForm.jsx'
 import styles from './Diary.module.css'
 
 // 일기 수정 (담당: 건용). SCREEN-SPEC 5절. 주소: /diary/:id/edit
+// App.jsx에서 RequireLogin으로 감싼다. 남의 여행의 일기면 폼 대신 안내 (SCREEN-SPEC 1절, D-042).
 export default function DiaryEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [diary, setDiary] = useState(null)
   const [trip, setTrip] = useState(null)
   const [status, setStatus] = useState('loading')
+  const { user } = useAuth()
 
   const loadDiary = useCallback(async () => {
     setStatus('loading')
@@ -38,6 +43,15 @@ export default function DiaryEdit() {
   async function handleSubmit(values) {
     await updateDiary(id, values)
     backToList()
+  }
+
+  if (status === 'done' && !isTripOwner(user, trip.user_id)) {
+    return (
+      <section className={styles.formPage}>
+        <h1>일기 수정</h1>
+        <NotOwnerMessage to={`/diary?trip=${diary.trip_id}`} />
+      </section>
+    )
   }
 
   if (status === 'done') {

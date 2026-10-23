@@ -60,3 +60,10 @@
   max-width: var(--content-width-form);
   margin: 0 auto;
 }
+
+/* 로그인하지 않았을 때 빈 상태 안내 (D-042, SCREEN-SPEC 3절 2번) */
+.loginHint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 15px;
+}

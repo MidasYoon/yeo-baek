@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getTrip, updateTrip } from '../../api/trips.js'
+import { useAuth } from '../../components/Auth/AuthContext.jsx'
+import NotOwnerMessage from '../../components/Auth/NotOwnerMessage.jsx'
+import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import TripForm from './TripForm.jsx'
@@ -8,11 +11,13 @@ import detailStyles from './TripDetail.module.css'
 import styles from './Trips.module.css'
 
 // 여행 수정 (담당: 서준). SCREEN-SPEC 3절. 주소: /trip/:id/edit
+// App.jsx에서 RequireLogin으로 감싼다. 남의 여행이면 폼 대신 안내 (SCREEN-SPEC 1절, D-042).
 export default function TripEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [trip, setTrip] = useState(null)
   const [status, setStatus] = useState('loading')
+  const { user } = useAuth()
 
   const loadTrip = useCallback(async () => {
     setStatus('loading')
@@ -59,6 +64,8 @@ export default function TripEdit() {
     )
   } else if (status === 'error') {
     content = <StatusMessage kind="error" message="여행을 불러오지 못했어요." onRetry={loadTrip} />
+  } else if (!isTripOwner(user, trip.user_id)) {
+    content = <NotOwnerMessage to="/trip" />
   } else {
     content = <TripForm initialValues={trip} onSubmit={handleSubmit} onCancel={handleCancel} />
   }

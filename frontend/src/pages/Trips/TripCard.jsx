@@ -41,6 +41,8 @@ export default function TripCard({ trip, index }) {
         <span className={styles.meta}>
           <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </span>
+        {/* 주인 닉네임 (D-042, SCREEN-SPEC 8절 2번). 주인 없는 여행은 보이지 않는다 */}
+        {trip.user_nickname && <span className={styles.owner}>{trip.user_nickname}</span>}
       </span>
       <svg className={styles.arrow} viewBox="0 0 24 24" aria-hidden="true">
         <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="2" />

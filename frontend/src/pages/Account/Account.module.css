@@ -1,0 +1,104 @@
+/* 로그인·회원가입·회원정보수정 (팀 공동, D-042). DESIGN 6절 "회원·좋아요·댓글".
+   다른 추가·수정 화면과 같은 720px 가운데 폼 칸, 입력 칸은 DESIGN 6절 "입력 칸"과 같다 (TripForm.module.css와 같은 값) */
+.formPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: var(--content-width-form);
+  margin: 0 auto;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.help {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.input {
+  height: 48px;
+  padding: 0 var(--space-12);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.invalid {
+  border-color: var(--color-accent);
+}
+
+.error {
+  color: var(--color-accent-deep);
+  font-size: 13px;
+}
+
+/* 아이디처럼 바꿀 수 없는 값은 입력 칸이 아니라 글자로 보인다 */
+.readonly {
+  margin: 0;
+  font-size: 15px;
+}
+
+/* 회원정보수정의 "비밀번호 바꾸기" 묶음: 위에 1px 선과 32px 여백 */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-24);
+  margin: var(--space-8) 0 0;
+  padding: var(--space-32) 0 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.sectionHelp {
+  margin: calc(var(--space-16) * -1) 0 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.saveError {
+  margin: 0;
+  color: var(--color-accent-deep);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+
+/* "회원가입"·"로그인"으로 가는 글: 15px 쪽빛 밑줄 */
+.switch {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+.switch a {
+  margin-left: var(--space-8);
+  color: var(--color-indigo);
+  text-underline-offset: 4px;
+}

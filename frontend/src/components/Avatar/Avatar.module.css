@@ -1,0 +1,18 @@
+/* DESIGN 6절 "회원·좋아요·댓글" 프로필사진 */
+.avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.initial {
+  background: var(--color-surface-sunken);
+  color: var(--color-indigo);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1;
+}

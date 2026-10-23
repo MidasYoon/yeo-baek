@@ -3,6 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { getDiaries } from '../../api/diaries.js'
 import { getPlaces } from '../../api/places.js'
 import { deleteTrip, getTrip, photoUrl } from '../../api/trips.js'
+import { useAuth } from '../../components/Auth/AuthContext.jsx'
+import AuthErrorText from '../../components/Auth/AuthErrorText.jsx'
+import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
@@ -26,7 +29,9 @@ export default function TripDetail() {
   const [diariesStatus, setDiariesStatus] = useState('loading')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [deleteFailed, setDeleteFailed] = useState(false)
+  // 지우기에 실패한 Error (401·403이면 그 문구, 그 밖은 공통 문구, D-042)
+  const [deleteError, setDeleteError] = useState(null)
+  const { user } = useAuth()
   const [blocked, setBlocked] = useState(null)
   // 불러오지 못한 사진 이름. 그 사진은 없는 것처럼 숨긴다 (SCREEN-SPEC 1절 "사진 표시").
   const [brokenPhoto, setBrokenPhoto] = useState(null)
@@ -81,7 +86,7 @@ export default function TripDetail() {
 
   function openDialog() {
     setBlocked(null)
-    setDeleteFailed(false)
+    setDeleteError(null)
     // 두 목록을 모두 불러왔으면 그 개수로 확인 창 대신 안내를 먼저 보인다 (SCREEN-SPEC 3절 4번, D-019).
     // 하나라도 불러오지 못했으면 확인 창을 띄우고 서버의 409로 안내한다.
     if (placesStatus === 'done' && diariesStatus === 'done') {
@@ -96,7 +101,7 @@ export default function TripDetail() {
 
   async function handleDelete() {
     setDeleting(true)
-    setDeleteFailed(false)
+    setDeleteError(null)
     try {
       await deleteTrip(id)
       navigate('/trip', { replace: true })
@@ -107,7 +112,7 @@ export default function TripDetail() {
         setDialogOpen(false)
         setBlocked(error.detail)
       } else {
-        setDeleteFailed(true)
+        setDeleteError(error)
       }
     }
   }
@@ -153,6 +158,8 @@ export default function TripDetail() {
           />
         )}
         <h1 className={styles.title}>{trip.name}</h1>
+        {/* 주인 닉네임 (D-042, SCREEN-SPEC 8절 2번). 주인 없는 여행은 이 줄이 없다 */}
+        {trip.user_nickname && <p className={styles.owner}>기록한 사람 {trip.user_nickname}</p>}
         <p className={styles.meta}>
           <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </p>
@@ -169,12 +176,17 @@ export default function TripDetail() {
         <Button variant="secondary" to="/trip">
           목록으로
         </Button>
-        <Button variant="secondary" to={`/trip/${trip.id}/edit`}>
-          수정
-        </Button>
-        <Button variant="secondary" onClick={openDialog}>
-          삭제
-        </Button>
+        {/* 수정·삭제는 주인에게만 보인다 (SCREEN-SPEC 1절 "주인만 보이는 버튼", D-042) */}
+        {isTripOwner(user, trip.user_id) && (
+          <>
+            <Button variant="secondary" to={`/trip/${trip.id}/edit`}>
+              수정
+            </Button>
+            <Button variant="secondary" onClick={openDialog}>
+              삭제
+            </Button>
+          </>
+        )}
       </div>
 
       <section className={styles.part}>
@@ -231,7 +243,11 @@ export default function TripDetail() {
       <ConfirmDialog
         open={dialogOpen}
         busy={deleting}
-        error={deleteFailed}
+        error={
+          deleteError && (
+            <AuthErrorText error={deleteError} fallback="지우지 못했어요. 다시 시도해 주세요." />
+          )
+        }
         onCancel={() => setDialogOpen(false)}
         onConfirm={handleDelete}
       />

@@ -69,6 +69,8 @@ export default function DiaryList({ diaries, renderActions, initialOpenId = null
             {group.items.map((diary) => {
               const open = openIds.has(diary.id)
               const panelId = `diary-${diary.id}-body`
+              // 수정·삭제 버튼. 남의 여행의 일기면 null이라 자리를 두지 않는다 (D-042).
+              const actions = renderActions?.(diary)
               return (
                 <li
                   key={diary.id}
@@ -107,7 +109,7 @@ export default function DiaryList({ diaries, renderActions, initialOpenId = null
                       {diary.photo && <DiaryPhoto key={diary.photo} filename={diary.photo} />}
                       {/* 본문이 없으면 본문 자리를 비워 둔다 (TEST-PLAN T-D-05) */}
                       <p className={styles.body}>{diary.body ?? ''}</p>
-                      {renderActions && <div className={styles.actions}>{renderActions(diary)}</div>}
+                      {actions && <div className={styles.actions}>{actions}</div>}
                     </div>
                   )}
                 </li>

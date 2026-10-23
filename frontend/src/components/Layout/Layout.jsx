@@ -1,6 +1,11 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useCallback, useRef, useState } from 'react'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useAuth } from '../Auth/AuthContext.jsx'
+import { loginUrl } from '../Auth/loginPaths.js'
+import Avatar from '../Avatar/Avatar.jsx'
 import RecommendChat from '../RecommendChat/RecommendChat.jsx'
 import ScrollTopButton from '../ScrollTopButton/ScrollTopButton.jsx'
+import UserModal from '../UserModal/UserModal.jsx'
 import styles from './Layout.module.css'
 
 // 공통 레이아웃 (담당: 건용). SCREEN-SPEC 2절. 메뉴 이름은 한글 (D-032), 주소는 그대로 (D-012).
@@ -9,6 +14,54 @@ const MENUS = [
   { to: '/place', label: '장소' },
   { to: '/diary', label: '일기' },
 ]
+
+// 네비 오른쪽 끝 회원 자리 (D-042, SCREEN-SPEC 2절·8절 2번, DESIGN 6절 "네비 회원 자리").
+// 불러오는 중에는 비어 있고, 로그인하지 않았으면 "로그인", 했으면 프로필사진 + 닉네임 버튼.
+function AccountArea() {
+  const { user, loading } = useAuth()
+  const location = useLocation()
+  const [open, setOpen] = useState(false)
+  const buttonRef = useRef(null)
+
+  const close = useCallback(() => {
+    setOpen(false)
+    buttonRef.current?.focus()
+  }, [])
+
+  if (loading) return <div className={styles.account} />
+
+  if (!user) {
+    // 로그인·회원가입 화면에서는 지금의 next를 그대로 둔다.
+    const onAuthPage = location.pathname === '/login' || location.pathname === '/signup'
+    const to = onAuthPage
+      ? `/login${location.search}`
+      : loginUrl(location.pathname + location.search)
+    return (
+      <div className={styles.account}>
+        <Link to={to} className={styles.loginLink}>
+          로그인
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.account}>
+      <button
+        ref={buttonRef}
+        type="button"
+        className={styles.userButton}
+        onClick={() => setOpen(true)}
+        aria-haspopup="dialog"
+        aria-label={`${user.nickname} 회원 정보`}
+      >
+        <Avatar nickname={user.nickname} photo={user.profile_photo} size={32} />
+        <span className={styles.nickname}>{user.nickname}</span>
+      </button>
+      {open && <UserModal onClose={close} />}
+    </div>
+  )
+}
 
 export default function Layout() {
   return (
@@ -40,6 +93,7 @@ export default function Layout() {
               </li>
             ))}
           </ul>
+          <AccountArea />
         </nav>
       </header>
       <main className={styles.main}>

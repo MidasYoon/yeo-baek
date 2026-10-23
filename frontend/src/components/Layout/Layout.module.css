@@ -135,6 +135,52 @@
   }
 }
 
+/* 네비 회원 자리 (D-042): DESIGN 6절 "회원·좋아요·댓글" */
+.account {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.loginLink {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.loginLink:hover {
+  color: var(--color-text);
+}
+
+.userButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.userButton:hover .nickname {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.nickname {
+  max-width: 120px;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 767px) {
   .nav {
     gap: var(--space-32);
@@ -142,6 +188,19 @@
 
   .menu {
     gap: var(--space-32);
+  }
+
+  /* 좁은 화면에서는 닉네임을 감추고 사진만 보인다 (이름은 aria-label에 남는다) */
+  .nickname {
+    display: none;
+  }
+}
+
+/* 400px 이하에서는 네비 사이를 20px로 줄여 회원 자리("로그인")가 한 줄에 들어가게 한다 (D-042) */
+@media (max-width: 400px) {
+  .nav,
+  .menu {
+    gap: var(--space-20);
   }
 }
 

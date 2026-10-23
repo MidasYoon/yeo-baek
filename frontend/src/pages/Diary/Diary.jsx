@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { deleteDiary, getDiaries, getDiaryPage } from '../../api/diaries.js'
+import { useAuth } from '../../components/Auth/AuthContext.jsx'
+import AuthErrorText from '../../components/Auth/AuthErrorText.jsx'
+import { isTripOwner } from '../../components/Auth/ownership.js'
 import Button from '../../components/Button/Button.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog/ConfirmDialog.jsx'
 import Pagination from '../../components/Pagination/Pagination.jsx'
@@ -33,13 +36,20 @@ export default function Diary() {
   const [status, setStatus] = useState('idle')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
-  const [deleteFailed, setDeleteFailed] = useState(false)
+  // 지우기에 실패한 Error (401·403이면 그 문구, 그 밖은 공통 문구, D-042)
+  const [deleteError, setDeleteError] = useState(null)
+  const { user } = useAuth()
 
   // 주소의 여행 번호가 여행 목록에 있을 때만 고른 것으로 본다. 아니면 전체 보기 (D-034).
   const selectedTrip = trips?.find((trip) => String(trip.id) === tripParam) ?? null
   const selectedId = selectedTrip?.id ?? null
   // 여행 목록을 불러와 여행이 하나라도 있어야 일기를 부른다.
   const showAll = trips?.length > 0 && selectedId === null
+  // 내 여행의 번호들. "일기 추가"와 줄의 수정·삭제는 내 여행에만 보인다 (SCREEN-SPEC 1절, D-042).
+  // 전체 보기에서는 일기마다 그 일기의 여행으로 본다.
+  const ownTripIds = new Set(
+    (trips ?? []).filter((trip) => isTripOwner(user, trip.user_id)).map((trip) => trip.id),
+  )
 
   const loadDiaries = useCallback(
     async (tripId, pageNumber, isCurrent = () => true) => {
@@ -103,13 +113,13 @@ export default function Diary() {
   }
 
   function openDelete(diary) {
-    setDeleteFailed(false)
+    setDeleteError(null)
     setDeleteTarget(diary)
   }
 
   async function handleDelete() {
     setDeleting(true)
-    setDeleteFailed(false)
+    setDeleteError(null)
     try {
       await deleteDiary(deleteTarget.id)
       setDeleteTarget(null)
@@ -120,16 +130,18 @@ export default function Diary() {
         // 그 줄만 사라지고 고른 여행은 그대로다 (SCREEN-SPEC 5절 3번).
         setDiaries((prev) => prev.filter((diary) => diary.id !== deleteTarget.id))
       }
-    } catch {
+    } catch (error) {
       // 지우지 못하면 일기는 그대로 둔다 (SCREEN-SPEC 5절 5번).
-      setDeleteFailed(true)
+      setDeleteError(error)
     }
     setDeleting(false)
   }
 
-  const newDiaryLink = selectedTrip ? `/diary/new?trip=${selectedTrip.id}` : null
+  const newDiaryLink =
+    selectedTrip && ownTripIds.has(selectedTrip.id) ? `/diary/new?trip=${selectedTrip.id}` : null
 
   function renderActions(diary) {
+    if (!ownTripIds.has(diary.trip_id)) return null
     return (
       <>
         <Button variant="secondary" to={`/diary/${diary.id}/edit`}>
@@ -199,13 +211,17 @@ export default function Diary() {
       <div className={styles.tripField}>
         <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
         {/* 전체 보기에서는 "일기 추가" 대신 안내를 둔다 (SCREEN-SPEC 5절 2번, AI 제안 문구) */}
-        {showAll && <p className={styles.guide}>여행을 고르면 일기를 쓸 수 있어요.</p>}
+        {showAll && user && <p className={styles.guide}>여행을 고르면 일기를 쓸 수 있어요.</p>}
       </div>
       {content}
       <ConfirmDialog
         open={deleteTarget !== null}
         busy={deleting}
-        error={deleteFailed}
+        error={
+          deleteError && (
+            <AuthErrorText error={deleteError} fallback="지우지 못했어요. 다시 시도해 주세요." />
+          )
+        }
         onCancel={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
       />
