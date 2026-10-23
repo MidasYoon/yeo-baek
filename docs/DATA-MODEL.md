@@ -2,7 +2,7 @@
 
 > 저장할 정보의 이름과 뜻을 적는다. 무엇을 만들지는 `docs/PRD.md`, 구조는 `docs/ARCHITECTURE.md`를 따른다.
 > 한 파일 안에 담당자별 절로 쓰고, 담당자별 절도 팀이 합의한 뒤에만 고친다 (D-007).
-> 테이블별 절(2~5)은 모두 같은 목차 1~5를 따른다. 근거가 되는 PRD·SCREEN-SPEC 번호를 괄호로 적는다.
+> 테이블별 절(2~9)은 모두 같은 목차 1~5를 따른다. 근거가 되는 PRD·SCREEN-SPEC 번호를 괄호로 적는다.
 > API 주소와 요청·응답 모양은 적지 않는다 (`docs/API-SPEC.md` 몫).
 > "제안"이나 "확인 필요"가 붙은 내용은 확정이 아니다.
 
@@ -16,6 +16,10 @@
 | `places` | 여행에서 방문한 장소 한 곳 | 은희 | D-002 |
 | `diaries` | 여행 중 쓴 일기 한 편 | 건용 | D-003 |
 | `place_photos` | 장소에 붙인 사진 한 장 | 은희 | D-033 |
+| `users` | 회원 한 명 | 팀 공동 | D-042 |
+| `sessions` | 로그인 한 번 (로그인 유지용) | 팀 공동 | D-042 |
+| `trip_likes` | 회원이 여행에 누른 좋아요 하나 | 팀 공동 | D-042 |
+| `trip_comments` | 회원이 여행에 쓴 댓글 하나 | 팀 공동 | D-042 |
 
 ### 테이블 사이의 연결
 
@@ -23,11 +27,20 @@
 trips (1) ──< places  (여러 개)   places.trip_id  → trips.id
       (1) ──< diaries (여러 개)   diaries.trip_id → trips.id
 places (1) ──< place_photos (0~4개)   place_photos.place_id → places.id
+
+users (1) ──< trips          (여러 개)   trips.user_id         → users.id   (D-042)
+      (1) ──< sessions       (여러 개)   sessions.user_id      → users.id
+      (1) ──< trip_likes     (여러 개)   trip_likes.user_id    → users.id
+      (1) ──< trip_comments  (여러 개)   trip_comments.user_id → users.id
+trips (1) ──< trip_likes     (여러 개)   trip_likes.trip_id    → trips.id
+      (1) ──< trip_comments  (여러 개)   trip_comments.trip_id → trips.id
 ```
 
 - 장소와 일기는 꼭 한 여행에 속한다. `trip_id`는 비울 수 없다.
 - `places`와 `diaries`는 서로 연결하지 않는다.
 - 사진 한 장은 꼭 한 장소에 속한다. `place_id`는 비울 수 없다. 여행·일기 사진은 1장뿐이라 따로 테이블을 두지 않고 그 테이블의 `photo` 칸에 둔다. (D-033)
+- 여행의 주인은 `trips.user_id`다. 장소·일기는 `user_id`를 두지 않고 그 여행의 주인을 따른다 (D-042).
+- 좋아요·댓글은 여행에만 단다. 장소·일기에는 달지 않는다 (D-042).
 
 ### 공통 규칙
 
@@ -72,6 +85,19 @@ places (1) ──< place_photos (0~4개)   place_photos.place_id → places.id
 
 - SQLite는 `PRAGMA foreign_keys = ON`을 켜지 않으면 외래 키를 검사하지 않는다. 연결마다 켜야 한다.
 - 라우터가 돌려주는 응답 모양과 개수를 얻는 방법은 `docs/API-SPEC.md`에서 정한다.
+- 좋아요·댓글은 여행 지우기를 막지 않는다. `trip_likes.trip_id`, `trip_comments.trip_id`는 `ON DELETE CASCADE`라 여행을 지우면 DB가 함께 지운다 (D-042, 8·9절).
+
+### 회원 기능을 기존 DB에 더하기 (D-042)
+
+| 항목 | 방법 |
+| --- | --- |
+| 새 테이블 4개 | `users`, `sessions`, `trip_likes`, `trip_comments`는 `CREATE TABLE IF NOT EXISTS`로 만든다. 이미 있는 DB에도 그대로 생긴다 |
+| `trips.user_id` | `backend/database.py`가 시작할 때 칸이 없으면 `ALTER TABLE trips ADD COLUMN user_id INTEGER REFERENCES users(id)`로 더한다 (D-036과 같은 방식). 넣어 둔 여행은 그대로이고 `user_id`는 `NULL`이다 |
+| 주인이 없는 여행 | 그 DB에 처음 가입한 회원(`id`가 가장 작은 회원)에게 붙인다. 회원가입을 저장할 때(같은 트랜잭션)와 백엔드를 켤 때(`init_db`), 회원이 한 명이라도 있으면 `user_id`가 `NULL`인 여행을 모두 그 회원의 것으로 바꾼다 (D-042). 켤 때도 하는 이유: 권한 검사(PLAN P-73) 전에 로그인 없이 만든 여행도 주인을 갖게 하기 위해서다 (AI 제안) |
+| DB 다시 만들기 | 필요 없다. 넣어 둔 데이터는 그대로다 |
+
+- 테이블을 만드는 순서: `users` → `trips` → … 순서로 둔다. `trips`·`sessions`·`trip_likes`·`trip_comments`가 `users(id)`를 가리키기 때문이다 (AI 제안).
+- 가입한 회원이 아무도 없는 동안에는 기존 여행을 아무도 고치거나 지울 수 없다. 여행 만들기도 로그인해야 하므로, 가입한 뒤에 만든 여행에는 늘 주인이 있다.
 
 ### 열린 질문 (여러 테이블에 걸친 것)
 
@@ -90,8 +116,11 @@ places (1) ──< place_photos (0~4개)   place_photos.place_id → places.id
 | `end_date` | 종료일 | `TEXT NOT NULL` | 필수 | `YYYY-MM-DD`. 시작일보다 빠를 수 없다. 같은 날은 된다 | PRD 2절 3번 |
 | `info` | 여행 정보 (자유 메모) | `TEXT` | 선택 | 글자 수 제한 없음 | PRD 2절 3번 |
 | `photo` | 대표사진 파일 이름 | `TEXT` | 선택 | 0~1장. 없으면 `NULL`. 1절 "사진 저장" | PRD 2절 3번, R-T-020, D-033 |
+| `user_id` | 이 여행의 주인 (만든 회원) | `INTEGER REFERENCES users(id)` | 자동 | 만들 때 로그인한 회원의 `id`를 라우터가 넣는다. 본문으로 받지 않고 고칠 수 없다. D-042 전에 넣은 여행은 처음 가입한 회원이 생길 때까지 `NULL` (1절 "회원 기능을 기존 DB에 더하기") | PRD 7절, D-042 |
 | `created_at` | 만든 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | `YYYY-MM-DD HH:MM:SS`. 기록용 | 1절 |
 | `updated_at` | 마지막으로 고친 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | `YYYY-MM-DD HH:MM:SS`. 고칠 때 라우터가 넣는다 | 1절 |
+
+- `user_id`는 `ALTER TABLE`로 더하는 칸이라 `NOT NULL`을 붙일 수 없다. 비지 않게 지키는 일은 라우터가 한다 (D-042, AI 제안).
 
 ### 2. 순서
 
@@ -102,6 +131,8 @@ places (1) ──< place_photos (0~4개)   place_photos.place_id → places.id
 
 - 장소·일기가 붙은 여행은 지울 수 없다. (R-T-012, 1절)
 - 기간을 고칠 때, 그 여행의 `places.visit_date`나 `diaries.date` 중 새 기간 밖의 것이 하나라도 있으면 고칠 수 없다. (R-T-017)
+- 여행과 그 여행의 장소·일기를 만들고 고치고 지우는 일은 `user_id`의 회원만 한다 (D-042).
+- 여행을 지우면 그 여행의 좋아요·댓글도 DB가 함께 지운다 (8·9절, D-042).
 
 ### 4. 다른 문서로 넘길 것
 
@@ -241,3 +272,146 @@ places (1) ──< place_photos (0~4개)   place_photos.place_id → places.id
 
 - 닫은 질문 (2026-10-22, PLAN P-36)
   - DM-01 장소를 지울 때 사진 줄을 지우는 방법: `place_id`를 `ON DELETE CASCADE`로 두어 DB가 함께 지운다. 사진 파일은 `places` 라우터가 지운다 (사람이 AI 제안대로 정함).
+
+## 6. `users` (담당: 팀 공동)
+
+> 근거: D-042, PRD 7절. 칸 이름·타입·글자 규칙은 AI 제안이다 (사람이 고른 항목: 아이디, 비밀번호(bcrypt), 닉네임, 프로필사진, `created_at`, `updated_at`).
+
+### 1. 필드
+
+| 필드 | 뜻 | 타입 | 필수 | 입력 규칙 | 근거 |
+| --- | --- | --- | --- | --- | --- |
+| `id` | 회원 번호 | `INTEGER PRIMARY KEY` | 자동 | — | 1절 공통 규칙 |
+| `login_id` | 아이디 (로그인할 때 적는 것) | `TEXT NOT NULL UNIQUE` | 필수 | 4~20자, 영문 소문자·숫자·밑줄(`_`)만. 다른 회원과 겹칠 수 없다. 가입한 뒤 바꾸지 않는다. 기본 키 `id`와 헷갈리지 않게 `login_id`로 짓는다 | PRD 7절 3번 |
+| `password_hash` | 비밀번호의 bcrypt 해시 | `TEXT NOT NULL` | 필수 | 비밀번호 원문은 어디에도 저장하지 않는다. bcrypt가 만든 글자(`$2b$…`, 소금 포함)를 그대로 넣는다 | PRD 7절 3번, D-042 |
+| `nickname` | 닉네임 | `TEXT NOT NULL` | 필수 | 2~10자. 다른 회원과 겹쳐도 된다 | PRD 7절 3번 |
+| `profile_photo` | 프로필사진 파일 이름 | `TEXT` | 선택 | 0~1장. 없으면 `NULL`. 1절 "사진 저장" | PRD 7절 3번, D-033, D-042 |
+| `created_at` | 가입한 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | `YYYY-MM-DD HH:MM:SS`. 회원상세 창의 가입일로 쓴다 | 1절, PRD R-M-004 |
+| `updated_at` | 마지막으로 고친 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | 닉네임·사진·비밀번호를 고칠 때 라우터가 넣는다 | 1절 |
+
+### 2. 순서
+
+- 회원 목록을 보이는 화면이 없어 순서를 정하지 않는다.
+
+### 3. 지키는 규칙
+
+- `login_id`는 겹칠 수 없다. DB의 `UNIQUE`와 라우터가 함께 막는다.
+- `password_hash`는 API 응답·서버 로그·화면 어디에도 내보내지 않는다 (D-042).
+- 회원을 지우는 기능(탈퇴)이 없으므로 `users` 줄은 지우지 않는다 (PRD 7절 6번).
+- 사진을 바꾸거나 빼면 전 사진 파일도 라우터가 지운다 (1절 "사진 저장").
+
+### 4. 다른 문서로 넘길 것
+
+| 내용 | 문서 |
+| --- | --- |
+| 가입·로그인·정보수정 요청과 응답 모양, 글자 규칙 서버 검사, 겹친 아이디의 오류 | `API-SPEC` 7절 |
+
+### 5. 열린 질문
+
+- PRD M-01: 글자 수·글자 종류, 닉네임 겹침 허용은 AI 제안이다.
+
+## 7. `sessions` (담당: 팀 공동)
+
+> 근거: D-042. 로그인을 유지하려고 둔다. 칸과 유지 기간은 AI 제안이다.
+
+### 1. 필드
+
+| 필드 | 뜻 | 타입 | 필수 | 입력 규칙 | 근거 |
+| --- | --- | --- | --- | --- | --- |
+| `id` | 세션 번호 | `INTEGER PRIMARY KEY` | 자동 | — | 1절 공통 규칙 |
+| `user_id` | 로그인한 회원 | `INTEGER NOT NULL REFERENCES users(id)` | 필수 | 있는 회원의 `id` | D-042 |
+| `token` | 쿠키에 넣는 무작위 글자 | `TEXT NOT NULL UNIQUE` | 필수 | 서버가 Python `secrets.token_urlsafe(32)`로 만든다. 겹치지 않는다 | D-042, AI 제안 |
+| `expires_at` | 로그인이 풀리는 시각 | `TEXT NOT NULL` | 필수 | `YYYY-MM-DD HH:MM:SS`, 한국 시각. 로그인한 때부터 7일 뒤 | PRD 7절 3번, AI 제안 |
+| `created_at` | 로그인한 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | 기록용 | 1절 |
+| `updated_at` | 마지막으로 고친 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | 세션 줄은 고치지 않으므로 만든 시각과 같다 | 1절 |
+
+### 2. 순서
+
+- 정하지 않는다 (목록으로 보이지 않는다).
+
+### 3. 지키는 규칙
+
+- 한 회원이 여러 세션을 가질 수 있다 (브라우저마다 로그인).
+- 로그아웃하면 그 `token`의 줄을 지운다.
+- `expires_at`이 지난 세션은 로그인하지 않은 것으로 보고, 발견한 라우터가 그 줄을 지운다 (AI 제안).
+- 비밀번호를 바꾸면 그 회원의 다른 세션을 모두 지운다. 지금 브라우저의 세션은 남긴다 (AI 제안).
+- `token`은 서버 로그에 남기지 않는다.
+
+### 4. 다른 문서로 넘길 것
+
+| 내용 | 문서 |
+| --- | --- |
+| 쿠키 이름·속성, 로그인 여부를 보는 방법 | `API-SPEC` 1절 "로그인" |
+
+### 5. 열린 질문
+
+- 로그인 유지 7일은 AI 제안이다 (PRD M-01).
+
+## 8. `trip_likes` (담당: 팀 공동)
+
+> 근거: D-042, PRD 7절 R-M-009.
+
+### 1. 필드
+
+| 필드 | 뜻 | 타입 | 필수 | 입력 규칙 | 근거 |
+| --- | --- | --- | --- | --- | --- |
+| `id` | 좋아요 번호 | `INTEGER PRIMARY KEY` | 자동 | — | 1절 공통 규칙 |
+| `trip_id` | 좋아요를 누른 여행 | `INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE` | 필수 | 있는 여행의 `id`. 여행을 지우면 DB가 함께 지운다 | D-042 |
+| `user_id` | 좋아요를 누른 회원 | `INTEGER NOT NULL REFERENCES users(id)` | 필수 | 로그인한 회원의 `id`를 라우터가 넣는다 | D-042 |
+| `created_at` | 누른 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | 기록용 | 1절 |
+| `updated_at` | 마지막으로 고친 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | 좋아요 줄은 고치지 않고 더하고 지우므로 만든 시각과 같다 | 1절 |
+
+- 테이블 끝에 `UNIQUE (trip_id, user_id)`를 둔다. 한 회원은 한 여행에 좋아요를 한 번만 누른다.
+
+### 2. 순서
+
+- 누른 사람 목록을 보이지 않으므로 정하지 않는다. 화면에는 개수만 보인다 (PRD 7절 6번).
+
+### 3. 지키는 규칙
+
+- 좋아요를 취소하면 그 줄을 지운다.
+- 내 여행에도 누를 수 있다 (PRD R-M-009).
+
+### 4. 다른 문서로 넘길 것
+
+| 내용 | 문서 |
+| --- | --- |
+| 누르기·취소 API, 여행 객체의 좋아요 수와 내가 눌렀는지 | `API-SPEC` 2·8절 |
+
+### 5. 열린 질문
+
+지금은 없다.
+
+## 9. `trip_comments` (담당: 팀 공동)
+
+> 근거: D-042, PRD 7절 R-M-010, R-M-011.
+
+### 1. 필드
+
+| 필드 | 뜻 | 타입 | 필수 | 입력 규칙 | 근거 |
+| --- | --- | --- | --- | --- | --- |
+| `id` | 댓글 번호 | `INTEGER PRIMARY KEY` | 자동 | — | 1절 공통 규칙 |
+| `trip_id` | 댓글을 단 여행 | `INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE` | 필수 | 있는 여행의 `id`. 여행을 지우면 DB가 함께 지운다 | D-042 |
+| `user_id` | 댓글을 쓴 회원 | `INTEGER NOT NULL REFERENCES users(id)` | 필수 | 로그인한 회원의 `id`를 라우터가 넣는다 | D-042 |
+| `content` | 댓글 내용 | `TEXT NOT NULL` | 필수 | 1~200자. 줄바꿈 된다 | PRD 7절 3번 |
+| `created_at` | 쓴 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | 화면에 보인다 | 1절, PRD 7절 4번 |
+| `updated_at` | 마지막으로 고친 시각 | `TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))` | 자동 | 댓글은 고치지 않으므로 만든 시각과 같다 | 1절 |
+
+### 2. 순서
+
+- 한 여행의 댓글: `id`가 작은 것(먼저 쓴 것)이 위다 (PRD 7절 4번, AI 제안).
+
+### 3. 지키는 규칙
+
+- 댓글은 쓴 회원만 지운다. 여행 주인도 남의 댓글을 지우지 않는다 (PRD 7절 6번).
+- 댓글을 고치지 않는다 (D-042).
+
+### 4. 다른 문서로 넘길 것
+
+| 내용 | 문서 |
+| --- | --- |
+| 댓글 목록·쓰기·지우기 API와 응답의 쓴 사람 정보 | `API-SPEC` 9절 |
+
+### 5. 열린 질문
+
+- 200자는 AI 제안이다 (PRD M-01).

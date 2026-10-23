@@ -2,7 +2,7 @@
 
 > 무엇을 보면 통과인지 적는다. 무엇을 만들지는 `docs/PRD.md`, 화면은 `docs/SCREEN-SPEC.md`, 서버와의 약속은 `docs/API-SPEC.md`를 따른다.
 > 한 파일 안에 담당자별 절로 쓰고, 담당자별 절도 팀이 합의한 뒤에만 고친다 (D-007). 쓰는 자리는 팀원 모두가 함께한다.
-> 기능별 절(2~6, 8)은 모두 같은 목차 1~6을 따른다. 근거가 되는 PRD·SCREEN-SPEC·API-SPEC·DECISIONS 번호를 괄호로 적는다.
+> 기능별 절(2~6, 8, 9)은 모두 같은 목차 1~6을 따른다. 근거가 되는 PRD·SCREEN-SPEC·API-SPEC·DECISIONS 번호를 괄호로 적는다.
 > 검사한 결과는 이 문서에 적지 않고 `docs/PLAN.md` "실제 검증 결과"에 적는다.
 > "제안"이나 "확인 필요"가 붙은 내용은 확정이 아니다.
 
@@ -19,7 +19,7 @@
 | 불러오기·저장 오류 만들기 | 백엔드를 끈 채 화면에서 불러오거나 저장한다 | 2026-10-21 팀 합의 |
 | API 하나만 실패시키기 | 브라우저 개발자 도구 Network의 "Block request URL"로 그 주소(예: `/api/places`)만 막는다 | 2026-10-21 팀 합의 |
 | 판정 | 기대 결과와 같으면 통과, 다르면 실패. 결과는 `docs/PLAN.md` "실제 검증 결과"에 적는다 | AGENTS 문서 역할 |
-| 검사 번호 | 절마다 접두어를 붙인다: `T-C-`(공통), `T-L-`(공통 레이아웃), `T-T-`(여행기록), `T-P-`(여행지 정보), `T-D-`(다이어리), `T-H-`(Home), `T-X-`(연결), `T-A-`(AI 여행지 추천, D-037) | 2026-10-21 팀 합의. `T-A-`는 2026-10-23 사람이 확정 |
+| 검사 번호 | 절마다 접두어를 붙인다: `T-C-`(공통), `T-L-`(공통 레이아웃), `T-T-`(여행기록), `T-P-`(여행지 정보), `T-D-`(다이어리), `T-H-`(Home), `T-X-`(연결), `T-A-`(AI 여행지 추천, D-037), `T-M-`(회원·좋아요·댓글, D-042) | 2026-10-21 팀 합의. `T-A-`는 2026-10-23 사람이 확정. `T-M-`은 AI 제안 |
 | 기대 결과 적는 법 | 화면 문구는 그대로 적는다. 근거 문서에 "(AI 제안)"이 붙은 내용은 검사에도 "(AI 제안)"을 남긴다 | 2026-10-21 팀 합의 |
 
 ### 검사 전 준비
@@ -40,6 +40,9 @@ DB 파일을 지우고 빈 DB에서 시작해, 아래 예시 데이터를 순서
 
 - 데이터를 바꾸는 검사를 한 뒤에는 백엔드를 끄고 DB 파일을 지운 다음 다시 켜고, 위 데이터를 다시 넣어 되돌린다 (README 실행 방법).
 - 사진 검사(D-033)에 쓸 파일을 미리 준비한다 (AI 제안): `small.jpg`(1MB 안팎), `small.png`, `small.webp`, `big.jpg`(5MB 넘음), `wrong.gif`. 사진 검사 뒤에는 DB 파일과 함께 `backend/uploads/` 안의 파일도 지운다.
+- **회원 (D-042 뒤, AI 제안):** 빈 DB에서 먼저 회원 1(아이디 `tester1`, 닉네임 "검사 하나")로 가입하고, 로그인한 채로 위 예시 데이터를 넣는다. 그래서 여행 1~4의 주인은 회원 1이다. 이어서 회원 2(아이디 `tester2`, 닉네임 "검사 둘")로 가입한다. 비밀번호는 규칙(8~20자)에 맞는 검사용 값을 각자 정해 쓰고, 실제로 쓰는 비밀번호는 쓰지 않으며 검사 기록에도 적지 않는다.
+- `http://localhost:8000/docs`에서 가입·로그인하면 8000 주소에 쿠키가 생겨 이후 요청에 함께 간다. 다른 회원으로 바꿀 때는 `POST /api/users/login`을 다시 부른다. 로그인하지 않은 요청은 `POST /api/users/logout` 뒤에 보낸다.
+- 2~6절의 만들기·고치기·지우기 검사는 회원 1로 로그인한 채로 한다. 로그인하지 않은 경우와 남의 기록은 9절에서 본다.
 
 ### 공통 API 응답 검사
 
@@ -658,6 +661,13 @@ Home만을 위한 API는 없다. 쓰는 API(`GET /api/trips`, `GET /api/places/r
 | `backend/routers/recommend.py`, `backend/.env.example`, `requirements.txt`의 `google-genai`·`python-dotenv` | 팀 공동 | T-A-12 ~ T-A-17, T-A-22, T-A-23 |
 | `frontend/src/api/recommend.js` | 팀 공동 | T-A-07, T-A-18 ~ T-A-21 |
 | 추천 대화창 공통 부품 (`frontend/src/components/RecommendChat/`) | 팀 공동 | T-A-01 ~ T-A-11, T-A-18 ~ T-A-21 |
+| `backend/routers/users.py`, `requirements.txt`의 `bcrypt`, `database.py`의 `users`·`sessions`·`trips.user_id` | 팀 공동 | T-M-01 ~ T-M-15, T-M-30 ~ T-M-36 |
+| `backend/routers/likes.py`, `frontend/src/api/likes.js`, `components/LikeButton/` | 팀 공동 | T-M-16 ~ T-M-18, T-M-23, T-M-39, T-M-40 |
+| `backend/routers/comments.py`, `frontend/src/api/comments.js`, `components/Comments/` | 팀 공동 | T-M-19 ~ T-M-23, T-M-41, T-M-42 |
+| `frontend/src/api/users.js`, `components/Auth/`, `components/UserModal/`, `pages/Account/` | 팀 공동 | T-M-30 ~ T-M-38, T-M-43 |
+| 세 기능 라우터의 권한 검사 (`trips.py`·`places.py`·`diaries.py`의 `401`·`403`) | 각 담당 | T-M-10 ~ T-M-13, T-M-37, T-M-38, T-M-44 |
+
+- D-042 뒤에는 위 표의 `trips.py`·`places.py`·`diaries.py`, `api/` 세 파일, `pages/` 기능 폴더를 고친 PR도 T-M-10 ~ T-M-13, T-M-37을 함께 본다.
 
 - `api/` 파일과 라우터는 다른 기능도 쓰므로 그 기능의 검사 번호도 함께 적었다 (API-SPEC 2~4절 5번).
 
@@ -731,3 +741,86 @@ Home만을 위한 API는 없다. 쓰는 API(`GET /api/trips`, `GET /api/places/r
 ### 6. 열린 질문
 
 - 이 절은 근거 문서(SCREEN-SPEC 7절, API-SPEC 6절)의 AI 제안을 그대로 썼다. 근거 문서가 바뀌면 함께 고친다.
+
+---
+
+## 9. 회원·좋아요·댓글 (담당: 팀 공동)
+
+> 근거: D-042, PRD 7절, SCREEN-SPEC 1·8절, API-SPEC 1·2·7~9절, DATA-MODEL 1·6~9절, DESIGN 6절. 근거 문서의 문구·모양·응답 모양은 AI 제안이므로 이 절의 기대 결과도 모두 (AI 제안)이다.
+
+### 1. 검사 전 준비할 데이터
+
+- 1절 "검사 전 준비"의 회원 데이터를 쓴다: 회원 1(`tester1`, 여행 1~4의 주인), 회원 2(`tester2`).
+- T-M-02는 회원을 넣기 **전에** 한다: 빈 DB에서 회원 없이 여행을 넣을 수 없으므로, D-042 전에 만든 DB(여행이 있고 `users`가 없는 DB)를 복사해 백엔드를 켠다. 그런 DB가 없으면 빈 DB를 만든 뒤 `sqlite3`로 `trips`에 여행 줄을 직접 넣는다.
+- 화면 검사는 일반 창(회원 1 또는 2)과 시크릿 창(다른 회원 또는 로그인 안 함)을 함께 쓰면 편하다.
+- 1절의 사진 파일(`small.jpg` 등)을 프로필사진 검사에 쓴다.
+
+### 2. 화면 검사
+
+| 번호 | 하는 일 | 기대 결과 | 근거 |
+| --- | --- | --- | --- |
+| T-M-30 | 로그인하지 않고 `/`를 연다 → 회원 1로 로그인한다 → 767px로 줄인다 | 네비 오른쪽 끝에 "로그인". 로그인하면 32px 사각에 닉네임 첫 글자 "검"과 "검사 하나". 767px에서는 사각만 보이고 가로 넘침이 없다 | SCREEN-SPEC 2·8절, DESIGN 6절 |
+| T-M-31 | `/login`에서 빈 채로 "로그인" → 회원 1 아이디 + 틀린 비밀번호 → 맞는 비밀번호 | "아이디를 적어 주세요"·"비밀번호를 적어 주세요". 틀리면 버튼 위 "아이디 또는 비밀번호가 맞지 않아요."이고 비밀번호 칸이 빈다. 맞으면 `/`로 가고 네비에 닉네임 | SCREEN-SPEC 8절 3·4번 |
+| T-M-32 | `/signup`에서 아이디 `AB`, 비밀번호 7자, 확인 다르게, 닉네임 "가" → 아이디 `tester1`(이미 있음)로 나머지는 맞게 → 새 아이디 `tester3` + 프로필사진 `small.png`로 가입 | 칸마다 "영문 소문자·숫자·_로 4~20자를 적어 주세요", "영문·숫자·기호로 8~20자를 적어 주세요", "비밀번호가 서로 달라요", "닉네임은 2~10자로 적어 주세요". 다음은 아이디 칸 아래 "이미 쓰는 아이디예요". 마지막은 로그인된 채로 `/`에 가고 네비에 사진이 보인다 | SCREEN-SPEC 8절 |
+| T-M-33 | 로그인하지 않고 `/trip/new`, `/trip/1/edit`, `/place/new?trip=1`, `/diary/1/edit`, `/me/edit`를 연다. `/trip/new`에서 로그인한다. `/login?next=https://example.com`으로 로그인한다 | 모두 `/login?next=(그 주소)`로 간다. 로그인하면 `/trip/new`로 돌아온다. 바깥 주소 `next`는 무시하고 `/`로 간다 | SCREEN-SPEC 1절 "로그인이 필요한 화면", 8절 1번 |
+| T-M-34 | 로그인한 채로 `/login`, `/signup`을 연다 | 폼이 보이지 않고 `/`로 간다 | SCREEN-SPEC 8절 2번 |
+| T-M-35 | 네비 닉네임 → 창 확인 → ×, Esc, 창 바깥으로 각각 닫기 → 다시 열어 "정보 수정" → 다시 열어 `/trip/new`에서 "로그아웃" | 창에 사진(또는 첫 글자 96px)·"검사 하나"·"@tester1"·"가입일 YYYY-MM-DD", "정보 수정"·"로그아웃". 세 방법 모두 닫히고 포커스가 네비 닉네임으로. "정보 수정"은 `/me/edit`. 로그아웃하면 네비가 "로그인"이 되고 `/`로 간다 | SCREEN-SPEC 8절 |
+| T-M-36 | `/me/edit`에서 닉네임을 "검사 하나둘"로 저장 → 다시 열어 새 비밀번호만 적고 저장 → 지금 비밀번호를 틀리게 적고 저장 → 맞게 적고 저장 | 아이디는 입력 칸이 아닌 글자. 첫 저장 뒤 이전 화면으로 가고 네비·여행 카드 닉네임이 "검사 하나둘". "지금 비밀번호를 적어 주세요", "지금 비밀번호가 맞지 않아요". 마지막은 저장되고, 로그아웃 뒤 새 비밀번호로 로그인된다 | SCREEN-SPEC 8절, R-M-005, R-M-006 |
+| T-M-37 | 로그인 안 함 / 회원 2 / 회원 1로 각각 `/trip`, `/trip/1`, `/place`(전체 보기), `/place?trip=1`, `/diary`(전체 보기), `/diary?trip=1`(줄 펼침)을 본다 | 로그인 안 함·회원 2: "여행 추가"(여행이 있으므로 제목 오른쪽 자리가 빔), 여행 1의 수정·삭제, "장소 추가"·"일기 추가", 장소 카드·일기 줄의 수정·삭제, 전체 보기 안내 문구가 모두 없다. 단 회원 2는 로그인했으므로 "여행 추가"와 전체 보기 안내 문구가 보인다(SCREEN-SPEC 4·5절 2번). 회원 1: 모두 보인다 (이전과 같다) | SCREEN-SPEC 1절 "주인만 보이는 버튼", R-M-008 |
+| T-M-38 | 회원 2로 `/trip/1/edit`, `/place/1/edit`, `/diary/1/edit`, `/place/new?trip=1`을 연다 | 폼 대신 "내 여행만 고칠 수 있어요." + "목록으로" | SCREEN-SPEC 1절 "남의 기록 수정 화면" |
+| T-M-39 | 회원 2가 여행 1에 좋아요를 누른 뒤, 로그인하지 않고 `/trip`과 `/trip/1`을 본다 | 여행 1 카드 아래 "검사 하나"와 선 하트 + "1", 다른 카드는 "0". 상세 여행명 아래 "기록한 사람 검사 하나", 좋아요 버튼 "좋아요 1"(빈 하트) | SCREEN-SPEC 8절 2번, R-M-012 |
+| T-M-40 | 로그인하지 않고 `/trip/1`의 좋아요 → 회원 2로 로그인해 돌아와 좋아요 → 새로고침 → 다시 누름 | 처음에는 `/login?next=/trip/1`로 간다. 누르면 하트가 주홍으로 채워지고 "좋아요 1", 새로고침해도 그대로. 다시 누르면 비고 "좋아요 0". 누르는 동안 버튼을 누를 수 없다 | SCREEN-SPEC 8절 3번, R-M-009 |
+| T-M-41 | `/trip/1` 댓글 칸: 로그인 안 함 → 회원 2로 "  첫 댓글  " 쓰기 → 공백만 적기 → 201자 붙여 넣기 → 회원 1로 다른 댓글 쓰기 → 회원 1 화면에서 각 댓글의 "삭제" 보기 → 회원 1 댓글 "삭제" → "지우기" | 처음에는 쓰기 칸 대신 "로그인하면 댓글을 쓸 수 있어요." + "로그인". 쓰면 목록 맨 아래에 "검사 둘" · 시각 · "첫 댓글"이 붙고, 칸이 비고 제목이 "댓글 1개". 공백만이면 "댓글 쓰기"를 누를 수 없다. 200자까지만 들어가고 "200/200". 회원 1 댓글이 아래에 붙는다. 회원 1에게는 자기 댓글에만 "삭제". "정말 지울까요?" 뒤 사라지고 "댓글 1개" | SCREEN-SPEC 8절, R-M-010, R-M-011 |
+| T-M-43 | 회원 1로 `/trip/1/edit`를 연 뒤, 다른 탭에서 로그아웃하고 돌아와 "저장" | "로그인이 풀렸어요. 다시 로그인해 주세요." + "로그인" 링크. 입력한 값은 남는다 | SCREEN-SPEC 1절 (`401`) |
+| T-M-44 | 회원 1로 로그인한 채 T-T-01, T-T-07, T-P-01, T-D-01, T-H-01을 다시 한다. 로그인하지 않고 T-H-01, T-A-07을 다시 한다 | 모두 이전 기대 결과와 같다 (Home·AI 추천은 로그인 없이도 같다) | D-042 "영향" |
+
+### 3. API 검사
+
+| 번호 | 요청 | 기대 응답 | 근거 |
+| --- | --- | --- | --- |
+| T-M-01 | `POST /api/users` `{"login_id":"tester9","password":"(규칙에 맞는 값)","nickname":"검사 구","profile_photo":null}` | `201` + 회원 객체(`id`, `login_id`, `nickname`, `profile_photo` `null`, `created_at`, `updated_at`). `password`·`password_hash`가 없다. 응답 머리에 `Set-Cookie: yeoback_session=…; HttpOnly; Max-Age=604800; Path=/; SameSite=lax` | API-SPEC 1·7절 |
+| T-M-02 | (회원이 없고 여행 1~4가 있는 DB) `GET /api/trips` → 회원 1 가입 → `GET /api/trips` → 회원 2 가입 → `GET /api/trips` | 처음에는 모든 여행의 `user_id`·`user_nickname`이 `null`. 회원 1 가입 뒤 모두 회원 1의 `id`·닉네임. 회원 2 가입 뒤에도 그대로 회원 1 | DATA-MODEL 1절, D-042 |
+| T-M-03 | 같은 `login_id`로 `POST /api/users`를 한 번 더 | `409`, `{"detail": "이미 쓰는 아이디예요"}` | API-SPEC 7절 |
+| T-M-04 | `POST /api/users`에 하나씩: `login_id` `"AB"`, `"Tester1"`, `"test er"`, 21자 / `password` 7자, 21자, 한글 섞임, 공백 섞임 / `nickname` `"가"`, `"   "`, 11자 / `profile_photo` `"../x.jpg"` | 모두 `422`. 회원이 늘지 않는다 | API-SPEC 7절 3번 |
+| T-M-05 | `POST /api/users/login` 맞는 값 / 틀린 비밀번호 / 없는 아이디 / `password` 뺌 | `200` + 회원 객체 + `Set-Cookie` / `401` `{"detail": "아이디 또는 비밀번호가 맞지 않아요"}` / 같은 `401`, 같은 `detail` / `422` | API-SPEC 7절 4번 |
+| T-M-06 | 로그아웃 상태 `GET /api/users/me` → 로그인 → `GET /api/users/me` → `POST /api/users/logout` → `GET /api/users/me` → `POST /api/users/logout` | `200` + `null` → 회원 객체 → `204`(쿠키 `Max-Age=0`) → `200` + `null` → `204` | API-SPEC 7절 4번 |
+| T-M-07 | 회원 1로 `PUT /api/users/me` `{"nickname":"  새 이름  ","profile_photo":null,"current_password":null,"new_password":null}` → `GET /api/trips/1` | `200`, `nickname` `"새 이름"`, `updated_at`이 바뀜. 여행 1의 `user_nickname`도 `"새 이름"` | API-SPEC 2·7절 |
+| T-M-08 | 회원 1로 `PUT /api/users/me`: `new_password`만 넣음 / 틀린 `current_password` + `new_password` / 맞는 `current_password` + `new_password` → 옛 비밀번호로 로그인 → 새 비밀번호로 로그인 | `422` / `403` `{"detail": "지금 비밀번호가 맞지 않아요"}` / `200` → `401` → `200` | API-SPEC 7절 |
+| T-M-09 | 회원 1로 두 곳(일반 창, 시크릿 창)에서 로그인 → 일반 창에서 비밀번호를 바꿈 → 두 곳에서 `GET /api/users/me` | 일반 창은 회원 객체, 시크릿 창은 `null` | DATA-MODEL 7절 |
+| T-M-10 | 로그인하지 않고: `POST /api/trips`, `PUT`·`DELETE /api/trips/1`, `POST /api/places`, `PUT`·`DELETE /api/places/1`, `POST /api/diaries`, `PUT`·`DELETE /api/diaries/1`, `PUT /api/users/me`, `POST /api/likes`, `DELETE /api/likes?trip_id=1`, `POST /api/comments`, `DELETE /api/comments/1` | 모두 `401` `{"detail": "로그인이 필요해요"}`. 데이터가 바뀌지 않는다. 같은 상태에서 모든 `GET`(T-C-01, T-C-02 꼴)과 `POST /api/uploads`(T-C-26)는 이전처럼 된다 | API-SPEC 1절 "로그인" |
+| T-M-11 | 회원 2로: `PUT`·`DELETE /api/trips/1`, 여행 1에 `POST /api/places`·`POST /api/diaries`, `PUT`·`DELETE /api/places/1`, `PUT`·`DELETE /api/diaries/1` | 모두 `403` `{"detail": "내 여행만 고칠 수 있어요"}`. 데이터가 바뀌지 않는다 | API-SPEC 1~4절, D-042 |
+| T-M-12 | 검사 순서: 로그인 안 함 + 틀린 본문 `PUT /api/trips/999` / 회원 2 + 틀린 본문 `PUT /api/trips/1` / 회원 2 + 맞는 본문 `PUT /api/trips/999` / 회원 2 + 맞는 본문 `PUT /api/trips/1` / 회원 2 `DELETE /api/trips/1` (장소·일기 있음) | `401` / `422` / `404` / `403` / `403` (`409`가 아님) | API-SPEC 1절 "로그인" |
+| T-M-13 | 회원 2로 `POST /api/trips`(맞는 값) → 그 여행에 `POST /api/places` → 회원 1로 그 장소 `DELETE` | `201`, `user_id`가 회원 2 → `201` → `403` | D-042 |
+| T-M-14 | T-M-01 ~ T-M-13을 하는 동안의 서버 터미널 로그와 응답 본문을 본다 | 비밀번호 원문, `$2b$`로 시작하는 해시, 세션 토큰 값이 어디에도 없다 | API-SPEC 1절 |
+| T-M-15 | 회원 1로 로그인 → `sqlite3`로 그 세션의 `expires_at`을 어제로 바꿈 → `GET /api/users/me` → `sessions` 줄 확인 | `200` + `null`. 그 세션 줄이 지워져 있다 | DATA-MODEL 7절 |
+| T-M-16 | 회원 2로 `POST /api/likes` `{"trip_id":1}` 두 번 → `GET /api/trips/1` → 로그아웃 후 `GET /api/trips/1` | 두 번 모두 `200` `{"trip_id":1,"like_count":1,"liked":true}` (`trip_likes` 줄 하나). 여행 1 `like_count` 1, `liked` `true`. 로그아웃 뒤 `like_count` 1, `liked` `false` | API-SPEC 2·8절 |
+| T-M-17 | 회원 2로 `DELETE /api/likes?trip_id=1` 두 번 | 두 번 모두 `200` `{"trip_id":1,"like_count":0,"liked":false}` | API-SPEC 8절 |
+| T-M-18 | 회원 2로 `POST /api/likes` `{"trip_id":999}`, `{}` / `DELETE /api/likes`(`trip_id` 없음), `?trip_id=999` | 모두 `422` | API-SPEC 8절 3번 |
+| T-M-19 | `GET /api/comments?trip_id=1`(댓글 없음), `GET /api/comments`, `GET /api/comments?trip_id=999` | `200` + `[]` / `422` / `200` + `[]` | API-SPEC 9절 |
+| T-M-20 | 회원 2로 `POST /api/comments` `{"trip_id":1,"content":"  첫 댓글  "}` → 회원 1로 `{"trip_id":1,"content":"둘째"}` → `GET /api/comments?trip_id=1` | `201`, `content` `"첫 댓글"`, `nickname` `"검사 둘"`. 목록은 "첫 댓글" → "둘째" 순서이고 줄마다 `user_id`·`nickname`·`profile_photo`가 있다 | API-SPEC 9절 |
+| T-M-21 | `content`를 `""`, `"   "`, 201자로 / 꼭 200자로 `POST /api/comments` | `422`, `422`, `422` / `201` | API-SPEC 9절 3번 |
+| T-M-22 | T-M-20의 "첫 댓글"(회원 2)을: 로그인 안 함으로 `DELETE` / 회원 1로 `DELETE` / 회원 2로 `DELETE /api/comments/999` / 회원 2로 `DELETE` | `401` / `403` `{"detail": "내 댓글만 지울 수 있어요"}` / `404` `{"detail": "댓글을 찾을 수 없어요"}` / `204` | API-SPEC 9절 4번 |
+| T-M-23 | 여행 4(회원 1, 장소·일기 없음)에 회원 2가 좋아요·댓글 → 회원 1로 `DELETE /api/trips/4` → `GET /api/comments?trip_id=4`, `sqlite3`로 `trip_likes`·`trip_comments`에서 `trip_id = 4` 세기. 여행 1에 좋아요를 누른 뒤 회원 1로 `DELETE /api/trips/1` | `204` → `[]`, 둘 다 0줄. 여행 1은 이전처럼 `409` `{"detail": {"place_count": 2, "diary_count": 1}}` | DATA-MODEL 1·8·9절, D-015, D-042 |
+
+### 4. 빈 상태 · 로딩 · 오류 검사
+
+| 번호 | 하는 일 | 기대 결과 | 근거 |
+| --- | --- | --- | --- |
+| T-M-42 | `/trip/2`(댓글 없음)를 연다 → `/api/comments`만 막고 연다 → 풀고 "다시 시도" → 느린 네트워크로 연다 → `/api/likes`만 막고 좋아요 → 백엔드를 끄고 `/login`에서 로그인 | "아직 댓글이 없어요." / "댓글을 불러오지 못했어요." + "다시 시도"이고 여행 내용·좋아요는 보인다 / 목록이 보인다 / 댓글 자리에 "불러오는 중…" / 버튼 옆 "좋아요를 바꾸지 못했어요. 다시 시도해 주세요."이고 하트·수는 그대로 / "로그인하지 못했어요. 다시 시도해 주세요." | SCREEN-SPEC 8절 5번 |
+| T-M-45 | `/api/users/me`만 막고 `/`와 `/trip/1`을 연다 | 네비에 "로그인"이 보이고 주인 버튼은 없다. 화면의 나머지는 평소처럼 보인다 | SCREEN-SPEC 2·8절 5번 |
+
+### 5. 넘어온 항목
+
+| 내용 | 넘어온 곳 | 반영한 검사 번호 |
+| --- | --- | --- |
+| 가입·로그인·로그아웃·정보수정, `401`·`403`·`409`, 쿠키, 비밀번호 숨김, 첫 가입자 | API-SPEC 7절 6번 | T-M-01 ~ T-M-15 |
+| `401`·`403`, 만든 여행의 `user_id`, `like_count`·`liked`, 좋아요·댓글 있는 여행 지우기 | API-SPEC 2절 6번 | T-M-10 ~ T-M-13, T-M-16, T-M-23 |
+| 좋아요 누르기·취소·`422` | API-SPEC 8절 6번 | T-M-16 ~ T-M-18 |
+| 댓글 목록·쓰기·지우기·오류, 여행과 함께 지워짐 | API-SPEC 9절 6번 | T-M-19 ~ T-M-23 |
+| 화면·행동·문구, 주인 버튼 보이기 | SCREEN-SPEC 8절 6번 | T-M-30 ~ T-M-45 |
+
+### 6. 열린 질문
+
+- 이 절은 근거 문서의 AI 제안(문구, 글자 수, 주소)을 그대로 썼다. PRD M-01·M-02, SCREEN-SPEC M-03이 정해지면 함께 고친다.
+- 기존 검사(2~8절) 가운데 화면의 버튼을 누르는 것은 회원 1로 로그인한 채로 해야 같은 결과가 나온다 (1절 "검사 전 준비").
+- 번호는 API 검사 T-M-01~23, 화면 검사 T-M-30부터로 나눴다. T-M-24~29는 API 검사를 더할 자리로 비워 둔다.

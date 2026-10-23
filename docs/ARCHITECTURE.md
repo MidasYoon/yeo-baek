@@ -17,10 +17,12 @@
 [서버] FastAPI (8000)
    │  라우터를 기능별 파일로 나눔: trips / places / diaries (+ 공통 사진 올리기 uploads, AI 추천 recommend)
    │                                     └─ recommend만 인터넷 너머 [Gemini API]를 부른다 (키는 backend/.env, D-037·D-038)
+   │  회원·좋아요·댓글: users / likes / comments (팀 공동, D-042). 로그인은 쿠키(yeoback_session) → sessions 테이블
    ▼
 [DB] SQLite (sqlite3로 접근)          [사진 파일] backend/uploads/
       places, diaries는 trip_id로 trips에 연결    DB에는 파일 이름만 (D-033)
       place_photos는 place_id로 places에 연결
+      trips.user_id → users (여행 주인), sessions·trip_likes·trip_comments → users (D-042)
 ```
 
 | 부품 | 책임 | 근거 |
@@ -37,6 +39,10 @@
 | 추천 대화창 부품 | 모든 화면 오른쪽 아래 버튼과 대화창. 질문 흐름을 화면 안에서만 들고 있다가 마지막에 `api/recommend.js`로 한 번 부른다 | D-037 |
 | Gemini API (바깥) | Google의 AI, 무료 등급. `recommend` 라우터만 서버에서 부른다. 화면은 직접 부르지 않는다 | D-037, D-038 |
 | `backend/.env` | AI 키(`GEMINI_API_KEY`, D-038). 팀원이 각자 만들고 Git에 올리지 않는다. 서버가 켜질 때 `python-dotenv`로 읽는다 | D-037 |
+| `users` 라우터 | 가입·로그인·로그아웃·내 정보·정보수정. 비밀번호를 bcrypt로 해시하고 세션을 만들어 쿠키로 준다. 로그인한 회원을 찾는 함수(쿠키 → `sessions` → `users`)를 두고, 다른 라우터가 가져다 쓴다 (AI 제안) | D-042 |
+| `likes`·`comments` 라우터 | 여행 좋아요 누르기·취소, 여행 댓글 목록·쓰기·지우기 | D-042 |
+| 세 기능 라우터의 권한 검사 | `trips`·`places`·`diaries`의 만들기·고치기·지우기가 로그인(`401`)과 주인(`403`)을 검사한다. 조회는 그대로다 | D-042 |
+| 로그인 상태 부품 (화면) | 앱을 열 때 `GET /api/users/me`로 로그인한 회원을 한 번 불러 모든 화면에 나눠 준다. React Context로 만들어 새 라이브러리를 쓰지 않는다 (5절, AI 제안) | D-042 |
 
 ## 2. 기술 스택
 
@@ -52,6 +58,7 @@
 | 사진 받기 (multipart) | `python-multipart` (FastAPI가 파일을 받을 때 필요한 패키지). 버전은 설치할 때 `requirements.txt`에 고정한다 (D-026) | 확정 (D-033) |
 | AI 부르기 | `google-genai` (Gemini 공식 Python SDK), 모델 `gemini-3.8-flash` (무료 등급), Google 서버 오류(5xx)면 `gemini-3.5-flash-lite`로 한 번 더 (D-039, D-040). 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-038). P-67에서 2.33.0 설치 (처음 설치한 `anthropic` 2.1.0은 지움) |
 | `.env` 읽기 | `python-dotenv`. 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-037). P-67에서 1.2.4 설치 |
+| 비밀번호 해시 | `bcrypt` (Python 패키지). 버전은 설치할 때 `requirements.txt`에 고정한다 (D-026). 세션 토큰은 Python 기본 `secrets`로 만들어 패키지가 더 필요 없다 | 정함 (D-042). P-71에서 5.0.0 설치 (사람 승인) |
 | 버전, 설치·실행 명령 | Python 3.10+, Node.js 20+. 명령은 `README.md` "실행 방법" | 확정 (D-024) |
 
 React · FastAPI · SQLite 외의 프레임워크·DB는 쓰지 않는다.
@@ -75,12 +82,15 @@ frontend/
 └─ src/
    ├─ App.jsx         화면 주소 등록 (팀 공동)
    ├─ api/            trips.js · places.js · diaries.js · recommend.js(팀 공동, D-037)   ← 서버 호출은 여기서만
+   │                  users.js · likes.js · comments.js (팀 공동, D-042, P-71~P-75에서 만듦)
    ├─ pages/
    │  ├─ Home/        은희
    │  ├─ Trips/       서준
    │  ├─ Places/      은희
-   │  └─ Diary/       건용
+   │  ├─ Diary/       건용
+   │  └─ Account/     로그인·회원가입·회원정보수정 화면 (팀 공동, D-042, AI 제안 이름)
    ├─ components/     공통 컴포넌트 (팀 공동, D-028). 사진 칸 부품 `PhotoInput/`도 여기에 둔다 (D-033, P-37). 추천 대화창 `RecommendChat/`도 여기에 둔다 (D-037)
+   │                  로그인 상태 `Auth/`, 프로필사진 `Avatar/`, 회원상세 창 `UserModal/`, 좋아요 버튼 `LikeButton/`, 댓글 `Comments/` (D-042, AI 제안 이름)
    ├─ assets/         지도 그림 등 (팀 공동, D-030)
    │  └─ Layout/      공통 레이아웃, 네비 포함 (건용). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)
@@ -92,7 +102,10 @@ backend/
 │  ├─ places.py       은희
 │  ├─ diaries.py      건용
 │  ├─ uploads.py      사진 올리기 (건용, D-033)
-│  └─ recommend.py    AI 여행지 추천 (팀 공동, D-037)
+│  ├─ recommend.py    AI 여행지 추천 (팀 공동, D-037)
+│  ├─ users.py        회원·로그인 (팀 공동, D-042, P-71에서 만듦)
+│  ├─ likes.py        여행 좋아요 (팀 공동, D-042, P-74에서 만듦)
+│  └─ comments.py     여행 댓글 (팀 공동, D-042, P-75에서 만듦)
 ├─ uploads/           사진 파일 (Git에 올리지 않음, D-033)
 ├─ .env               AI 키 (각자 만듦, Git에 올리지 않음, D-037)
 ├─ .env.example       키 이름만 적은 본보기 (D-037)
@@ -109,6 +122,8 @@ backend/
 | DB 설정 | `backend/database.py` | 건용 | D-004 |
 | 사진 올리기 라우터 | `backend/routers/uploads.py` | 건용 | D-033 |
 | AI 추천 라우터·API 호출·대화창 | `routers/recommend.py`, `api/recommend.js`, `components/RecommendChat/`, `backend/.env.example` | 팀 공동 (합의 후 수정) | D-037 |
+| 회원·좋아요·댓글 라우터·API 호출·화면·부품 | `routers/users.py`·`likes.py`·`comments.py`, `api/users.js`·`likes.js`·`comments.js`, `pages/Account/`, `components/Auth/`·`Avatar/`·`UserModal/`·`LikeButton/`·`Comments/` | 팀 공동 (합의 후 수정) | D-042 |
+| 세 기능 라우터·화면의 권한 부분 | `routers/trips.py`·`places.py`·`diaries.py`의 `401`·`403` 검사, 각 화면의 버튼 보이기 | 각 담당. D-042 작업(P-73) 때는 팀이 함께 고치고 담당자에게 알린다 | D-042 |
 | 화면 레이아웃 (네비 포함) | `frontend/src/components/Layout/` | 건용 | D-004, D-010 |
 | 공통 스타일 | `frontend/src/styles/tokens.css`, `global.css` | 팀 공동 (합의 후 수정) | D-010 |
 | 프록시 설정 | `frontend/vite.config.js` | 팀 공동 (합의 후 수정) | D-010, D-011 |
@@ -132,9 +147,12 @@ backend/
 | API 주소 규칙 | `/api`로 시작한다. 화면 주소(`/trip` 등)와 겹치지 않게 하기 위해서다 | 확정 (D-011) |
 | 백엔드 라우터 | `trips` / `places` / `diaries` 기능별 파일. 사진 올리기만 공통 `uploads`, AI 추천은 팀 공동 `recommend` | 확정 (AGENTS, D-033, D-037) |
 | AI 추천 | 화면 → `POST /api/recommend` → `recommend` 라우터 → Gemini API (D-038). 키는 서버의 `backend/.env`에만 있고 화면에 보내지 않는다. 키가 없으면 `503`이고 나머지 기능은 그대로 동작한다 | 확정 (D-037). 응답 모양은 `docs/API-SPEC.md` 6절 |
-| 데이터 연결 | `places`와 `diaries`는 `trip_id`로 `trips`에 연결. `place_photos`는 `place_id`로 `places`에 연결 | 확정 (AGENTS, D-033) |
+| 데이터 연결 | `places`와 `diaries`는 `trip_id`로 `trips`에 연결. `place_photos`는 `place_id`로 `places`에 연결. `trips.user_id`는 `users`에, 좋아요·댓글은 `trip_id`로 `trips`에 연결 | 확정 (AGENTS, D-033, D-042) |
 | 사진 | `POST /api/uploads`로 먼저 올려 파일 이름을 받고, 저장할 때 JSON에 그 이름을 넣는다. 보기는 `/api/uploads/{filename}`이라 Vite 프록시 설정을 바꾸지 않는다 | 확정 (D-033) |
 | 카카오맵 | 화면이 SDK 주소(`dapi.kakao.com`)를 `<script>`로 한 번 불러온다(`autoload=false`, `libraries=services`). `index.html`과 Vite 프록시는 바꾸지 않고 npm 라이브러리도 쓰지 않는다. 장소 검색 결과의 좌표·카카오 장소 id·시·도는 장소를 저장할 때 `/api/places` JSON에 넣는다 | 정함 (D-036). 불러오는 방법은 AI 제안 |
+| 로그인 | 서버가 가입·로그인 때 세션 토큰을 `HttpOnly` 쿠키로 주고, 브라우저가 이후 요청마다 보낸다. Vite 프록시 덕에 화면과 서버가 같은 주소(5173)라 `vite.config.js`와 `fetch` 옵션을 바꾸지 않는다. 화면 코드는 쿠키를 읽지 않고 `GET /api/users/me`로 로그인 여부를 안다 | 정함 (D-042). 쿠키 속성은 `docs/API-SPEC.md` 1절 (AI 제안) |
+| 로그인 상태 나눠 주기 | `components/Auth/`의 Context 부품이 `App.jsx`의 화면 전체를 감싸 로그인한 회원(`null` 또는 회원 객체)과 로그인·로그아웃 뒤 다시 불러오는 함수를 준다. 네비·여행·장소·다이어리·여행 상세가 이것을 읽어 버튼을 보이거나 숨긴다 | AI 제안 (D-042) |
+| 권한 | 화면은 버튼을 숨기고, 서버는 `401`·`403`으로 한 번 더 막는다. 장소·일기의 주인은 그 여행의 `user_id`로 정한다 | 정함 (D-042) |
 | 날짜 형식 | `YYYY-MM-DD` | 확정 (AGENTS) |
 | API 주소, 메서드, 요청·응답 모양 | `docs/API-SPEC.md`에 정함 | 정함 (D-018~D-020) |
 | 테이블 구조 | `docs/DATA-MODEL.md`에 정함 | 확정 (D-015~D-017) |
@@ -154,7 +172,8 @@ Home은 세 기능의 API를 가져다 쓰기만 한다 (PRD 5절 Home "5. 다�
 | 각 화면 안쪽 주소 (여행 상세·추가 등) | 그 기능의 담당자가 정한다. 여행기록: 상세 `/trip/:id`, 추가 `/trip/new`, 수정 `/trip/:id/edit`. 여행지 정보: 여행을 고른 목록 `/place?trip=:tripId`, 추가 `/place/new?trip=:tripId`, 수정 `/place/:id/edit`. 다이어리: 여행을 고른 목록 `/diary?trip=:tripId`, 쓰기 `/diary/new?trip=:tripId`, 고치기 `/diary/:id/edit` | 정함 (`docs/SCREEN-SPEC.md` 3·4·5절, D-012) |
 | 네비 메뉴 | 여행 · 장소 · 일기 3개 (PRD L-07), 주소는 `/trip` · `/place` · `/diary` | 확정 (D-012, 이름은 D-032) |
 | 반응형 구조 | 화면 폭 768px을 기준으로 모바일·PC를 나눈다. 모바일에서도 네비는 맨 위 가로 한 줄 | 정함 (`docs/SCREEN-SPEC.md` 2절) |
-| Home "+ 새 여행 추가" 버튼이 가는 곳 | 여행 추가 화면 `/trip/new`. 저장은 그 화면에서 서버를 부른다 (PRD H-04) | 정함 (`docs/SCREEN-SPEC.md` 3절) |
+| Home "+ 새 여행 추가" 버튼이 가는 곳 | 여행 추가 화면 `/trip/new`. 저장은 그 화면에서 서버를 부른다 (PRD H-04). 로그인하지 않았으면 `/trip/new`가 로그인 화면으로 보낸다 (D-042) | 정함 (`docs/SCREEN-SPEC.md` 3절) |
+| 회원 화면 주소 | 로그인 `/login`, 회원가입 `/signup`, 회원정보수정 `/me/edit`. 회원상세는 주소 없는 창이다. 네비 메뉴(3개)는 그대로이고 네비 오른쪽에 회원 자리가 붙는다 | AI 제안 (D-042, `docs/SCREEN-SPEC.md` 8절) |
 
 ## 7. 열린 질문
 
