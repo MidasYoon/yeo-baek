@@ -77,8 +77,14 @@
   }
 }
 
+/* 실패 문구는 버튼 아래 4px에 오른쪽을 맞춰 놓는다. 옆에 두면 버튼 줄의 좋아요·"댓글 N" 사이가 벌어져서다 (P-81).
+   자리는 가장 가까운 position 있는 부모(여행 상세의 .reactions)를 기준으로 한다 */
 .error {
+  position: absolute;
+  top: calc(100% + var(--space-4));
+  right: 0;
   margin: 0;
   color: var(--color-accent-deep);
   font-size: 14px;
+  white-space: nowrap;
 }

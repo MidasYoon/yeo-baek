@@ -20,6 +20,8 @@ import pageStyles from './Trips.module.css'
 // 여행 상세 (담당: 서준). SCREEN-SPEC 3절. 주소: /trip/:id
 // 아래에 그 여행의 장소·일기 목록을 보인다 (R-T-009). 장소 화면·다이어리 화면과 같은 모양·순서이고,
 // 수정·삭제 버튼은 넘기지 않는다. 두 목록은 따로 불러와 하나가 실패해도 여행 내용은 그대로 보인다.
+const COMMENTS_TITLE_ID = 'trip-comments-title'
+
 export default function TripDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -37,6 +39,17 @@ export default function TripDetail() {
   const [blocked, setBlocked] = useState(null)
   // 불러오지 못한 사진 이름. 그 사진은 없는 것처럼 숨긴다 (SCREEN-SPEC 1절 "사진 표시").
   const [brokenPhoto, setBrokenPhoto] = useState(null)
+  // 댓글 칸이 알려 주는 댓글 수. 불러오는 중·오류면 null (D-044)
+  const [commentCount, setCommentCount] = useState(null)
+
+  // "댓글 N": 맨 아래 댓글 제목으로 내려가 포커스를 옮긴다. 움직임 줄이기를 켰으면 한 번에 간다 (SCREEN-SPEC 8절 3번)
+  function goToComments() {
+    const title = document.getElementById(COMMENTS_TITLE_ID)
+    if (!title) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    title.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+    title.focus({ preventScroll: true })
+  }
 
   const loadTrip = useCallback(async () => {
     setStatus('loading')
@@ -189,6 +202,15 @@ export default function TripDetail() {
             </Button>
           </>
         )}
+        {/* 오른쪽 끝의 반응 묶음: 좋아요 + "댓글 N" 바로가기 (D-044, SCREEN-SPEC 8절 2번).
+            두 버튼은 한 덩어리라 줄이 모자라면 함께 다음 줄 오른쪽 끝으로 넘어간다. 내 여행에도 누를 수 있다 */}
+        <div className={styles.reactions}>
+          <LikeButton key={trip.id} tripId={trip.id} likeCount={trip.like_count} liked={trip.liked} />
+          {/* 댓글 수를 모르면(불러오는 중·오류) 수 없이 "댓글" */}
+          <Button variant="secondary" onClick={goToComments}>
+            {commentCount === null ? '댓글' : `댓글 ${commentCount}`}
+          </Button>
+        </div>
       </div>
 
       <section className={styles.part}>
@@ -242,13 +264,14 @@ export default function TripDetail() {
         )}
       </section>
 
-      {/* 좋아요 버튼 (D-042, SCREEN-SPEC 8절 2번). 내 여행에도 누를 수 있다 */}
-      <div className={styles.like}>
-        <LikeButton key={trip.id} tripId={trip.id} likeCount={trip.like_count} liked={trip.liked} />
-      </div>
-
-      {/* 댓글 칸 (D-042, SCREEN-SPEC 8절 2번). 화면 맨 아래. 목록은 따로 불러와 실패해도 여행 내용은 그대로다 */}
-      <Comments key={trip.id} tripId={trip.id} />
+      {/* 댓글 칸 (D-042, SCREEN-SPEC 8절 2번). 일기 목록 아래, 화면 맨 아래. 목록은 따로 불러와 실패해도 여행 내용은 그대로다.
+          댓글 수는 위쪽 "댓글 N"에 쓴다 */}
+      <Comments
+        key={trip.id}
+        tripId={trip.id}
+        titleId={COMMENTS_TITLE_ID}
+        onCountChange={setCommentCount}
+      />
 
       <ConfirmDialog
         open={dialogOpen}

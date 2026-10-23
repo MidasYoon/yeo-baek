@@ -13,6 +13,9 @@ import styles from './Comments.module.css'
 // 여행 상세의 댓글 칸 (팀 공동, D-042). SCREEN-SPEC 8절, DESIGN 6절 "댓글 칸·줄·쓰기 칸".
 // 목록은 누구나 보고, 쓰기는 로그인한 회원, 지우기는 쓴 회원만 한다.
 // 다른 여행으로 옮겨 가면 부르는 쪽이 key로 새로 그린다.
+// onCountChange(count): 불러오기·쓰기·지우기 뒤마다 지금 댓글 수를 알린다. 불러오는 중·오류면 null.
+//   여행 상세가 버튼 줄의 "댓글 N" 바로가기에 쓴다 (D-044, ARCHITECTURE 5절)
+// titleId: 제목의 id. 제목은 포커스를 받을 수 있어, 바로가기가 여기로 옮겨 온다.
 const MAX_LENGTH = 200
 
 // "2026-10-23 16:20:00" → "2026-10-23 16:20"
@@ -20,7 +23,7 @@ function shortTime(value) {
   return value.slice(0, 16)
 }
 
-export default function Comments({ tripId }) {
+export default function Comments({ tripId, titleId, onCountChange }) {
   const { user } = useAuth()
   const location = useLocation()
   const [comments, setComments] = useState([])
@@ -52,6 +55,11 @@ export default function Comments({ tripId }) {
       current = false
     }
   }, [load])
+
+  const count = status === 'done' ? comments.length : null
+  useEffect(() => {
+    onCountChange?.(count)
+  }, [count, onCountChange])
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -92,9 +100,9 @@ export default function Comments({ tripId }) {
   return (
     <section className={styles.part}>
       {/* 장(章) 제목: 여행 상세의 "장소"·"일기" 제목(TripDetail.module.css .partTitle)과 같은 모양 */}
-      <h2 className={styles.partTitle}>
+      <h2 id={titleId} className={styles.partTitle} tabIndex={-1}>
         댓글
-        {status === 'done' && <span className={styles.count}>{comments.length}개</span>}
+        {count !== null && <span className={styles.count}>{count}개</span>}
         <span className={styles.rule} aria-hidden="true" />
       </h2>
 

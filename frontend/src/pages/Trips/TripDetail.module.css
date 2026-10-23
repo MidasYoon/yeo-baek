@@ -123,7 +123,12 @@
   justify-content: center;
 }
 
-/* 좋아요 버튼: 일기 목록 아래 48px(.page 사이 32px + 16px), 왼쪽 정렬 (D-042, DESIGN 6절) */
-.like {
-  margin-top: var(--space-16);
+/* 버튼 줄 오른쪽 끝의 좋아요·"댓글 N" 묶음 (D-044, DESIGN 6절 "좋아요·댓글 버튼 자리").
+   남은 폭을 왼쪽에 두고 붙는다. 줄이 모자라면 묶음째 다음 줄로 넘어가도 오른쪽 끝에 붙는다.
+   좋아요 실패 문구는 이 묶음을 기준으로 버튼 아래에 놓인다 (LikeButton.module.css .error) */
+.reactions {
+  position: relative;
+  display: flex;
+  gap: var(--space-8);
+  margin-left: auto;
 }
