@@ -36,6 +36,7 @@ SCHEMA = [
         lat REAL,
         lng REAL,
         kakao_place_id TEXT,
+        rating INTEGER,
         created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
     )
@@ -74,6 +75,8 @@ ADDED_COLUMNS = [
     ("places", "lat", "REAL"),
     ("places", "lng", "REAL"),
     ("places", "kakao_place_id", "TEXT"),
+    # places 별점 1~5 (담당: 은희) — DATA-MODEL 3절, D-042. 필수는 서버(routers/places.py)가 지킨다
+    ("places", "rating", "INTEGER"),
 ]
 
 

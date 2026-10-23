@@ -3,7 +3,7 @@
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query, Response
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from database import get_connection
 from routers.uploads import check_photo_name, delete_photo
@@ -44,6 +44,8 @@ class PlaceUpdate(BaseModel):
     name: str
     visit_date: str
     memo: str | None = None
+    # 별점 1~5, 꼭 있어야 한다 (D-042). 글자 "4"나 true는 숫자로 바꾸지 않고 422로 막는다.
+    rating: int = Field(strict=True)
     photos: list[str] = []  # 사진 파일 이름 목록 (D-033)
     # 카카오 장소 검색으로 고른 곳의 좌표와 id (D-036). 셋 다 있거나 셋 다 없다.
     lat: float | None = None
@@ -82,6 +84,13 @@ class PlaceUpdate(BaseModel):
         if len(value) > 20:
             raise ValueError("20자까지 쓸 수 있어요")
         return value or None
+
+    @field_validator("rating")
+    @classmethod
+    def check_rating(cls, value: int) -> int:
+        if not 1 <= value <= 5:
+            raise ValueError("별점은 1~5 중 하나여야 해요")
+        return value
 
     @field_validator("photos")
     @classmethod
@@ -243,11 +252,11 @@ def create_place(place: PlaceIn):
     try:
         check_in_period(conn, place.trip_id, place.visit_date)
         cursor = conn.execute(
-            "INSERT INTO places (trip_id, region, name, visit_date, memo, lat, lng, kakao_place_id)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO places (trip_id, region, name, visit_date, memo, rating, lat, lng, kakao_place_id)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 place.trip_id, place.region, place.name, place.visit_date, place.memo,
-                place.lat, place.lng, place.kakao_place_id,
+                place.rating, place.lat, place.lng, place.kakao_place_id,
             ),
         )
         conn.executemany(
@@ -270,11 +279,11 @@ def update_place(place_id: int, place: PlaceUpdate):
         saved = find_place(conn, place_id)
         check_in_period(conn, saved["trip_id"], place.visit_date)
         conn.execute(
-            "UPDATE places SET region = ?, name = ?, visit_date = ?, memo = ?,"
+            "UPDATE places SET region = ?, name = ?, visit_date = ?, memo = ?, rating = ?,"
             " lat = ?, lng = ?, kakao_place_id = ?,"
             " updated_at = datetime('now', 'localtime') WHERE id = ?",
             (
-                place.region, place.name, place.visit_date, place.memo,
+                place.region, place.name, place.visit_date, place.memo, place.rating,
                 place.lat, place.lng, place.kakao_place_id, place_id,
             ),
         )
