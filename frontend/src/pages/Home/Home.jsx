@@ -63,8 +63,14 @@ export default function Home() {
           <p className={styles.intro}>
             다녀온 곳은 지도에, 그날의 마음은 일기에. 여행 한 편을 차곡차곡 남겨 보세요.
           </p>
+          {/* Home 바로가기만 앞에 + 선 아이콘과 "새 여행 추가" (2026-10-23 사람이 정함) */}
           <div className={styles.heroAction}>
-            <Button to="/trip/new">새 여행 만들기</Button>
+            <Button to="/trip/new">
+              <svg className={styles.plus} viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth="2" />
+              </svg>
+              새 여행 추가
+            </Button>
           </div>
           {firstVisit && <p className={styles.firstVisit}>첫 여행을 만들어 보세요</p>}
         </div>

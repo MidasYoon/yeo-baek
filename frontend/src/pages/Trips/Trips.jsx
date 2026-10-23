@@ -36,7 +36,7 @@ export default function Trips() {
       <StatusMessage
         kind="empty"
         message="아직 기록한 여행이 없어요."
-        action={<Button to="/trip/new">새 여행 만들기</Button>}
+        action={<Button to="/trip/new">여행 추가</Button>}
       />
     )
   } else {
@@ -51,14 +51,14 @@ export default function Trips() {
     )
   }
 
-  // "새 여행 만들기"는 한 곳에만 둔다: 목록이 있으면 오른쪽 위, 없으면 빈 상태 문구 아래.
+  // "여행 추가"는 한 곳에만 둔다: 목록이 있으면 오른쪽 위, 없으면 빈 상태 문구 아래.
   const hasList = status === 'done' && trips.length > 0
 
   return (
     <section className={styles.page}>
       <div className={styles.header}>
         <h1>여행 기록</h1>
-        {hasList && <Button to="/trip/new">새 여행 만들기</Button>}
+        {hasList && <Button to="/trip/new">여행 추가</Button>}
       </div>
       {content}
     </section>

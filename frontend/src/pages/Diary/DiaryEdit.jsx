@@ -7,7 +7,7 @@ import StatusMessage from '../../components/StatusMessage/StatusMessage.jsx'
 import DiaryForm from './DiaryForm.jsx'
 import styles from './Diary.module.css'
 
-// 일기 고치기 (담당: 건용). SCREEN-SPEC 5절. 주소: /diary/:id/edit
+// 일기 수정 (담당: 건용). SCREEN-SPEC 5절. 주소: /diary/:id/edit
 export default function DiaryEdit() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -44,7 +44,7 @@ export default function DiaryEdit() {
     return (
       <section className={styles.page}>
         <DiaryForm
-          title="일기 고치기"
+          title="일기 수정"
           trip={trip}
           initialValues={diary}
           onSubmit={handleSubmit}
@@ -56,7 +56,7 @@ export default function DiaryEdit() {
 
   return (
     <section className={styles.page}>
-      <h1>일기 고치기</h1>
+      <h1>일기 수정</h1>
       {status === 'loading' && <StatusMessage kind="loading" />}
       {status === 'error' && (
         <StatusMessage kind="error" message="일기를 불러오지 못했어요." onRetry={loadDiary} />

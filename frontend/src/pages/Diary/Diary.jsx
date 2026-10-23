@@ -103,7 +103,7 @@ export default function Diary() {
       <StatusMessage
         kind="empty"
         message="아직 쓴 일기가 없어요."
-        action={<Button to={newDiaryLink}>새 일기 쓰기</Button>}
+        action={<Button to={newDiaryLink}>일기 추가</Button>}
       />
     )
   } else if (status === 'done') {
@@ -116,14 +116,14 @@ export default function Diary() {
     )
   }
 
-  // "새 일기 쓰기"는 한 곳에만 둔다: 일기가 있으면 오른쪽 위, 없으면 빈 상태 문구 아래.
+  // "일기 추가"는 한 곳에만 둔다: 일기가 있으면 오른쪽 위, 없으면 빈 상태 문구 아래.
   const hasList = status === 'done' && diaries.length > 0
 
   return (
     <section className={styles.page}>
       <div className={styles.header}>
         <h1>여행 일기</h1>
-        {hasList && <Button to={newDiaryLink}>새 일기 쓰기</Button>}
+        {hasList && <Button to={newDiaryLink}>일기 추가</Button>}
       </div>
       <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
       {content}

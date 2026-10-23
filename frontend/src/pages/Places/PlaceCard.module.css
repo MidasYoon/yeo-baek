@@ -91,12 +91,13 @@
 
 .actions {
   display: flex;
-  gap: var(--space-4);
-  margin-top: calc(-1 * var(--space-8));
+  gap: var(--space-8);
 }
 
 @media (max-width: 767px) {
+  /* 좁은 화면에서는 수정·삭제를 내용 아래로 내린다 */
   .row {
+    grid-template-columns: minmax(0, 1fr);
     padding: var(--space-16);
   }
 }

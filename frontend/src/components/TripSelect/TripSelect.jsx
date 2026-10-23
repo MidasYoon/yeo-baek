@@ -44,7 +44,7 @@ export default function TripSelect({ value, onChange, onLoad }) {
       <StatusMessage
         kind="empty"
         message="아직 기록한 여행이 없어요."
-        action={<Button to="/trip/new">새 여행 만들기</Button>}
+        action={<Button to="/trip/new">여행 추가</Button>}
       />
     )
   }

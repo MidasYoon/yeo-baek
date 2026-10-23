@@ -20,9 +20,46 @@
 }
 
 .item {
+  position: relative;
+}
+
+/* 사진 빼기: 사진 오른쪽 위 × (2026-10-23 사람이 정함). 보이는 칸 32px, 누르는 곳은 44px (DESIGN 8절) */
+.remove {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.remove::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.remove:not(:disabled):hover {
+  background: var(--color-surface-sunken);
+}
+
+.remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.remove svg {
+  width: 18px;
+  height: 18px;
 }
 
 .preview {

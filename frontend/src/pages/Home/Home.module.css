@@ -65,6 +65,13 @@
   margin-top: var(--space-8);
 }
 
+/* "새 여행 추가" 앞 + 선 아이콘 (DESIGN 6절 "버튼": 주요 버튼은 앞이나 뒤에 선 아이콘) */
+.plus {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
 .firstVisit {
   margin: 0;
   font-size: 16px;
