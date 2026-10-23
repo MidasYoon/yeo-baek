@@ -1,0 +1,309 @@
+/* DESIGN 6절 "AI 추천 버튼과 대화창" (D-036), 5절(768px 미만은 화면 전체) */
+
+/* 추천 버튼: 56px 정사각형, 주홍 바탕, 흰 말풍선 아이콘. 확인 창(z-index 100)보다 아래 */
+.openButton {
+  position: fixed;
+  right: var(--space-24);
+  bottom: var(--space-24);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    transform 0.1s;
+}
+
+.openButton:hover {
+  border-color: var(--color-accent-deep);
+  background: var(--color-accent-deep);
+}
+
+.openButton:active {
+  transform: translateY(1px);
+}
+
+.openButton svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 대화창: 폭 380px, 높이 최대 560px. 뒤 화면을 덮지 않는다 */
+.panel {
+  position: fixed;
+  right: var(--space-24);
+  bottom: var(--space-24);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: min(560px, calc(100vh - 48px));
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: 0 24px 64px rgba(43, 33, 27, 0.18);
+  overflow: hidden;
+  animation: rise-in 0.18s ease-out;
+}
+
+.panel:focus {
+  outline: none;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* 머리: 높이 56px, 위쪽 가장자리에 색동 띠 4px */
+.head {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 4px var(--space-12) 0 var(--space-16);
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* 색동 띠: 주홍·송화·청록·쪽빛·연한 살구색 5칸 (DESIGN 7절, Home 카드와 같은 색) */
+.stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-accent) 0 20%,
+    var(--color-gold) 20% 40%,
+    var(--color-green) 40% 60%,
+    var(--color-indigo) 60% 80%,
+    #f2c9b1 80% 100% /* 연한 살구색 (DESIGN 7절, 토큰 없음) */
+  );
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* 닫기 ×: 사진 빼기 × 버튼과 같은 모양 (32px, 누르는 곳 44px) */
+.close {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.close::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.close:hover {
+  background: var(--color-surface-sunken);
+}
+
+.close svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* 몸통: 대화 줄 */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-16);
+  overflow-y: auto;
+}
+
+.ai,
+.user {
+  max-width: 85%;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.ai {
+  align-self: flex-start;
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+}
+
+.user {
+  align-self: flex-end;
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
+  font-weight: 500;
+}
+
+.waiting {
+  color: var(--color-text-muted);
+}
+
+/* 추천 카드 */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  padding: 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.cardTitle {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.cardNumber {
+  color: var(--color-accent);
+}
+
+.reason {
+  margin: 0 0 var(--space-4);
+  font-size: 14px;
+}
+
+.activities {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.notice {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.error {
+  margin: 0;
+  color: var(--color-accent-deep);
+  font-size: 14px;
+}
+
+/* 꼬리: 선택지, 입력 칸, 버튼 */
+.foot {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-16);
+  border-top: 1px solid var(--color-line);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.option {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+.option:hover {
+  border-color: var(--color-text-muted);
+  background: var(--color-surface-sunken);
+}
+
+/* 고른 선택지 (여행 스타일): 옅은 주홍 바탕 + 주홍 2px 테두리. 테두리가 굵어져도 크기가 같게 안쪽 여백을 줄인다 */
+.picked,
+.picked:hover {
+  padding: 0 13px;
+  border: 2px solid var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+
+.noteForm {
+  display: flex;
+  gap: var(--space-8);
+}
+
+.noteInput {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 var(--space-12);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.noteInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* 768px 미만: 버튼은 16px 띄우고, 창은 화면 전체를 채운다 */
+@media (max-width: 767px) {
+  .openButton {
+    right: var(--space-16);
+    bottom: var(--space-16);
+  }
+
+  .panel {
+    inset: 0;
+    width: auto;
+    height: auto;
+    border: none;
+    border-radius: 0;
+  }
+}

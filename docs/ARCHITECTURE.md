@@ -13,7 +13,8 @@
 [Vite 개발 서버 프록시]  /api 로 시작하는 요청만 백엔드로 넘김
    ▼
 [서버] FastAPI (8000)
-   │  라우터를 기능별 파일로 나눔: trips / places / diaries (+ 공통 사진 올리기 uploads)
+   │  라우터를 기능별 파일로 나눔: trips / places / diaries (+ 공통 사진 올리기 uploads, AI 추천 recommend)
+   │                                     └─ recommend만 인터넷 너머 [Gemini API]를 부른다 (키는 backend/.env, D-036·D-037)
    ▼
 [DB] SQLite (sqlite3로 접근)          [사진 파일] backend/uploads/
       places, diaries는 trip_id로 trips에 연결    DB에는 파일 이름만 (D-033)
@@ -29,6 +30,10 @@
 | SQLite | 여행·장소·일기와 사진 파일 이름 저장 | AGENTS 환경, D-009, D-033 |
 | `uploads` 라우터 | 사진 한 장을 받아 검사(형식·용량)하고 `backend/uploads/`에 새 이름으로 저장한다. 기능별 라우터가 아닌 세 기능 공통 | D-033 |
 | `backend/uploads/` | 사진 파일 보관. `main.py`가 `/api/uploads`로 보여 준다. Git에 올리지 않는다 | D-033 |
+| `recommend` 라우터 | 고른 답을 검사하고 Gemini에게 국내 도시 3곳을 추천받아, 모양(3곳, 17개 시·도 이름)을 검사한 뒤 돌려준다. DB를 쓰지 않는다 | D-036 |
+| 추천 대화창 부품 | 모든 화면 오른쪽 아래 버튼과 대화창. 질문 흐름을 화면 안에서만 들고 있다가 마지막에 `api/recommend.js`로 한 번 부른다 | D-036 |
+| Gemini API (바깥) | Google의 AI, 무료 등급. `recommend` 라우터만 서버에서 부른다. 화면은 직접 부르지 않는다 | D-036, D-037 |
+| `backend/.env` | AI 키(`GEMINI_API_KEY`, D-037). 팀원이 각자 만들고 Git에 올리지 않는다. 서버가 켜질 때 `python-dotenv`로 읽는다 | D-036 |
 
 ## 2. 기술 스택
 
@@ -42,6 +47,8 @@
 | DB | SQLite | 확정 |
 | DB 접근 방식 | `sqlite3` | 확정 (D-009) |
 | 사진 받기 (multipart) | `python-multipart` (FastAPI가 파일을 받을 때 필요한 패키지). 버전은 설치할 때 `requirements.txt`에 고정한다 (D-026) | 확정 (D-033) |
+| AI 부르기 | `google-genai` (Gemini 공식 Python SDK), 모델 `gemini-3.8-flash` (무료 등급), Google 서버 오류(5xx)면 `gemini-3.5-flash-lite`로 한 번 더 (D-038, D-039). 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-037). P-46에서 2.33.0 설치 (처음 설치한 `anthropic` 2.1.0은 지움) |
+| `.env` 읽기 | `python-dotenv`. 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-036). P-46에서 1.2.4 설치 |
 | 버전, 설치·실행 명령 | Python 3.10+, Node.js 20+. 명령은 `README.md` "실행 방법" | 확정 (D-024) |
 
 React · FastAPI · SQLite 외의 프레임워크·DB는 쓰지 않는다.
@@ -64,13 +71,13 @@ frontend/
 ├─ vite.config.js     프록시 설정 (팀 공동)
 └─ src/
    ├─ App.jsx         화면 주소 등록 (팀 공동)
-   ├─ api/            trips.js · places.js · diaries.js   ← 서버 호출은 여기서만
+   ├─ api/            trips.js · places.js · diaries.js · recommend.js(팀 공동, D-036)   ← 서버 호출은 여기서만
    ├─ pages/
    │  ├─ Home/        은희
    │  ├─ Trips/       서준
    │  ├─ Places/      은희
    │  └─ Diary/       건용
-   ├─ components/     공통 컴포넌트 (팀 공동, D-028). 사진 칸 부품 `PhotoInput/`도 여기에 둔다 (D-033, P-37)
+   ├─ components/     공통 컴포넌트 (팀 공동, D-028). 사진 칸 부품 `PhotoInput/`도 여기에 둔다 (D-033, P-37). 추천 대화창 `RecommendChat/`도 여기에 둔다 (D-036)
    ├─ assets/         지도 그림 등 (팀 공동, D-030)
    │  └─ Layout/      공통 레이아웃, 네비 포함 (건용). 없는 주소 화면 NotFound.jsx도 여기 (D-025)
    └─ styles/         tokens.css · global.css (팀 공동)
@@ -81,8 +88,11 @@ backend/
 │  ├─ trips.py        서준
 │  ├─ places.py       은희
 │  ├─ diaries.py      건용
-│  └─ uploads.py      사진 올리기 (건용, D-033)
+│  ├─ uploads.py      사진 올리기 (건용, D-033)
+│  └─ recommend.py    AI 여행지 추천 (팀 공동, D-036)
 ├─ uploads/           사진 파일 (Git에 올리지 않음, D-033)
+├─ .env               AI 키 (각자 만듦, Git에 올리지 않음, D-036)
+├─ .env.example       키 이름만 적은 본보기 (D-036)
 └─ requirements.txt
 ```
 
@@ -95,6 +105,7 @@ backend/
 | 라우터 등록 | `backend/main.py` | 건용 | D-004 |
 | DB 설정 | `backend/database.py` | 건용 | D-004 |
 | 사진 올리기 라우터 | `backend/routers/uploads.py` | 건용 | D-033 |
+| AI 추천 라우터·API 호출·대화창 | `routers/recommend.py`, `api/recommend.js`, `components/RecommendChat/`, `backend/.env.example` | 팀 공동 (합의 후 수정) | D-036 |
 | 화면 레이아웃 (네비 포함) | `frontend/src/components/Layout/` | 건용 | D-004, D-010 |
 | 공통 스타일 | `frontend/src/styles/tokens.css`, `global.css` | 팀 공동 (합의 후 수정) | D-010 |
 | 프록시 설정 | `frontend/vite.config.js` | 팀 공동 (합의 후 수정) | D-010, D-011 |
@@ -116,7 +127,8 @@ backend/
 | 서버 호출 위치 | `frontend/src/api/` 안의 기능별 파일에서만 | 확정 (AGENTS) |
 | 백엔드를 부르는 방식 | Vite 개발 서버 프록시. `api/` 파일은 `/api/...` 상대 주소만 쓰고 서버 포트를 적지 않는다 | 확정 (D-011) |
 | API 주소 규칙 | `/api`로 시작한다. 화면 주소(`/trip` 등)와 겹치지 않게 하기 위해서다 | 확정 (D-011) |
-| 백엔드 라우터 | `trips` / `places` / `diaries` 기능별 파일. 사진 올리기만 공통 `uploads` | 확정 (AGENTS, D-033) |
+| 백엔드 라우터 | `trips` / `places` / `diaries` 기능별 파일. 사진 올리기만 공통 `uploads`, AI 추천은 팀 공동 `recommend` | 확정 (AGENTS, D-033, D-036) |
+| AI 추천 | 화면 → `POST /api/recommend` → `recommend` 라우터 → Gemini API (D-037). 키는 서버의 `backend/.env`에만 있고 화면에 보내지 않는다. 키가 없으면 `503`이고 나머지 기능은 그대로 동작한다 | 확정 (D-036). 응답 모양은 `docs/API-SPEC.md` 6절 |
 | 데이터 연결 | `places`와 `diaries`는 `trip_id`로 `trips`에 연결. `place_photos`는 `place_id`로 `places`에 연결 | 확정 (AGENTS, D-033) |
 | 사진 | `POST /api/uploads`로 먼저 올려 파일 이름을 받고, 저장할 때 JSON에 그 이름을 넣는다. 보기는 `/api/uploads/{filename}`이라 Vite 프록시 설정을 바꾸지 않는다 | 확정 (D-033) |
 | 날짜 형식 | `YYYY-MM-DD` | 확정 (AGENTS) |
