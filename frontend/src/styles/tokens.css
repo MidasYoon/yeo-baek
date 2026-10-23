@@ -34,10 +34,11 @@
   --space-96: 96px;
 
   /* 폭과 높이 (DESIGN 4절) */
-  /* 2026-10-23 팀 합의로 모든 화면을 1200px로 맞춤. 이름은 그대로 두어 화면별로 다시 나눌 수 있게 한다 */
-  --content-width-wide: 1200px; /* 헤더, Home, 여행지 정보 */
-  --content-width-trip: 1200px; /* 여행기록 (전에는 960px) */
-  --content-width-diary: 1200px; /* 여행 다이어리 (전에는 880px) */
+  /* 2026-10-23 팀 합의로 모든 화면을 1080px로 맞춤 (전에는 1200px). 이름은 그대로 두어 화면별로 다시 나눌 수 있게 한다 */
+  --content-width-wide: 1080px; /* 헤더, Home, 여행지 정보 */
+  --content-width-trip: 1080px; /* 여행기록 */
+  --content-width-diary: 1080px; /* 여행 다이어리 */
+  --content-width-form: 720px; /* 추가·수정 화면 (2026-10-23 팀 합의) */
   --page-gutter: 24px;
   --header-height: 88px;
 
