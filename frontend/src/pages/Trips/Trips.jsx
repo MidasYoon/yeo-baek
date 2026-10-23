@@ -57,7 +57,7 @@ export default function Trips() {
   return (
     <section className={styles.page}>
       <div className={styles.header}>
-        <h1>여행기록</h1>
+        <h1>여행 기록</h1>
         {hasList && <Button to="/trip/new">새 여행 만들기</Button>}
       </div>
       {content}

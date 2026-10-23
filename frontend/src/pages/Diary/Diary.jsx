@@ -122,7 +122,7 @@ export default function Diary() {
   return (
     <section className={styles.page}>
       <div className={styles.header}>
-        <h1>여행 다이어리</h1>
+        <h1>여행 일기</h1>
         {hasList && <Button to={newDiaryLink}>새 일기 쓰기</Button>}
       </div>
       <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />

@@ -152,7 +152,7 @@ export default function Places() {
 
   return (
     <section className={styles.page}>
-      <h1>여행지 정보</h1>
+      <h1>여행 장소</h1>
       <TripSelect value={selectedId} onChange={handleTripChange} onLoad={setTrips} />
       {selectedTrip && (
         <div className={styles.toolbar}>

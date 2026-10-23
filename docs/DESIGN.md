@@ -60,7 +60,7 @@ https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700;800&family=IBM+Ple
 
 | 단계 | 크기 / 굵기 | 글꼴 | 쓰는 곳 |
 | --- | --- | --- | --- |
-| 화면 제목 | 44px / 800 | Hahmlet | "여행기록", "여행지 정보", "여행 다이어리" |
+| 화면 제목 | 44px / 800 | Hahmlet | "여행 기록", "여행 장소", "여행 일기" (메뉴 이름에 맞춤, D-034) |
 | Home 큰 문구 | 54px / 800, 줄 간격 1.25 | Hahmlet | Home 첫 화면 (11절 닫은 질문) |
 | 블록 제목 | 30px / 800 | Hahmlet | Home "최근 기록" |
 | 카드 제목 | 26px / 700 | Hahmlet | 여행 카드, Home 카드 |
