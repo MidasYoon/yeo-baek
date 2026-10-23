@@ -19,24 +19,27 @@ export default function TripCard({ trip, index }) {
 
   return (
     <Link to={`/trip/${trip.id}`} className={styles.card}>
-      {showPhoto ? (
-        <img
-          className={styles.photo}
-          src={photoUrl(trip.photo)}
-          alt="여행 대표사진"
-          onError={() => setBrokenPhoto(trip.photo)}
-        />
-      ) : (
-        <span className={styles.patchwork} aria-hidden="true">
-          {pattern.map((color, i) => (
-            <span key={i} className={styles[color]} />
-          ))}
-        </span>
-      )}
+      {/* 책 표지 (여행 책장, 2026-10-23 팀 합의). 조각보 표지에만 왼쪽 책등 선을 겹친다. 사진 위에는 장식을 두지 않는다 (DESIGN 7절) */}
+      <span className={showPhoto ? styles.cover : `${styles.cover} ${styles.bound}`}>
+        {showPhoto ? (
+          <img
+            className={styles.photo}
+            src={photoUrl(trip.photo)}
+            alt="여행 대표사진"
+            onError={() => setBrokenPhoto(trip.photo)}
+          />
+        ) : (
+          <span className={styles.patchwork} aria-hidden="true">
+            {pattern.map((color, i) => (
+              <span key={i} className={styles[color]} />
+            ))}
+          </span>
+        )}
+      </span>
       <span className={styles.body}>
         <span className={styles.name}>{trip.name}</span>
         <span className={styles.meta}>
-          {trip.destination} · {trip.start_date} ~ {trip.end_date}
+          <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </span>
       </span>
       <svg className={styles.arrow} viewBox="0 0 24 24" aria-hidden="true">

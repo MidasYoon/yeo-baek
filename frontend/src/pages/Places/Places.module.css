@@ -1,4 +1,4 @@
-/* 여행지 정보 화면 배치: DESIGN 4절(최대 폭 1200px), 5절(반응형) */
+/* 여행지 정보 화면 배치: DESIGN 4절(최대 폭 1080px), 5절(반응형) */
 .page {
   display: flex;
   flex-direction: column;
@@ -15,9 +15,26 @@
   gap: var(--space-32);
 }
 
+/* 답사 수첩의 지도: 옛 지도 액자처럼 미색 여백과 선을 두르고, 아래에 짧은 캡션 (2026-10-23 팀 합의) */
 .mapColumn {
   position: sticky;
   top: var(--space-24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.mapCaption {
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 /* 장소 목록: 미색 판 하나에 줄을 쌓고, 줄 사이에 1px 선 (시안 "한지 노을 · 여행지 정보") */
@@ -27,6 +44,7 @@
   overflow: hidden;
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
+  border-top: 3px solid var(--color-indigo); /* 수첩 머리 띠 (2026-10-23) */
   background: var(--color-surface);
   box-shadow: var(--shadow-row);
   list-style: none;
@@ -53,9 +71,37 @@
 .header {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-16);
+  padding-bottom: var(--space-20);
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* 화면 머리: 섹션 이름표("답사 수첩") 위, 화면 제목 아래 (2026-10-23 팀 합의) */
+.titleBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin: 0;
+  color: var(--color-indigo);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+/* 이름표 앞 짧은 선 (장식) */
+.kicker::before {
+  content: '';
+  width: 20px;
+  height: 2px;
+  background: currentColor;
 }
 
 .center {
@@ -72,4 +118,13 @@
   .mapColumn {
     position: static;
   }
+}
+
+/* 추가·수정 화면: 제목과 폼을 720px 칸 가운데에 둔다 (DESIGN 4절, 2026-10-23 팀 합의) */
+.formPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-32);
+  max-width: var(--content-width-form);
+  margin: 0 auto;
 }

@@ -43,14 +43,14 @@ export default function DiaryNew() {
 
   if (status === 'done') {
     return (
-      <section className={styles.page}>
+      <section className={styles.formPage}>
         <DiaryForm title="일기 추가" trip={trip} onSubmit={handleSubmit} onCancel={backToList} />
       </section>
     )
   }
 
   return (
-    <section className={styles.page}>
+    <section className={styles.formPage}>
       <h1>일기 추가</h1>
       {status === 'loading' && <StatusMessage kind="loading" />}
       {status === 'error' && (

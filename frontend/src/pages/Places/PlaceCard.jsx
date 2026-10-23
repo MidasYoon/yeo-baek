@@ -42,11 +42,20 @@ export default function PlaceCard({ place, highlighted = false, actions = null }
   return (
     <article className={className}>
       <div className={styles.body}>
+        {/* 지역은 작은 사각 도장 이름표로 보인다. 글자는 전과 같다 ("여행명 · 지역 · 날짜") (2026-10-23 답사 수첩) */}
         <p className={styles.meta}>
           {place.trip_name && `${place.trip_name} · `}
-          {place.region} · {place.visit_date}
+          <span className={styles.region}>{place.region}</span> · {place.visit_date}
         </p>
-        <h3 className={styles.name}>{place.name}</h3>
+        <h3 className={styles.name}>
+          {/* 지도 솟대와 같은 모양의 작은 솟대 (장식) */}
+          <svg className={styles.flag} viewBox="0 0 16 22" aria-hidden="true">
+            <path d="M8 21V7" stroke="#6e4630" strokeWidth="1.4" strokeLinecap="round" />
+            <path d="M2 6Q4.5 2.5 8.5 3.5Q11 1.5 13 2Q11.5 3.5 12 4.5L14 5Q11.5 6.5 8.5 6.5Q4.5 7.5 2 6Z" fill="currentColor" />
+            <path d="M13 2l1.6-.4-1 1.2z" fill="#c99a2e" />
+          </svg>
+          {place.name}
+        </h3>
         {place.memo && <p className={styles.memo}>{place.memo}</p>}
         {place.photos?.length > 0 && (
           <ul className={styles.photos}>

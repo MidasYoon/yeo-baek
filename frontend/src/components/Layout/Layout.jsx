@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import RecommendChat from '../RecommendChat/RecommendChat.jsx'
+import ScrollTopButton from '../ScrollTopButton/ScrollTopButton.jsx'
 import styles from './Layout.module.css'
 
 // 공통 레이아웃 (담당: 건용). SCREEN-SPEC 2절. 메뉴 이름은 한글 (D-032), 주소는 그대로 (D-012).
@@ -44,6 +45,8 @@ export default function Layout() {
       <main className={styles.main}>
         <Outlet />
       </main>
+      {/* 화면을 길게 내리면 오른쪽 아래, 추천 버튼 위에 나타난다 (2026-10-23) */}
+      <ScrollTopButton />
       {/* AI 여행지 추천 버튼과 대화창 (D-037, SCREEN-SPEC 7절). 모든 화면 오른쪽 아래에 뜬다 */}
       <RecommendChat />
     </>

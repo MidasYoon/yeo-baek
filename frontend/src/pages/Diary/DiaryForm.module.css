@@ -71,15 +71,37 @@
   gap: var(--space-8);
 }
 
+/* 하회탈 + 아래 이름 (2026-10-23. 전에는 48px 정사각형 이모지 버튼) */
 .mood {
-  width: 48px;
-  height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 64px;
+  height: 72px;
+  padding: var(--space-4);
   border: 2px solid var(--color-line-strong);
   border-radius: var(--radius);
   background: var(--color-surface);
-  font-size: 24px;
+  font-size: 32px; /* 하회탈 그림 크기 (2026-10-23. 이모지일 때는 24px) */
   line-height: 1;
   cursor: pointer;
+}
+
+.mood svg {
+  display: block;
+}
+
+.moodName {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.moodSelected .moodName {
+  color: var(--color-accent-deep);
+  font-weight: 700;
 }
 
 .moodSelected {

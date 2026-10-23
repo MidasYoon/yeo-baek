@@ -177,10 +177,11 @@ export default function Places() {
             selectedKey={selectedKey}
             onSelect={handlePinSelect}
           />
+          <p className={styles.mapCaption}>솟대를 누르면 그곳의 기록이 강조돼요</p>
         </div>
         {/* 페이지 버튼은 목록 칸 아래 가운데에 둔다 */}
         <div>
-          <ul className={styles.list} ref={listRef}>
+          <ul className={styles.list} ref={listRef} data-stagger>
             {places.map((place) => {
               const highlighted = pinKeyOf(place, mapMode) === selectedKey
               return (
@@ -219,7 +220,11 @@ export default function Places() {
     <section className={styles.page}>
       {/* "장소 추가"는 여행 기록·여행 일기처럼 제목 오른쪽에 둔다 (2026-10-23 사람이 정함). */}
       <div className={styles.header}>
-        <h1>여행 장소</h1>
+        {/* 섹션 이름표 + 화면 제목 (2026-10-23 팀 합의, DESIGN 6절 "화면 머리") */}
+        <div className={styles.titleBox}>
+          <p className={styles.kicker}>답사 수첩</p>
+          <h1>여행 장소</h1>
+        </div>
         {selectedTrip && <Button to={`/place/new?trip=${selectedTrip.id}`}>장소 추가</Button>}
       </div>
       <div className={styles.tripField}>

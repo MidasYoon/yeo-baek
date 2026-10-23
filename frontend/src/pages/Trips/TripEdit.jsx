@@ -64,7 +64,7 @@ export default function TripEdit() {
   }
 
   return (
-    <section className={styles.page}>
+    <section className={styles.formPage}>
       <h1>여행 수정</h1>
       {content}
     </section>

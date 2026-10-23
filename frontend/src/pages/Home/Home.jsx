@@ -4,7 +4,7 @@ import { getRecentPlace } from '../../api/places.js'
 import { getTrips } from '../../api/trips.js'
 import hanokImage from '../../assets/hanok-illustration.svg'
 import Button from '../../components/Button/Button.jsx'
-import { MOOD_EMOJI } from '../Diary/diaryFormat.js'
+import MoodMask from '../Diary/MoodMask.jsx'
 import RecentBlock from './RecentBlock.jsx'
 import styles from './Home.module.css'
 
@@ -74,7 +74,20 @@ export default function Home() {
           </div>
           {firstVisit && <p className={styles.firstVisit}>첫 여행을 만들어 보세요</p>}
         </div>
-        <img className={styles.heroImage} src={hanokImage} alt="" aria-hidden="true" />
+        {/* 한옥 그림을 창호 액자처럼: 미색 여백 + 1px 선, 모서리에 주홍 사각 인장, 왼쪽에 세로쓰기 旅白, 아래 캡션.
+            장식이라 화면 읽기 프로그램은 캡션만 읽는다 (DESIGN 7절) */}
+        <figure className={styles.heroFigure}>
+          <span className={styles.vertical} aria-hidden="true">
+            旅白
+          </span>
+          <div className={styles.frame}>
+            <img className={styles.heroImage} src={hanokImage} alt="" aria-hidden="true" />
+            <span className={styles.seal} aria-hidden="true">
+              여백
+            </span>
+          </div>
+          <figcaption className={styles.caption}>처마 끝에 걸린 오늘</figcaption>
+        </figure>
       </section>
 
       {!firstVisit && (
@@ -83,7 +96,7 @@ export default function Home() {
             최근 기록
             <span className={styles.titleRule} aria-hidden="true" />
           </h2>
-          <div className={styles.blocks}>
+          <div className={styles.blocks} data-stagger>
             <RecentBlock
               label="최근 여행"
               tone="trip"
@@ -130,13 +143,16 @@ export default function Home() {
               onRetry={reloadDiary}
               renderCard={(data) => (
                 <>
-                  {/* 긴 제목은 한 줄로 줄이고 끝에 "…"를 붙인다 (SCREEN-SPEC 6절 2번) */}
-                  <span className={`${styles.cardTitle} ${styles.oneLine}`}>
-                    <span className={styles.mood} role="img" aria-label={data.mood}>
-                      {MOOD_EMOJI[data.mood]}
+                  {/* 긴 제목은 두 줄로 줄이고 끝에 "…"를 붙인다. 세 카드가 같다 (SCREEN-SPEC 6절 2번, 2026-10-23 팀 합의) */}
+                  <span className={styles.cardTitle}>
+                    {/* 카드 제목 칸이 넘침을 자르므로 말풍선 대신 브라우저 기본 이름표(title)로 기분 이름을 보인다 */}
+                    <span className={styles.mood} role="img" aria-label={data.mood} title={data.mood}>
+                      <MoodMask mood={data.mood} />
                     </span>{' '}
                     {data.title}
                   </span>
+                  {/* 본문 첫머리 두 줄 (2026-10-23 사람이 요청). 본문이 없으면 두지 않는다 */}
+                  {data.body && <span className={styles.cardExcerpt}>{data.body}</span>}
                   <span className={styles.cardDate}>{data.date}</span>
                 </>
               )}

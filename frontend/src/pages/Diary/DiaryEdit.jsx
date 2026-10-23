@@ -42,7 +42,7 @@ export default function DiaryEdit() {
 
   if (status === 'done') {
     return (
-      <section className={styles.page}>
+      <section className={styles.formPage}>
         <DiaryForm
           title="일기 수정"
           trip={trip}
@@ -55,7 +55,7 @@ export default function DiaryEdit() {
   }
 
   return (
-    <section className={styles.page}>
+    <section className={styles.formPage}>
       <h1>일기 수정</h1>
       {status === 'loading' && <StatusMessage kind="loading" />}
       {status === 'error' && (

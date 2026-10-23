@@ -154,7 +154,7 @@ export default function TripDetail() {
         )}
         <h1 className={styles.title}>{trip.name}</h1>
         <p className={styles.meta}>
-          {trip.destination} · {trip.start_date} ~ {trip.end_date}
+          <span className={styles.destination}>{trip.destination}</span> · {trip.start_date} ~ {trip.end_date}
         </p>
         {trip.info && <p className={styles.info}>{trip.info}</p>}
       </div>
@@ -178,7 +178,12 @@ export default function TripDetail() {
       </div>
 
       <section className={styles.part}>
-        <h2 className={styles.partTitle}>장소</h2>
+        {/* 장(章) 제목: 이름 + 개수 + 오른쪽으로 이어지는 선 (여행 책장, 2026-10-23 팀 합의) */}
+        <h2 className={styles.partTitle}>
+          장소
+          {placesStatus === 'done' && <span className={styles.count}>{places.length}곳</span>}
+          <span className={styles.rule} aria-hidden="true" />
+        </h2>
         {placesStatus === 'loading' && <StatusMessage kind="loading" />}
         {placesStatus === 'error' && (
           <StatusMessage
@@ -191,7 +196,7 @@ export default function TripDetail() {
           <StatusMessage kind="empty" message="아직 넣은 장소가 없어요." />
         )}
         {placesStatus === 'done' && places.length > 0 && (
-          <ul className={styles.placeList}>
+          <ul className={styles.placeList} data-stagger>
             {places.map((place) => (
               <li key={place.id}>
                 <PlaceCard place={place} />
@@ -202,7 +207,11 @@ export default function TripDetail() {
       </section>
 
       <section className={styles.part}>
-        <h2 className={styles.partTitle}>일기</h2>
+        <h2 className={styles.partTitle}>
+          일기
+          {diariesStatus === 'done' && <span className={styles.count}>{diaries.length}편</span>}
+          <span className={styles.rule} aria-hidden="true" />
+        </h2>
         {diariesStatus === 'loading' && <StatusMessage kind="loading" />}
         {diariesStatus === 'error' && (
           <StatusMessage

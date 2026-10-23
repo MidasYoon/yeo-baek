@@ -10,9 +10,13 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* 바탕: 한지에 아주 옅은 섬유 결 두 겹(잔 결 + 가로로 긴 결). 그림 파일 없이 SVG 잡음으로 그린다 (2026-10-23 팀 합의) */
 body {
   margin: 0;
-  background: var(--color-bg);
+  background-color: var(--color-bg);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.43 0 0 0 0 0.36 0 0 0 0 0.31 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='480'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004 0.09' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.54 0 0 0 0 0.42 0 0 0 0 0.3 0 0 0 0.09 -0.02'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: 16px;
@@ -59,6 +63,38 @@ textarea {
   outline: 2px solid var(--color-indigo);
   outline-offset: 2px;
 }
+
+/* 등장 움직임 (2026-10-23 팀 합의, DESIGN 6절 "움직임")
+   - 화면을 옮기면 본문이 아래에서 12px 떠오르며 나타난다 (0.5초). 화면 컴포넌트가 새로 그려질 때만 움직인다
+   - data-stagger를 단 목록은 자식이 위에서부터 0.06초 간격으로 나타난다. 8번째부터는 함께 나타난다
+   - 채움은 backwards만 쓴다. both로 끝 상태를 붙잡아 두면 크롬이 그 칸을 고정 위치 창(사진 크게 보기, 확인 창)의 기준으로 삼아
+     창이 화면 전체가 아니라 칸 안에 갇힌다 (2026-10-23 사람이 찾음). 끝 상태는 원래 스타일과 같게 둔다 */
+@keyframes yeobaek-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+main > *,
+[data-stagger] > * {
+  animation: yeobaek-rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+[data-stagger] > * {
+  animation-delay: 0.12s;
+}
+[data-stagger] > :nth-child(2) { animation-delay: 0.18s; }
+[data-stagger] > :nth-child(3) { animation-delay: 0.24s; }
+[data-stagger] > :nth-child(4) { animation-delay: 0.3s; }
+[data-stagger] > :nth-child(5) { animation-delay: 0.36s; }
+[data-stagger] > :nth-child(6) { animation-delay: 0.42s; }
+[data-stagger] > :nth-child(7) { animation-delay: 0.48s; }
+[data-stagger] > :nth-child(n + 8) { animation-delay: 0.54s; }
 
 /* 움직임 줄이기를 켠 사용자에게는 전환·움직임을 끈다 */
 @media (prefers-reduced-motion: reduce) {

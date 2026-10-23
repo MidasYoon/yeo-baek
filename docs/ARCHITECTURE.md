@@ -50,8 +50,8 @@
 | DB | SQLite | 확정 |
 | DB 접근 방식 | `sqlite3` | 확정 (D-009) |
 | 사진 받기 (multipart) | `python-multipart` (FastAPI가 파일을 받을 때 필요한 패키지). 버전은 설치할 때 `requirements.txt`에 고정한다 (D-026) | 확정 (D-033) |
-| AI 부르기 | `google-genai` (Gemini 공식 Python SDK), 모델 `gemini-3.8-flash` (무료 등급), Google 서버 오류(5xx)면 `gemini-3.5-flash-lite`로 한 번 더 (D-039, D-040). 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-038). P-53에서 2.33.0 설치 (처음 설치한 `anthropic` 2.1.0은 지움) |
-| `.env` 읽기 | `python-dotenv`. 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-037). P-53에서 1.2.4 설치 |
+| AI 부르기 | `google-genai` (Gemini 공식 Python SDK), 모델 `gemini-3.8-flash` (무료 등급), Google 서버 오류(5xx)면 `gemini-3.5-flash-lite`로 한 번 더 (D-039, D-040). 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-038). P-67에서 2.33.0 설치 (처음 설치한 `anthropic` 2.1.0은 지움) |
+| `.env` 읽기 | `python-dotenv`. 버전은 `requirements.txt`에 고정한다 (D-026) | 확정 (D-037). P-67에서 1.2.4 설치 |
 | 버전, 설치·실행 명령 | Python 3.10+, Node.js 20+. 명령은 `README.md` "실행 방법" | 확정 (D-024) |
 
 React · FastAPI · SQLite 외의 프레임워크·DB는 쓰지 않는다.
