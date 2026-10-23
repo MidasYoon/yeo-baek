@@ -399,7 +399,7 @@
     - 색: DESIGN 2절 이름 그대로 (`--color-bg`, `--color-accent` 등)
     - 글꼴: `--font-heading`(Hahmlet), `--font-body`(IBM Plex Sans KR)
     - 간격: `--space-4` ~ `--space-96` (DESIGN 4절 간격 단계의 px 값을 이름에 붙인다)
-    - 폭·높이: `--content-width-wide`(1200px), `--content-width-trip`(960px), `--content-width-diary`(880px), `--page-gutter`, `--header-height`
+    - 폭·높이: `--content-width-wide`(1200px), `--content-width-trip`(1200px), `--content-width-diary`(1200px), `--page-gutter`, `--header-height`
     - 모양: `--radius`, `--shadow-card`, `--shadow-row`, `--shadow-hover`
   - 컴포넌트 파일과 그 CSS Module은 PascalCase로 짓는다 (예: `Layout.jsx`, `Layout.module.css`, `Home.jsx`). 폴더 이름과 같게 한다.
   - 없는 주소 화면은 `frontend/src/components/Layout/NotFound.jsx`에 둔다.
@@ -415,6 +415,7 @@
 - **다시 볼 조건:** DESIGN에 새 값이 생겨 토큰 이름을 더해야 할 때, 담당자가 화면 안에서 쓸 작은 부품 파일의 이름 규칙이 따로 필요할 때
 - **상태:** 유효
 - **날짜:** 2026-10-22
+- **변경:** 2026-10-23 팀 합의로 헤더와 모든 화면 폭을 1200px로 맞춤 (전에는 trip 960px, diary 880px). 이름은 그대로 두어 화면별로 다시 나눌 수 있게 한다 (DESIGN 4절)
 
 ## D-026 DB 파일, 테이블 만들기 위치, 백엔드 패키지 버전
 
